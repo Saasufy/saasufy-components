@@ -9,23 +9,8 @@ export function createSocket(options) {
     authTokenName: DEFAULT_AUTH_TOKEN_NAME,
     ...options
   });
-
-  (async () => {
-    for await (let { error } of socket.listener('error')) {
-      console.error(error);
-    }
-  })();
-
-  (async () => {
-    for await (let event of socket.listener('connect')) {
-      console.log('Socket is connected');
-    }
-  })();
-
   return socket;
 }
-
-window.createSocket = createSocket;
 
 export function getSocket(options) {
   if (socket) {
@@ -33,5 +18,3 @@ export function getSocket(options) {
   }
   return createSocket(options);
 }
-
-window.getSocket = getSocket;
