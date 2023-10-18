@@ -1,0 +1,23 @@
+{
+  "name": "saasufy-components",
+  "version": "1.0.0",
+  "description": "Components for Saasufy.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Saasufy/saasufy-components.git"
+  },
+  "keywords": [
+    "saasufy",
+    "components"
+  ],
+  "author": "Jonathan Gros-Dubois",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Saasufy/saasufy-components/issues"
+  },
+  "homepage": "https://github.com/Saasufy/saasufy-components#readme"
+}
