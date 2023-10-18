@@ -1,0 +1,58 @@
+class RenderGroup extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+
+    this.loadedElements = {};
+
+    this.loadHandler = (event) => {
+      let waitFor = this.getWaitFor();
+      let renderLoadId = event.target.getAttribute('load-id');
+      this.loadedElements[renderLoadId] = true;
+      let areAllLoaded = waitFor.every(waitForId => this.loadedElements[waitForId]);
+      if (areAllLoaded) {
+        this.showSlottedElements();
+      }
+    };
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('load', this.loadHandler);
+  }
+
+  connectedCallback() {
+    this.isReady = true;
+    this.loadedElements = {};
+    let hasPending = !!this.getWaitFor().length;
+    this.shadowRoot.innerHTML = `
+      <style>
+        .hidden {
+          display: none;
+        }
+      </style>
+      <slot${hasPending ? ' class="hidden"': ''}></slot>
+    `;
+    if (hasPending) {
+      this.addEventListener('load', this.loadHandler);
+    }
+  }
+
+  showSlottedElements() {
+    let slot = this.shadowRoot.querySelector('slot');
+    slot.classList.remove('hidden');
+  }
+
+  getWaitFor() {
+    let waitForString = this.getAttribute('wait-for');
+    if (!waitForString) {
+      return [];
+    }
+    return waitForString.split(',').map(id => id.trim());
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!this.isReady) return;
+  }
+}
+
+window.customElements.define('render-group', RenderGroup);
