@@ -9,19 +9,78 @@ class CollectionBrowser extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.socket = getSocket();
+
+    this.handleShowModalEvent = (event) => {
+      let modal = this.shadowRoot.querySelector('slot[name="modal"]').assignedNodes()[0];
+      modal.show(event.detail.message, event.detail.callback);
+    };
+
+    this.handleCRUDCreateEvent = (event) => {
+      if (this.collection) {
+        this.collection.create(event.detail);
+      }
+    };
+
+    this.handleCRUDDeleteEvent = (event) => {
+      if (this.collection) {
+        this.collection.delete(event.detail);
+      }
+    };
+
+    this.handleGoToPreviousPageEvent = () => {
+      this.goToPreviousPage();
+    };
+
+    this.handleGoToNextPageEvent = () => {
+      this.goToNextPage();
+    };
+
+    this.handleGoToPageEvent = (event) => {
+      this.goToPage((event.detail || {}).offset);
+    };
+
+    this.handleSlotChangeEvent = () => {
+      this.renderTable();
+    };
   }
 
   connectedCallback() {
     this.isReady = true;
-    this.shadowRoot.addEventListener('slotchange', () => this.renderTable());
-    this.addEventListener('showModal', (event) => this.handleShowModalEvent(event));
-    this.addEventListener('crudCreate', (event) => this.handleCRUDCreateEvent(event));
-    this.addEventListener('crudDelete', (event) => this.handleCRUDDeleteEvent(event));
+    this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
+    this.addEventListener('showModal', this.handleShowModalEvent);
+    this.addEventListener('crudCreate', this.handleCRUDCreateEvent);
+    this.addEventListener('crudDelete', this.handleCRUDDeleteEvent);
+    this.addEventListener('goToPreviousPage', this.handleGoToPreviousPageEvent);
+    this.addEventListener('goToNextPage', this.handleGoToNextPageEvent);
+    this.addEventListener('goToPage', this.handleGoToPageEvent);
     this.render();
   }
 
   disconnectedCallback() {
     if (this.collection) this.collection.destroy();
+    this.shadowRoot.removeEventListener('slotchange', this.handleSlotChangeEvent);
+    this.removeEventListener('showModal', this.handleShowModalEvent);
+    this.removeEventListener('crudCreate', this.handleCRUDCreateEvent);
+    this.removeEventListener('crudDelete', this.handleCRUDDeleteEvent);
+    this.removeEventListener('goToPreviousPage', this.handleGoToPreviousPageEvent);
+    this.removeEventListener('goToNextPage', this.handleGoToNextPageEvent);
+    this.removeEventListener('goToPage', this.handleGoToPageEvent);
+  }
+
+  goToPreviousPage() {
+    if (!this.collection) return;
+    this.collection.fetchPreviousPage();
+    this.setAttribute('collection-page-offset', this.collection.meta.pageOffset);
+  }
+
+  goToNextPage() {
+    if (!this.collection) return;
+    this.collection.fetchNextPage();
+    this.setAttribute('collection-page-offset', this.collection.meta.pageOffset);
+  }
+
+  goToPage(offset) {
+    this.setAttribute('collection-page-offset', offset);
   }
 
   static get observedAttributes() {
@@ -30,13 +89,61 @@ class CollectionBrowser extends HTMLElement {
       'collection-fields',
       'collection-view',
       'collection-view-params',
-      'collection-page-size'
+      'collection-page-size',
+      'collection-page-offset'
     ];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
-    this.render();
+    if (this.collection && name === 'collection-page-offset') {
+      let newOffset = Number(newValue);
+      if (newOffset !== this.collection.meta.pageOffset) {
+        this.collection.fetchPage(newOffset);
+      }
+      this.updatePageNumberElements();
+      this.updatePageButtons();
+    } else {
+      this.render();
+    }
+  }
+
+  updatePageNumberElements() {
+    if (!this.collection) return;
+    let currentPageElements = this.shadowRoot.querySelector('slot[name="page-number"]').assignedElements();
+    let pageNumber = Math.floor(this.collection.meta.pageOffset / this.collection.meta.pageSize + 1);
+    for (let element of currentPageElements) {
+      if (element.nodeName === 'INPUT') {
+        element.value = pageNumber;
+      } else {
+        element.innerHTML = pageNumber;
+      }
+    }
+  }
+
+  updatePageButtons() {
+    if (this.collection) {
+      let previousPageElements = this.shadowRoot.querySelector('slot[name="previous-page"]').assignedElements();
+      let nextPageElements = this.shadowRoot.querySelector('slot[name="next-page"]').assignedElements();
+      if (this.collection.meta.pageOffset <= 0) {
+        for (let element of previousPageElements) {
+          element.setAttribute('disabled', '');
+        }
+      } else {
+        for (let element of previousPageElements) {
+          element.removeAttribute('disabled');
+        }
+      }
+      if (this.collection.meta.isLastPage) {
+        for (let element of nextPageElements) {
+          element.setAttribute('disabled', '');
+        }
+      } else {
+        for (let element of nextPageElements) {
+          element.removeAttribute('disabled');
+        }
+      }
+    }
   }
 
   renderTable() {
@@ -64,29 +171,13 @@ class CollectionBrowser extends HTMLElement {
     }
   }
 
-  handleShowModalEvent(event) {
-    let modal = this.shadowRoot.querySelector('slot[name="modal"]').assignedNodes()[0];
-    modal.show(event.detail.message, event.detail.callback);
-  }
-
-  handleCRUDCreateEvent(event) {
-    if (this.collection) {
-      this.collection.create(event.detail);
-    }
-  }
-
-  handleCRUDDeleteEvent(event) {
-    if (this.collection) {
-      this.collection.delete(event.detail);
-    }
-  }
-
   render() {
     let collectionType = this.getAttribute('collection-type');
     let collectionFields = this.getAttribute('collection-fields');
     let collectionView = this.getAttribute('collection-view');
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionViewParams = this.getAttribute('collection-view-params');
+    let collectionPageOffset = this.getAttribute('collection-page-offset');
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
@@ -100,10 +191,32 @@ class CollectionBrowser extends HTMLElement {
       view: collectionView,
       viewParams,
       pageSize: Number(collectionPageSize || 10),
+      pageOffset: Number(collectionPageOffset || 0),
       changeReloadDelay: collectionReloadDelay
     });
 
-    this.shadowRoot.innerHTML = '<slot name="item"></slot><slot name="no-item"></slot><slot name="list"></slot><slot name="modal"></slot>';
+    this.shadowRoot.innerHTML = `
+      <slot name="item"></slot>
+      <slot name="no-item"></slot>
+      <slot name="list"></slot>
+      <slot name="previous-page"></slot>
+      <slot name="page-number"></slot>
+      <slot name="next-page"></slot>
+      <slot name="modal"></slot>
+    `;
+
+    let previousPageSlot = this.shadowRoot.querySelector('slot[name="previous-page"]');
+    previousPageSlot.addEventListener('click', () => {
+      this.goToPreviousPage();
+    });
+
+    let nextPageSlot = this.shadowRoot.querySelector('slot[name="next-page"]');
+    nextPageSlot.addEventListener('click', () => {
+      this.goToNextPage();
+    });
+
+    this.updatePageNumberElements();
+    this.updatePageButtons();
 
     (async () => {
       await this.collection.listener('load').once();
@@ -117,6 +230,7 @@ class CollectionBrowser extends HTMLElement {
     (async () => {
       for await (let event of this.collection.listener('change')) {
         this.renderTable();
+        this.updatePageButtons();
       }
     })();
   }
