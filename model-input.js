@@ -1,5 +1,5 @@
 import { getSocket } from './socket.js';
-import { getSafeHTML } from './utils.js';
+import { getSafeHTML, debouncer } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelInput extends HTMLElement {
@@ -30,6 +30,7 @@ class ModelInput extends HTMLElement {
       'model-type',
       'model-id',
       'model-field',
+      'debounce-delay',
       'options',
       'height'
     ];
@@ -199,38 +200,21 @@ class ModelInput extends HTMLElement {
       messageContainerElement.classList.add('hidden');
     };
 
-    let onInputChange = async (event) => {
-      if (event.target.value === String(model.value[fieldName])) return;
-      try {
-        if (inputElement.type === 'checkbox') {
-          await model.update(fieldName, !!inputElement.checked);
-          inputElement.classList.remove(errorStyleClass);
-          inputElement.classList.add(successStyleClass);
-          hideErrorMessage(fieldName);
-          return;
-        }
-        if (event.target.value === '') {
-          await model.delete(fieldName);
-        } else {
-          let targetValue = inputElement.type === 'number' ?
-            Number(event.target.value) : event.target.value;
-          await model.update(fieldName, targetValue);
-        }
-        inputElement.classList.remove(errorStyleClass);
-        inputElement.classList.add(successStyleClass);
-        hideErrorMessage(fieldName);
-      } catch (error) {
-        inputElement.classList.add(errorStyleClass);
-        inputElement.classList.remove(successStyleClass);
-        showErrorMessage(fieldName, error.message);
-      }
-    };
-    inputElement.addEventListener('change', onInputChange);
+    let debounceDelay = this.getAttribute('debounce-delay');
+    debounceDelay = debounceDelay ? Number(debounceDelay) : null;
+    let debounce = debouncer();
 
-    let onInputKeyUp;
-    if (inputElement.type !== 'checkbox') {
-      onInputKeyUp = async (event) => {
+    let onInputChange = (event) => {
+      if (event.target.value === String(model.value[fieldName])) return;
+      debounce(async () => {
         try {
+          if (inputElement.type === 'checkbox') {
+            await model.update(fieldName, !!inputElement.checked);
+            inputElement.classList.remove(errorStyleClass);
+            inputElement.classList.add(successStyleClass);
+            hideErrorMessage(fieldName);
+            return;
+          }
           if (event.target.value === '') {
             await model.delete(fieldName);
           } else {
@@ -246,6 +230,31 @@ class ModelInput extends HTMLElement {
           inputElement.classList.remove(successStyleClass);
           showErrorMessage(fieldName, error.message);
         }
+      }, debounceDelay);
+    };
+    inputElement.addEventListener('change', onInputChange);
+
+    let onInputKeyUp;
+    if (inputElement.type !== 'checkbox') {
+      onInputKeyUp = async (event) => {
+        debounce(async () => {
+          try {
+            if (event.target.value === '') {
+              await model.delete(fieldName);
+            } else {
+              let targetValue = inputElement.type === 'number' ?
+              Number(event.target.value) : event.target.value;
+              await model.update(fieldName, targetValue);
+            }
+            inputElement.classList.remove(errorStyleClass);
+            inputElement.classList.add(successStyleClass);
+            hideErrorMessage(fieldName);
+          } catch (error) {
+            inputElement.classList.add(errorStyleClass);
+            inputElement.classList.remove(successStyleClass);
+            showErrorMessage(fieldName, error.message);
+          }
+        }, debounceDelay);
       };
       inputElement.addEventListener('keyup', onInputKeyUp);
     }
