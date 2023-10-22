@@ -24,12 +24,13 @@ export function getGlobalSocket(options) {
 export class SocketProvider extends HTMLElement {
   constructor() {
     super();
-    this.areSocketOptionsReady = false;
+    this.areSocketOptionsReady = false;// TODO 0000 Allow it to work without any attributes on connectedCallback.
     this.saasufySocket = null;
   }
 
   connectedCallback() {
     this.areSocketOptionsReady = true;
+    this.createSocket();
   }
 
   disconnectedCallback() {
@@ -90,7 +91,7 @@ export class SocketConsumer extends HTMLElement {
     while (currentNode) {
       socket = currentNode.saasufySocket;
       if (socket) break;
-      currentNode = currentNode.parentNode;
+      currentNode = currentNode.getRootNode().host || currentNode.parentNode;
     }
     return socket;
   }

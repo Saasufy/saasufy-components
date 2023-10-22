@@ -1,5 +1,6 @@
 import { SocketConsumer } from './socket.js';
 import { getSafeHTML } from './utils.js';
+import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelText extends SocketConsumer {
   connectedCallback() {
@@ -40,7 +41,7 @@ class ModelText extends SocketConsumer {
       while (currentNode) {
         model = currentNode[modelInstanceProperty];
         if (model) break;
-        currentNode = currentNode.parentNode;
+        currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }
       if (!model) return;
     } else {
@@ -68,7 +69,7 @@ class ModelText extends SocketConsumer {
     (async () => {
       for await (let event of changeConsumer) {
         if (event.resourceField !== modelField || !event.isRemote) continue;
-        fieldValue = getSafeHTML(model.value[modelField]);
+        let fieldValue = getSafeHTML(model.value[modelField]);
         this.innerHTML = fieldValue;
       }
     })();

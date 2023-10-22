@@ -79,7 +79,7 @@ class ModelInput extends SocketConsumer {
       while (currentNode) {
         model = currentNode[modelInstanceProperty];
         if (model) break;
-        currentNode = currentNode.parentNode;
+        currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }
       if (!model) return;
     } else {

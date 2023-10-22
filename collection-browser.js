@@ -39,7 +39,7 @@ class CollectionBrowser extends SocketConsumer {
     };
 
     this.handleSlotChangeEvent = () => {
-      this.renderTable();
+      this.renderList();
     };
   }
 
@@ -146,11 +146,11 @@ class CollectionBrowser extends SocketConsumer {
     }
   }
 
-  renderTable() {
+  renderList() {
     if (!this.collection || !this.collection.isLoaded) return;
     let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
     if (!itemTemplate) return;
-    let listNode = this.shadowRoot.querySelector('slot[name="list"]').assignedNodes()[0];
+    let listNode = this.shadowRoot.querySelector('slot[name="list"]').assignedNodes()[0];// TODO 0000 rename list
     if (!listNode) return;
     let items = [];
 
@@ -221,7 +221,7 @@ class CollectionBrowser extends SocketConsumer {
     (async () => {
       await this.collection.listener('load').once();
       if (!this.collection.value.length) {
-        this.renderTable();
+        this.renderList();
       }
       this.setAttribute('is-loaded', '');
       this.dispatchEvent(new CustomEvent('load', { bubbles: true }));
@@ -229,7 +229,7 @@ class CollectionBrowser extends SocketConsumer {
 
     (async () => {
       for await (let event of this.collection.listener('change')) {
-        this.renderTable();
+        this.renderList();
         this.updatePageButtons();
       }
     })();
