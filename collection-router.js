@@ -1,6 +1,6 @@
 import { SocketConsumer } from './socket.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
-import { getSafeHTML } from './utils.js';
+import { renderTemplate } from './utils.js';
 import './static-router.js';
 
 const DEFAULT_RELOAD_DELAY = 0;
@@ -62,34 +62,35 @@ export class CollectionRouter extends SocketConsumer {
 
   renderRoutes() {
     let hideRouteLogs = this.hasAttribute('hide-route-logs');
-    let staticRouter = this.shadowRoot.querySelector('static-router');
-    if (!staticRouter) return;
+    let viewport = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
+    if (!viewport) return;
 
     let pageEntries = Object.entries(this.pages);
     if (!pageEntries.length) return;
 
     let routesList = [];
 
-    staticRouter.innerHTML = pageEntries.map(
-      ([ route, template ]) => {
-        let routePath = template.getAttribute('route-path');
-        let pageTemplates = this.collection.value.map(
-          (modelItem) => {
-            let pagePath = routePath;
-            let templateHTML = template.innerHTML;
-            for (let [ field, value ] of Object.entries(modelItem)) {
-              let regExp = new RegExp(`{{${this.collection.type}.${field}}}`, 'g');
-              let safeValue = getSafeHTML(value);
-              pagePath = pagePath.replace(regExp, String(safeValue).toLowerCase().replace(/ /g, '-'));
-              templateHTML = templateHTML.replace(regExp, safeValue);
+    viewport.innerHTML = `
+      <static-router>
+        ${
+          pageEntries.map(
+            ([ route, template ]) => {
+              let routePath = template.getAttribute('route-path');
+              let pageTemplates = this.collection.value.map(
+                (modelItem) => {
+                  let pagePath = renderTemplate(routePath, this.collection.type, modelItem);
+                  let templateHTML = renderTemplate(template.innerHTML, this.collection.type, modelItem);
+                  routesList.push(pagePath);
+                  return `<template slot="page" route-path="${pagePath}">${templateHTML}</template>`
+                }
+              );
+              return pageTemplates.join('');
             }
-            routesList.push(pagePath);
-            return `<template slot="page" route-path="${pagePath}">${templateHTML}</template>`
-          }
-        );
-        return pageTemplates.join('')
-      }
-    ).join('');
+          ).join('')
+        }
+        <div slot="viewport"></div>
+      </static-router>
+    `;
 
     if (!hideRouteLogs) console.log(`The following routes have been registered: ${routesList.join(', ')}`);
   }
@@ -121,7 +122,7 @@ export class CollectionRouter extends SocketConsumer {
 
     this.shadowRoot.innerHTML = `
       <slot name="page"></slot>
-      <static-router></static-router>
+      <slot name="viewport"></slot>
     `;
 
     (async () => {

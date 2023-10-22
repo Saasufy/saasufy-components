@@ -155,6 +155,29 @@ export function createModel(modelOptions) {
   return model;
 }
 
+let templateFormatters = {
+  url: (value) => String(value).toLowerCase().replace(/ /g, '-'),
+  lowerCase: (value) => String(value).toLowerCase(),
+  upperCase: (value) => String(value).toUpperCase(),
+  capitalize: (value) => {
+    let valueString = String(value);
+    return `${valueString.slice(0, 1).toUpperCase()}${valueString.slice(1)}`;
+  }
+};
+
+export function renderTemplate(templateString, dataType, data) {
+  for (let [ field, value ] of Object.entries(data)) {
+    let safeValue = getSafeHTML(value);
+    for (let [ formatName, formatFunction ] of Object.entries(templateFormatters)) {
+      let formatRegExp = new RegExp(`{{${formatName}:${dataType}.${field}}}`, 'g');
+      templateString = templateString.replace(formatRegExp, formatFunction(safeValue));
+    }
+    let regExp = new RegExp(`{{${dataType}.${field}}}`, 'g');
+    templateString = templateString.replace(regExp, safeValue);
+  }
+  return templateString;
+}
+
 export function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }

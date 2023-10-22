@@ -1,6 +1,6 @@
 import { SocketConsumer } from './socket.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
-import { getSafeHTML } from './utils.js';
+import { renderTemplate } from './utils.js';
 
 const DEFAULT_RELOAD_DELAY = 0;
 
@@ -150,24 +150,19 @@ class CollectionBrowser extends SocketConsumer {
     if (!this.collection || !this.collection.isLoaded) return;
     let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
     if (!itemTemplate) return;
-    let listNode = this.shadowRoot.querySelector('slot[name="list"]').assignedNodes()[0];// TODO 0000 rename list
-    if (!listNode) return;
+    let viewportNode = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
+    if (!viewportNode) return;
     let items = [];
 
     for (let modelItem of this.collection.value) {
-      let itemString = itemTemplate.innerHTML;
-
-      for (let [ field, value ] of Object.entries(modelItem)) {
-        let regExp = new RegExp(`{{${this.collection.type}.${field}}}`, 'g');
-        itemString = itemString.replace(regExp, getSafeHTML(value));
-      }
+      let itemString = renderTemplate(itemTemplate.innerHTML, this.collection.type, modelItem);
       items.push(itemString);
     }
     let noItemTemplate = this.shadowRoot.querySelector('slot[name="no-item"]').assignedNodes()[0];
     if (noItemTemplate && !items.length) {
-      listNode.innerHTML = noItemTemplate.innerHTML;
+      viewportNode.innerHTML = noItemTemplate.innerHTML;
     } else {
-      listNode.innerHTML = items.join('');
+      viewportNode.innerHTML = items.join('');
     }
   }
 
@@ -195,11 +190,11 @@ class CollectionBrowser extends SocketConsumer {
       pageOffset: Number(collectionPageOffset || 0),
       changeReloadDelay: collectionReloadDelay
     });
-    // TODO 00000000000000000000 rename slot list to render-area or content similar more generic
+
     this.shadowRoot.innerHTML = `
       <slot name="item"></slot>
       <slot name="no-item"></slot>
-      <slot name="list"></slot>
+      <slot name="viewport"></slot>
       <slot name="previous-page"></slot>
       <slot name="page-number"></slot>
       <slot name="next-page"></slot>

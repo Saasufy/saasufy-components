@@ -54,8 +54,8 @@ export class StaticRouter extends HTMLElement {
   }
 
   renderCurrentPage() {
-    let routerContainer = this.shadowRoot.querySelector('.static-router-container');
-    if (!routerContainer) return;
+    let routerViewport = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
+    if (!routerViewport) return;
 
     let { hash } = location;
     let pagePath = hash.replace(this.hashStartRegex, '');
@@ -80,15 +80,13 @@ export class StaticRouter extends HTMLElement {
       templateHTML = templateHTML.replace(regExp, getSafeHTML(value));
     }
 
-    routerContainer.innerHTML = templateHTML;
+    routerViewport.innerHTML = templateHTML;
   }
 
   render() {
     this.shadowRoot.innerHTML = `
-      <style>
-      </style>
       <slot name="page"></slot>
-      <div class="static-router-container"></div>
+      <slot name="viewport"></slot>
     `;
   }
 }
