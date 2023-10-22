@@ -165,14 +165,14 @@ let templateFormatters = {
   }
 };
 
-export function renderTemplate(templateString, dataType, data) {
+export function renderTemplate(templateString, data, dataType) {
   for (let [ field, value ] of Object.entries(data)) {
     let safeValue = getSafeHTML(value);
     for (let [ formatName, formatFunction ] of Object.entries(templateFormatters)) {
-      let formatRegExp = new RegExp(`{{${formatName}:${dataType}.${field}}}`, 'g');
+      let formatRegExp = new RegExp(`{{${formatName}:${dataType ? dataType + '.' : ''}${field}}}`, 'g');
       templateString = templateString.replace(formatRegExp, formatFunction(safeValue));
     }
-    let regExp = new RegExp(`{{${dataType}.${field}}}`, 'g');
+    let regExp = new RegExp(`{{${dataType ? dataType + '.' : ''}${field}}}`, 'g');
     templateString = templateString.replace(regExp, safeValue);
   }
   return templateString;

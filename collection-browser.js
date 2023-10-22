@@ -155,7 +155,7 @@ class CollectionBrowser extends SocketConsumer {
     let items = [];
 
     for (let modelItem of this.collection.value) {
-      let itemString = renderTemplate(itemTemplate.innerHTML, this.collection.type, modelItem);
+      let itemString = renderTemplate(itemTemplate.innerHTML, modelItem, this.collection.type);
       items.push(itemString);
     }
     let noItemTemplate = this.shadowRoot.querySelector('slot[name="no-item"]').assignedNodes()[0];

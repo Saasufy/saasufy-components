@@ -1,6 +1,7 @@
 import { getSafeHTML } from './utils.js';
+import { renderTemplate } from './utils.js';
 
-export class StaticRouter extends HTMLElement {
+export class AppRouter extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -74,13 +75,7 @@ export class StaticRouter extends HTMLElement {
       routeArgs = {};
     }
 
-    let templateHTML = pageTemplate.innerHTML;
-    for (let [ key, value ] of Object.entries(routeArgs)) {
-      let regExp = new RegExp(`{{${key}}}`, 'g');
-      templateHTML = templateHTML.replace(regExp, getSafeHTML(value));
-    }
-
-    routerViewport.innerHTML = templateHTML;
+    routerViewport.innerHTML = renderTemplate(pageTemplate.innerHTML, routeArgs);
   }
 
   render() {
@@ -91,4 +86,4 @@ export class StaticRouter extends HTMLElement {
   }
 }
 
-window.customElements.define('static-router', StaticRouter);
+window.customElements.define('app-router', AppRouter);
