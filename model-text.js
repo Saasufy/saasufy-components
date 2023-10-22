@@ -34,6 +34,7 @@ class ModelText extends SocketConsumer {
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
+    let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let currentNode = this.parentNode;
     let model;
     let isModelLocal = false;
@@ -52,6 +53,15 @@ class ModelText extends SocketConsumer {
         id: modelId,
         fields: [ modelField ]
       });
+      if (!hideErrorLogs) {
+        (async () => {
+          for await (let { error } of model.listener('error')) {
+            console.error(
+              `Model input encountered an error: ${error.message}`
+            );
+          }
+        })();
+      }
       isModelLocal = true;
     }
     if (model.isLoaded) {

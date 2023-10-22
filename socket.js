@@ -30,7 +30,7 @@ export class SocketProvider extends HTMLElement {
 
   connectedCallback() {
     this.areSocketOptionsReady = true;
-    this.createSocket();
+    this.getSocket();
   }
 
   disconnectedCallback() {
@@ -47,13 +47,20 @@ export class SocketProvider extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.areSocketOptionsReady) return;
     this.destroySocket();
-    this.createSocket();
+    this.getSocket();
   }
 
   destroySocket() {
     if (this.saasufySocket) {
       this.saasufySocket.disconnect();
     }
+  }
+
+  getSocket() {
+    if (this.saasufySocket) {
+      return this.saasufySocket;
+    }
+    return this.createSocket();
   }
 
   createSocket() {

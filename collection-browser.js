@@ -158,7 +158,7 @@ class CollectionBrowser extends SocketConsumer {
       let itemString = itemTemplate.innerHTML;
 
       for (let [ field, value ] of Object.entries(modelItem)) {
-        let regExp = new RegExp(`{{${field}}}`, 'g');
+        let regExp = new RegExp(`{{${this.collection.type}.${field}}}`, 'g');
         itemString = itemString.replace(regExp, getSafeHTML(value));
       }
       items.push(itemString);
@@ -178,6 +178,7 @@ class CollectionBrowser extends SocketConsumer {
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionViewParams = this.getAttribute('collection-view-params');
     let collectionPageOffset = this.getAttribute('collection-page-offset');
+    let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
@@ -233,6 +234,16 @@ class CollectionBrowser extends SocketConsumer {
         this.updatePageButtons();
       }
     })();
+
+    if (!hideErrorLogs) {
+      (async () => {
+        for await (let { error } of this.collection.listener('error')) {
+          console.error(
+            `Collection browser encountered an error: ${error.message}`
+          );
+        }
+      })();
+    }
   }
 }
 

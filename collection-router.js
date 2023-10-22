@@ -43,7 +43,8 @@ export class CollectionRouter extends SocketConsumer {
       'collection-view-params',
       'collection-page-size',
       'collection-page-offset',
-      'log-routes'
+      'hide-route-logs',
+      'hide-error-logs'
     ];
   }
 
@@ -60,12 +61,14 @@ export class CollectionRouter extends SocketConsumer {
   }
 
   renderRoutes() {
-    let logRoutes = this.hasAttribute('log-routes');
+    let hideRouteLogs = this.hasAttribute('hide-route-logs');
     let staticRouter = this.shadowRoot.querySelector('static-router');
     if (!staticRouter) return;
 
     let pageEntries = Object.entries(this.pages);
     if (!pageEntries.length) return;
+
+    let routesList = [];
 
     staticRouter.innerHTML = pageEntries.map(
       ([ route, template ]) => {
@@ -75,18 +78,20 @@ export class CollectionRouter extends SocketConsumer {
             let pagePath = routePath;
             let templateHTML = template.innerHTML;
             for (let [ field, value ] of Object.entries(modelItem)) {
-              let regExp = new RegExp(`{{${field}}}`, 'g');
+              let regExp = new RegExp(`{{${this.collection.type}.${field}}}`, 'g');
               let safeValue = getSafeHTML(value);
               pagePath = pagePath.replace(regExp, String(safeValue).toLowerCase().replace(/ /g, '-'));
               templateHTML = templateHTML.replace(regExp, safeValue);
             }
-            if (logRoutes) console.log(`Route: ${pagePath}`);
+            routesList.push(pagePath);
             return `<template slot="page" route-path="${pagePath}">${templateHTML}</template>`
           }
         );
         return pageTemplates.join('')
       }
     ).join('');
+
+    if (!hideRouteLogs) console.log(`The following routes have been registered: ${routesList.join(', ')}`);
   }
 
   render() {
@@ -96,6 +101,7 @@ export class CollectionRouter extends SocketConsumer {
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionViewParams = this.getAttribute('collection-view-params');
     let collectionPageOffset = this.getAttribute('collection-page-offset');
+    let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
@@ -133,6 +139,16 @@ export class CollectionRouter extends SocketConsumer {
         this.renderRoutes();
       }
     })();
+
+    if (!hideErrorLogs) {
+      (async () => {
+        for await (let { error } of this.collection.listener('error')) {
+          console.error(
+            `Collection router encountered an error: ${error.message}`
+          );
+        }
+      })();
+    }
   }
 }
 
