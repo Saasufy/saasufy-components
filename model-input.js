@@ -1,13 +1,12 @@
-import { getSocket } from './socket.js';
+import { SocketConsumer } from './socket.js';
 import { getSafeHTML, debouncer } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
-class ModelInput extends HTMLElement {
+class ModelInput extends SocketConsumer {
   constructor() {
     super();
     this.isReady = false;
     this.inputElement = null;
-    this.socket = null;
   }
   connectedCallback() {
     this.isReady = true;
@@ -84,7 +83,7 @@ class ModelInput extends HTMLElement {
       }
       if (!model) return;
     } else {
-      this.socket = getSocket();
+      this.socket = this.getSocket();
       model = new AGModel({
         socket: this.socket,
         type: modelType,

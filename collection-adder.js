@@ -1,11 +1,11 @@
-import { getSocket } from './socket.js';
+import { SocketConsumer } from './socket.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 
-class CollectionAdder extends HTMLElement {
+class CollectionAdder extends SocketConsumer {
   constructor(options) {
     super();
-    options = options || {};
-    this.socket = getSocket(options.socketOptions);
+    this.options = options || {};
+
     this.typeCastFunctions = {
       text: String,
       checkbox: Boolean,
@@ -16,6 +16,7 @@ class CollectionAdder extends HTMLElement {
   }
 
   connectedCallback() {
+    this.socket = this.getSocket();
     this.isReady = true;
     this.render();
   }

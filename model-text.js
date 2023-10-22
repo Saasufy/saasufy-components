@@ -1,11 +1,10 @@
-import { getSocket } from './socket.js';
+import { SocketConsumer } from './socket.js';
 import { getSafeHTML } from './utils.js';
 
-class ModelText extends HTMLElement {
+class ModelText extends SocketConsumer {
   connectedCallback() {
     this.isReady = true;
     this.destroy = () => {};
-    this.socket = null;
     this.render();
   }
 
@@ -45,7 +44,7 @@ class ModelText extends HTMLElement {
       }
       if (!model) return;
     } else {
-      this.socket = getSocket();
+      this.socket = this.getSocket();
       model = new AGModel({
         socket: this.socket,
         type: modelType,

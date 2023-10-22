@@ -1,14 +1,13 @@
-import { getSocket } from './socket.js';
+import { SocketConsumer } from './socket.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 import { getSafeHTML } from './utils.js';
 
 const DEFAULT_RELOAD_DELAY = 0;
 
-class CollectionBrowser extends HTMLElement {
+class CollectionBrowser extends SocketConsumer {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.socket = getSocket();
 
     this.handleShowModalEvent = (event) => {
       let modal = this.shadowRoot.querySelector('slot[name="modal"]').assignedNodes()[0];
@@ -46,6 +45,7 @@ class CollectionBrowser extends HTMLElement {
 
   connectedCallback() {
     this.isReady = true;
+    this.socket = this.getSocket();
     this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
     this.addEventListener('showModal', this.handleShowModalEvent);
     this.addEventListener('crudCreate', this.handleCRUDCreateEvent);
@@ -194,7 +194,7 @@ class CollectionBrowser extends HTMLElement {
       pageOffset: Number(collectionPageOffset || 0),
       changeReloadDelay: collectionReloadDelay
     });
-
+    // TODO 00000000000000000000 rename slot list to render-area or content similar more generic
     this.shadowRoot.innerHTML = `
       <slot name="item"></slot>
       <slot name="no-item"></slot>
