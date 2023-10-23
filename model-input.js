@@ -1,5 +1,5 @@
 import { SocketConsumer } from './socket.js';
-import { getSafeHTML, debouncer } from './utils.js';
+import { debouncer } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelInput extends SocketConsumer {
@@ -166,7 +166,7 @@ class ModelInput extends SocketConsumer {
 
   syncInputElementWithModel(inputElement, model, fieldName, messageContainerElement) {
     if (model.isLoaded) {
-      let fieldValue = getSafeHTML(model.value[fieldName]);
+      let fieldValue = model.value[fieldName];
       if (inputElement.type === 'checkbox') {
         inputElement.checked = !!fieldValue;
       } else {
@@ -178,7 +178,7 @@ class ModelInput extends SocketConsumer {
     (async () => {
       for await (let event of changeConsumer) {
         if (event.resourceField !== fieldName || !event.isRemote) continue;
-        let fieldValue = getSafeHTML(model.value[fieldName]);
+        let fieldValue = model.value[fieldName];
         if (inputElement.type === 'checkbox') {
           inputElement.checked = fieldValue;
         } else {
