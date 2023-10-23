@@ -1,10 +1,11 @@
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
+import { Parser } from '/node_modules/expr-eval/dist/index.mjs';
 
 const DEFAULT_DEBOUNCE_DELAY = 300;
 const DEFAULT_RELOAD_DELAY = 0;
 
-export function getSafeHTML(text) {
+export function toSafeHTML(text) {
   if (typeof text === 'string') {
     return text.replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -29,10 +30,10 @@ export function debouncer() {
   };
 }
 
-export function getSafeModelValue(value) {
+export function toSafeModelValue(value) {
   return Object.fromEntries(
     Object.entries(value || {}).map(
-      ([key, value]) => [ key, getSafeHTML(value) ]
+      ([key, value]) => [ key, toSafeHTML(value) ]
     )
   );
 }
@@ -60,7 +61,7 @@ export function createReactiveCollection(collectionOptions, callback) {
 
       if (!collection.isLoaded) continue;
 
-      collection.safeValue = collection.value.map(getSafeModelValue);
+      collection.safeValue = collection.value.map(toSafeModelValue);
 
       callback({
         changes
@@ -102,7 +103,7 @@ export function createReactiveModel(modelOptions, callback) {
         changes[event.resourceField] = event.isRemote;
       }
 
-      model.safeValue = getSafeModelValue(model.value);
+      model.safeValue = toSafeModelValue(model.value);
       callback({
         changes
       });
@@ -128,7 +129,7 @@ export function createCollection(collectionOptions) {
   (async () => {
     for await (let event of collection.listener('change')) {
       if (!collection.isLoaded) continue;
-      collection.safeValue = collection.value.map(getSafeModelValue);
+      collection.safeValue = collection.value.map(toSafeModelValue);
     }
   })();
 
@@ -148,7 +149,7 @@ export function createModel(modelOptions) {
 
   (async () => {
     for await (let event of model.listener('change')) {
-      model.safeValue = getSafeModelValue(model.value);
+      model.safeValue = toSafeModelValue(model.value);
     }
   })();
 
@@ -162,20 +163,32 @@ let templateFormatters = {
   capitalize: (value) => {
     let valueString = String(value);
     return `${valueString.slice(0, 1).toUpperCase()}${valueString.slice(1)}`;
+  },
+  fallback: (...args) => {
+    return args.filter(arg => arg)[0];
   }
 };
 
-export function renderTemplate(templateString, data, dataType) {
-  for (let [ field, value ] of Object.entries(data)) {
-    let safeValue = getSafeHTML(value);
-    for (let [ formatName, formatFunction ] of Object.entries(templateFormatters)) {
-      let formatRegExp = new RegExp(`{{${formatName}:${dataType ? dataType + '.' : ''}${field}}}`, 'g');
-      templateString = templateString.replace(formatRegExp, formatFunction(safeValue));
+let templateTagsRegExp = /{{[^}]+}}/g;
+
+export function renderTemplate(templateString, data) {
+  return templateString.replace(templateTagsRegExp, (match) => {
+    let expString = match.slice(2, -2);
+    let options = {
+      ...templateFormatters,
+      ...data
+    };
+    try {
+      return toSafeHTML(
+        Parser.evaluate(
+          expString,
+          options
+        )
+      );
+    } catch (error) {
+      return match;
     }
-    let regExp = new RegExp(`{{${dataType ? dataType + '.' : ''}${field}}}`, 'g');
-    templateString = templateString.replace(regExp, safeValue);
-  }
-  return templateString;
+  });
 }
 
 export function wait(duration) {

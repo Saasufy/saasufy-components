@@ -1,4 +1,4 @@
-import { getSafeHTML } from './utils.js';
+import { toSafeHTML } from './utils.js';
 import { renderTemplate } from './utils.js';
 
 export class AppRouter extends HTMLElement {

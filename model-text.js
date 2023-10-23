@@ -1,5 +1,5 @@
 import { SocketConsumer } from './socket.js';
-import { getSafeHTML } from './utils.js';
+import { toSafeHTML } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelText extends SocketConsumer {
@@ -79,12 +79,12 @@ class ModelText extends SocketConsumer {
     (async () => {
       for await (let event of changeConsumer) {
         if (event.resourceField !== modelField || !event.isRemote) continue;
-        let fieldValue = getSafeHTML(model.value[modelField]);
+        let fieldValue = toSafeHTML(model.value[modelField]);
         this.innerHTML = fieldValue;
       }
     })();
     if (model.isLoaded) {
-      this.innerHTML = getSafeHTML(model.value[modelField]);
+      this.innerHTML = toSafeHTML(model.value[modelField]);
     }
     this.destroy = () => {
       changeConsumer.kill();
