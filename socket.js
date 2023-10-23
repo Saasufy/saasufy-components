@@ -1,16 +1,11 @@
 import { create } from '/node_modules/socketcluster-client/socketcluster-client.min.js';
 
-const DEFAULT_AUTH_TOKEN_NAME = 'saasufy.authToken';
-
 let globalSocket;
 
 let urlPartsRegExp = /(^[^:]+):\/\/([^:\/]*)(:[0-9]*)?(\/.*)/;
 
 export function createGlobalSocket(options) {
-  globalSocket = create({
-    authTokenName: DEFAULT_AUTH_TOKEN_NAME,
-    ...options
-  });
+  globalSocket = create({ ...options });
   return globalSocket;
 }
 
@@ -64,7 +59,7 @@ export class SocketProvider extends HTMLElement {
   }
 
   createSocket() {
-    let authTokenName = this.getAttribute('auth-token-name') || DEFAULT_AUTH_TOKEN_NAME;
+    let authTokenName = this.getAttribute('auth-token-name') || null;
     let url = this.getAttribute('url') || '';
     let urlOptions;
     let matchedList = url.match(urlPartsRegExp);
