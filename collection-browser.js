@@ -171,22 +171,26 @@ class CollectionBrowser extends SocketConsumer {
 
   render() {
     let collectionType = this.getAttribute('collection-type');
-    let collectionFields = this.getAttribute('collection-fields');
+    let collectionFields = this.getAttribute('collection-fields') || '';
     let collectionView = this.getAttribute('collection-view');
     let collectionPageSize = this.getAttribute('collection-page-size');
-    let collectionViewParams = this.getAttribute('collection-view-params');
+    let collectionViewParams = this.getAttribute('collection-view-params') || '';
     let collectionPageOffset = this.getAttribute('collection-page-offset');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
-    let viewParams = Object.fromEntries(collectionViewParams.split(',').map((pair) => pair.split('=')));
+    let viewParams = Object.fromEntries(
+      collectionViewParams.split(',')
+      .map(pair => pair.split('='))
+      .filter(([field]) => field)
+    );
     if (this.collection) this.collection.destroy();
 
     this.collection = new AGCollection({
       socket: this.socket,
       type: collectionType,
-      fields: collectionFields.split(',').map(field => field.trim()),
+      fields: collectionFields.split(',').map(field => field.trim()).filter(field => field),
       view: collectionView,
       viewParams,
       pageSize: Number(collectionPageSize || 10),
