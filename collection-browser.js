@@ -90,7 +90,8 @@ class CollectionBrowser extends SocketConsumer {
       'collection-view',
       'collection-view-params',
       'collection-page-size',
-      'collection-page-offset'
+      'collection-page-offset',
+      'hide-error-logs'
     ];
   }
 
@@ -148,23 +149,23 @@ class CollectionBrowser extends SocketConsumer {
 
   renderList() {
     if (!this.collection || !this.collection.isLoaded) return;
-    let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
-    if (!itemTemplate) return;
     let viewportNode = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
     if (!viewportNode) return;
-    let items = [];
 
-    for (let modelItem of this.collection.value) {
-      let itemString = renderTemplate(
-        itemTemplate.innerHTML,
-        { [this.collection.type]: modelItem }
-      );
-      items.push(itemString);
-    }
+    let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
     let noItemTemplate = this.shadowRoot.querySelector('slot[name="no-item"]').assignedNodes()[0];
-    if (noItemTemplate && !items.length) {
+
+    if (noItemTemplate && !this.collection.value.length) {
       viewportNode.innerHTML = noItemTemplate.innerHTML;
-    } else {
+    } else if (itemTemplate) {
+      let items = [];
+      for (let modelItem of this.collection.value) {
+        let itemString = renderTemplate(
+          itemTemplate.innerHTML,
+          { [this.collection.type]: modelItem }
+        );
+        items.push(itemString);
+      }
       viewportNode.innerHTML = items.join('');
     }
   }

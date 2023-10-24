@@ -13,13 +13,17 @@ A form component for inserting data into collections.
 
 ### collection-browser
 
-Used for rendering collections as lists, tables or other sequences based on a specific view.
+Used for rendering collections as lists, tables or other sequences based on a specific view using a template.
 Supports pagination by allowing you to specify custom buttons or links to navigate between pages.
 Can also perform basic CRUD operations such as deleting or creating records.
 
 ### model-input
 
 Used for displaying and editing a field of a model instance in real time.
+
+### model-viewer
+
+Used for rendering models using a template.
 
 ### confirm-modal
 
