@@ -21,7 +21,7 @@ class ModelInput extends SocketConsumer {
   static get observedAttributes() {
     return [
       'input-id',
-      'input-list',
+      'list',
       'model-instance-property',
       'type',
       'placeholder',
@@ -31,7 +31,8 @@ class ModelInput extends SocketConsumer {
       'model-field',
       'debounce-delay',
       'options',
-      'height'
+      'height',
+      'hide-error-logs'
     ];
   }
 
@@ -64,8 +65,8 @@ class ModelInput extends SocketConsumer {
     let modelInstanceProperty = this.getAttribute('model-instance-property');
     let showErrorMessage = this.hasAttribute('show-error-message');
     let inputId = this.getAttribute('input-id');
-    let inputList = this.getAttribute('input-list');
-    let type = this.getAttribute('type');
+    let inputList = this.getAttribute('list');
+    let type = this.getAttribute('type') || 'text';
     let placeholder = this.getAttribute('placeholder');
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');

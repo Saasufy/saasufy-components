@@ -41,7 +41,14 @@ export class SocketProvider extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
-    this.destroySocket();
+    let sanitizedURL = this.getSanitizedURL();
+    if (
+      this.saasufySocket &&
+      this.saasufySocket.transport &&
+      this.saasufySocket.transport.uri() !== sanitizedURL
+    ) {
+      this.saasufySocket.disconnect();
+    }
     this.getSocket();
   }
 
@@ -53,14 +60,24 @@ export class SocketProvider extends HTMLElement {
 
   getSocket() {
     if (this.saasufySocket) {
+      this.saasufySocket.options = {
+        ...this.saasufySocket.options,
+        ...this.getSocketOptions()
+      };
+      this.saasufySocket.connect();
       return this.saasufySocket;
     }
     return this.createSocket();
   }
 
-  createSocket() {
-    let authTokenName = this.getAttribute('auth-token-name') || null;
+  getSanitizedURL() {
     let url = this.getAttribute('url') || '';
+    return url.trim();
+  }
+
+  getSocketOptions() {
+    let authTokenName = this.getAttribute('auth-token-name') || null;
+    let url = this.getSanitizedURL();
     let urlOptions;
     let matchedList = url.match(urlPartsRegExp);
     if (matchedList) {
@@ -75,12 +92,22 @@ export class SocketProvider extends HTMLElement {
         path
       };
     } else {
+      if (url) {
+        throw new Error(`The specified URL ${url} was invalid`);
+      }
       urlOptions = {};
     }
-    this.saasufySocket = create({
+    let socketOptions = {
       authTokenName,
       ...urlOptions
-    });
+    };
+    socketOptions.autoConnect = !!url;
+    return socketOptions;
+  }
+
+  createSocket() {
+    let socketOptions = this.getSocketOptions();
+    this.saasufySocket = create(socketOptions);
 
     return this.saasufySocket;
   }

@@ -18,7 +18,8 @@ class ModelText extends SocketConsumer {
       'model-instance-property',
       'model-type',
       'model-id',
-      'model-field'
+      'model-field',
+      'hide-error-logs'
     ];
   }
 

@@ -164,6 +164,7 @@ let templateFormatters = {
     let valueString = String(value);
     return `${valueString.slice(0, 1).toUpperCase()}${valueString.slice(1)}`;
   },
+  trim: (value) => String(value).trim(),
   fallback: (...args) => {
     return args.filter(arg => arg)[0];
   }
