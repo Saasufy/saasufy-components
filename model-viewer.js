@@ -29,6 +29,7 @@ class ModelViewer extends SocketConsumer {
       'model-type',
       'model-id',
       'model-fields',
+      'type-alias',
       'hide-error-logs'
     ];
   }
@@ -55,9 +56,10 @@ class ModelViewer extends SocketConsumer {
     if (noItemTemplate && !this.modelValueExists(modelValue)) {
       viewportNode.innerHTML = noItemTemplate.innerHTML;
     } else if (itemTemplate) {
+      let type = this.getAttribute('type-alias') || this.model.type;
       let itemString = renderTemplate(
         itemTemplate.innerHTML,
-        { [this.model.type]: modelValue }
+        { [type]: modelValue }
       );
       viewportNode.innerHTML = itemString;
     }

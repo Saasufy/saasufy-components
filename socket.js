@@ -122,6 +122,13 @@ export class SocketConsumer extends HTMLElement {
       if (socket) break;
       currentNode = currentNode.getRootNode().host || currentNode.parentNode;
     }
+    if (!socket) {
+      throw new Error(
+        `The ${
+          this.nodeName.toLowerCase()
+        } element failed to obtain a socket - Make sure it is nested inside a socket-provider element`
+      );
+    }
     return socket;
   }
 }

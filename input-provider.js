@@ -128,11 +128,19 @@ class InputProvider extends HTMLElement {
         let matchingElements = parentElement.querySelectorAll(selector);
         if (attributeName) {
           for (let element of matchingElements) {
-            element.setAttribute(attributeName, value);
+            if (typeof value === 'boolean') {
+              if (value) {
+                element.setAttribute(attributeName, '');
+              } else {
+                element.removeAttribute(attributeName);
+              }
+            } else {
+              element.setAttribute(attributeName, value);
+            }
           }
         } else {
           for (let element of matchingElements) {
-            if (element.nodeType === 'INPUT') {
+            if (element.nodeName === 'INPUT') {
               if (element.type === 'checkbox') {
                 if (value) {
                   element.setAttribute('checked', '');
@@ -164,11 +172,13 @@ class InputProvider extends HTMLElement {
     let onInputChange = (event) => {
       debounce(async () => {
         if (event.target.value === this.lastValue) return;
-        this.lastValue = event.target.value;
         if (inputElement.type === 'checkbox') {
-          this.updateConsumerElements(consumers, !!inputElement.checked);
+          let checked = !!inputElement.checked;
+          this.lastValue = checked;
+          this.updateConsumerElements(consumers, checked);
           return;
         }
+        this.lastValue = event.target.value;
         if (event.target.value === '') {
           this.updateConsumerElements(consumers, '');
         } else {

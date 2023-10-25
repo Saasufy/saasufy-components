@@ -91,6 +91,7 @@ class CollectionBrowser extends SocketConsumer {
       'collection-view-params',
       'collection-page-size',
       'collection-page-offset',
+      'type-alias',
       'hide-error-logs'
     ];
   }
@@ -158,11 +159,12 @@ class CollectionBrowser extends SocketConsumer {
     if (noItemTemplate && !this.collection.value.length) {
       viewportNode.innerHTML = noItemTemplate.innerHTML;
     } else if (itemTemplate) {
+      let type = this.getAttribute('type-alias') || this.collection.type;
       let items = [];
       for (let modelItem of this.collection.value) {
         let itemString = renderTemplate(
           itemTemplate.innerHTML,
-          { [this.collection.type]: modelItem }
+          { [type]: modelItem }
         );
         items.push(itemString);
       }
