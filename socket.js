@@ -87,7 +87,8 @@ export class SocketProvider extends HTMLElement {
 
   getSocket() {
     if (this.saasufySocket) {
-      if (this.saasufySocket.uri() !== this.getSanitizedURL()) {
+      let sanitizedURL = this.getSanitizedURL();
+      if (sanitizedURL && this.saasufySocket.uri() !== sanitizedURL) {
         this.saasufySocket.connect(
           this.getSocketOptions()
         );
