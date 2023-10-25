@@ -41,14 +41,6 @@ export class SocketProvider extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
-    let sanitizedURL = this.getSanitizedURL();
-    if (
-      this.saasufySocket &&
-      this.saasufySocket.transport &&
-      this.saasufySocket.transport.uri() !== sanitizedURL
-    ) {
-      this.saasufySocket.disconnect();
-    }
     this.getSocket();
   }
 
@@ -56,18 +48,6 @@ export class SocketProvider extends HTMLElement {
     if (this.saasufySocket) {
       this.saasufySocket.disconnect();
     }
-  }
-
-  getSocket() {
-    if (this.saasufySocket) {
-      this.saasufySocket.options = {
-        ...this.saasufySocket.options,
-        ...this.getSocketOptions()
-      };
-      this.saasufySocket.connect();
-      return this.saasufySocket;
-    }
-    return this.createSocket();
   }
 
   getSanitizedURL() {
@@ -103,6 +83,20 @@ export class SocketProvider extends HTMLElement {
     };
     socketOptions.autoConnect = !!url;
     return socketOptions;
+  }
+
+  getSocket() {
+    if (this.saasufySocket) {
+      if (this.saasufySocket.uri() !== this.getSanitizedURL()) {
+        this.saasufySocket.connect(
+          this.getSocketOptions()
+        );
+      } else {
+        this.saasufySocket.connect();
+      }
+      return this.saasufySocket;
+    }
+    return this.createSocket();
   }
 
   createSocket() {
