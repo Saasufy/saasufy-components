@@ -88,13 +88,14 @@ export class SocketProvider extends HTMLElement {
   getSocket() {
     if (this.saasufySocket) {
       let sanitizedURL = this.getSanitizedURL();
-      if (sanitizedURL && this.saasufySocket.uri() !== sanitizedURL) {
+      if (this.lastSaasufySocketURL !== sanitizedURL) {
         this.saasufySocket.connect(
           this.getSocketOptions()
         );
       } else {
         this.saasufySocket.connect();
       }
+      this.lastSaasufySocketURL = sanitizedURL;
       return this.saasufySocket;
     }
     return this.createSocket();
@@ -103,6 +104,7 @@ export class SocketProvider extends HTMLElement {
   createSocket() {
     let socketOptions = this.getSocketOptions();
     this.saasufySocket = create(socketOptions);
+    this.lastSaasufySocketURL = this.getSanitizedURL();
 
     return this.saasufySocket;
   }
