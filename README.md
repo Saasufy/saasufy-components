@@ -25,6 +25,13 @@ Used for displaying and editing a field of a model instance in real time.
 
 Used for rendering models using a template.
 
+### input-provider
+
+An input component which can pass data to other components (or HTML elements) via custom attributes.
+A common use case for it is to pass user input to `collection-browser` or `model-viewer` to display relevant data loaded from Saasufy (e.g. based on a user query).
+This component can be configured to provide its data to multiple components (consumers) via custom attributes.
+Note that an `input-provider` only targets elements which are downstream from its parent element in the HTML hierarchy.
+
 ### confirm-modal
 
 A modal component to prompt the user for confirmation before performing sensitive operations.
