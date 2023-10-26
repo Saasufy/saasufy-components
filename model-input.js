@@ -171,7 +171,8 @@ class ModelInput extends SocketConsumer {
       if (inputElement.type === 'checkbox') {
         inputElement.checked = !!fieldValue;
       } else {
-        inputElement.value = fieldValue == null ? '' : fieldValue;
+        let defaultValue = this.getAttribute('default-value') || '';
+        inputElement.value = fieldValue == null ? defaultValue : fieldValue;
       }
     }
     let stopSaving = this.saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement);
@@ -181,9 +182,10 @@ class ModelInput extends SocketConsumer {
         if (event.resourceField !== fieldName || !event.isRemote) continue;
         let fieldValue = model.value[fieldName];
         if (inputElement.type === 'checkbox') {
-          inputElement.checked = fieldValue;
+          inputElement.checked = !!fieldValue;
         } else {
-          inputElement.value = fieldValue == null ? '' : fieldValue;
+          let defaultValue = this.getAttribute('default-value') || '';
+          inputElement.value = fieldValue == null ? defaultValue : fieldValue;
         }
       }
     })();
