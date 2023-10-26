@@ -155,12 +155,19 @@ class CollectionBrowser extends SocketConsumer {
 
     let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
     let noItemTemplate = this.shadowRoot.querySelector('slot[name="no-item"]').assignedNodes()[0];
+    let firstItemTemplate = this.shadowRoot.querySelector('slot[name="first-item"]').assignedNodes()[0];
+    let lastItemTemplate = this.shadowRoot.querySelector('slot[name="last-item"]').assignedNodes()[0];
 
+    let items = [];
+
+    if (firstItemTemplate) {
+      items.push(firstItemTemplate.innerHTML);
+    }
     if (noItemTemplate && !this.collection.value.length) {
-      viewportNode.innerHTML = noItemTemplate.innerHTML;
+      items.push(noItemTemplate.innerHTML);
     } else if (itemTemplate) {
       let type = this.getAttribute('type-alias') || this.collection.type;
-      let items = [];
+
       for (let modelItem of this.collection.value) {
         let itemString = renderTemplate(
           itemTemplate.innerHTML,
@@ -168,8 +175,11 @@ class CollectionBrowser extends SocketConsumer {
         );
         items.push(itemString);
       }
-      viewportNode.innerHTML = items.join('');
     }
+    if (lastItemTemplate) {
+      items.push(lastItemTemplate.innerHTML);
+    }
+    viewportNode.innerHTML = items.join('');
   }
 
   render() {
@@ -204,6 +214,8 @@ class CollectionBrowser extends SocketConsumer {
     this.shadowRoot.innerHTML = `
       <slot name="item"></slot>
       <slot name="no-item"></slot>
+      <slot name="first-item"></slot>
+      <slot name="last-item"></slot>
       <slot name="viewport"></slot>
       <slot name="previous-page"></slot>
       <slot name="page-number"></slot>
