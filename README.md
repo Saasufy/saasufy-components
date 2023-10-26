@@ -17,6 +17,11 @@ Used for rendering collections as lists, tables or other sequences based on a sp
 Supports pagination by allowing you to specify custom buttons or links to navigate between pages.
 Can also perform basic CRUD operations such as deleting or creating records.
 
+### collection-reducer
+
+Similar to the `collection-browser` component but designed to render collections in combined format. For example, to combine values from multiple records into a single item.
+A common use case is to extract and combine values from a specific field to pass to other child components via their attributes.
+
 ### model-input
 
 Used for displaying and editing a field of a model instance in real time.
