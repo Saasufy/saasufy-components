@@ -167,6 +167,9 @@ let templateFormatters = {
   trim: (value) => String(value).trim(),
   fallback: (...args) => {
     return args.filter(arg => arg)[0];
+  },
+  joinFields: (list, field, sep) => {
+    return list.map(item => item[field]).join(sep);
   }
 };
 
