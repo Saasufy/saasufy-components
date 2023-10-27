@@ -8,6 +8,7 @@ class CollectionAdder extends SocketConsumer {
 
     this.typeCastFunctions = {
       text: String,
+      textarea: String,
       checkbox: Boolean,
       number: Number
     };
@@ -112,8 +113,8 @@ class CollectionAdder extends SocketConsumer {
         inputTypeParams = inputTypeParts[3] ? inputTypeParts[3].split(',') : [];
       }
       if (inputType === 'checkbox') {
-        items.push(`
-          <label>
+        items.push(
+          `<label>
             ${
               field
             }
@@ -122,23 +123,29 @@ class CollectionAdder extends SocketConsumer {
             }" name="${
               field
             }" />
-          </label>
-        `);
+          </label>`
+        );
       } else if (inputType === 'text-select') {
         items.push(
-          `
-            <div class="collection-adder-select-text-row">
-              <input class="collection-adder-input" type="text" name="${
-                field
-              }" placeholder="${
-                field
-              }" />
-              <select class="collection-adder-select">
-                <option value="" selected disabled hidden>Options</option>
-                ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`)}
-              </select>
-            </div>
-          `
+          `<div class="collection-adder-select-text-row">
+            <input class="collection-adder-input" type="text" name="${
+              field
+            }" placeholder="${
+              field
+            }" />
+            <select class="collection-adder-select">
+              <option value="" selected disabled hidden>Options</option>
+              ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`)}
+            </select>
+          </div>`
+        );
+      } else if (inputType === 'textarea') {
+        items.push(
+          `<textarea class="collection-adder-input" name="${
+            field
+          }" placeholder="${
+            field
+          }"></textarea>`
         );
       } else {
         items.push(
@@ -186,11 +193,17 @@ class CollectionAdder extends SocketConsumer {
         ...modelFieldValues,
         ...Object.fromEntries(
           [...event.target.querySelectorAll('.collection-adder-input')]
+            .filter(input => input.value !== '')
             .map((input) => {
-              let Type = this.getTypeCastFunction(
-                fieldTypes[input.name]
-              );
-              return [ input.name, Type(input.value) ];
+              let fieldType = fieldTypes[input.name];
+              let Type = this.getTypeCastFunction(fieldType);
+              let value;
+              if (fieldType === 'checkbox') {
+                value = input.checked;
+              } else {
+                value = input.value;
+              }
+              return [ input.name, Type(value) ];
             })
         )
       };
