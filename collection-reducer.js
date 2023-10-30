@@ -139,7 +139,8 @@ class CollectionReducer extends SocketConsumer {
       let type = this.getAttribute('type-alias') || this.collection.type;
       let itemString = renderTemplate(
         itemTemplate.innerHTML,
-        { [type]: this.collection.value }
+        { [type]: this.collection.value },
+        this.socket
       );
       viewportNode.innerHTML = itemString;
     }

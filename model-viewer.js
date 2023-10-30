@@ -59,7 +59,8 @@ class ModelViewer extends SocketConsumer {
       let type = this.getAttribute('type-alias') || this.model.type;
       let itemString = renderTemplate(
         itemTemplate.innerHTML,
-        { [type]: modelValue }
+        { [type]: modelValue },
+        this.socket
       );
       viewportNode.innerHTML = itemString;
     }

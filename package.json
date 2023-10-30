@@ -20,7 +20,6 @@
     "ag-collection": "^3.3.0",
     "ag-model": "^1.4.1",
     "capitalisk-auth-client": "^1.5.1",
-    "expr-eval": "^2.0.2",
     "socketcluster-client": "^19.1.0"
   },
   "bugs": {

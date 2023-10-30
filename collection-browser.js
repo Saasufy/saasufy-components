@@ -171,7 +171,8 @@ class CollectionBrowser extends SocketConsumer {
       for (let modelItem of this.collection.value) {
         let itemString = renderTemplate(
           itemTemplate.innerHTML,
-          { [type]: modelItem }
+          { [type]: modelItem },
+          this.socket
         );
         items.push(itemString);
       }

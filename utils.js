@@ -1,6 +1,5 @@
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
-import { Parser } from '/node_modules/expr-eval/dist/index.mjs';
 
 const DEFAULT_DEBOUNCE_DELAY = 300;
 const DEFAULT_RELOAD_DELAY = 0;
@@ -11,7 +10,8 @@ export function toSafeHTML(text) {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+      .replace(/'/g, '&#039;')
+      .replace(/\n/g, '<br />');
   } else if (text != null && typeof text.toString !== 'function') {
     return '[invalid]';
   }
@@ -170,21 +170,48 @@ let templateFormatters = {
   },
   joinFields: (list, field, sep) => {
     return list.map(item => item[field]).join(sep);
+  },
+  date: (timestamp) => {
+    let date = new Date(timestamp);
+    let year = date.getFullYear();
+    let month = date.toLocaleString('default', { month: 'long' });
+    let day = date.getDate();
+    let hour = date.getHours();
+    let minutes = date.getMinutes();
+    return `${month} ${day}, ${year} at ${hour}:${minutes.toString().padStart(2, '0')}`;
   }
 };
 
 let templateTagsRegExp = /{{[^}]+}}/g;
 
-export function renderTemplate(templateString, data) {
+function execExpression(expression, options) {
+  let keys = Object.keys(options);
+  let args = [
+    ...keys,
+    `return (function () {
+      return ${expression};
+    })();`
+  ];
+  return (new Function(...args))(...keys.map(key => options[key]));
+}
+
+export function renderTemplate(templateString, data, socket) {
   return templateString.replace(templateTagsRegExp, (match) => {
     let expString = match.slice(2, -2);
     let options = {
       ...templateFormatters,
+      socket: socket ? {
+        state: socket.state,
+        pendingReconnect: socket.pendingReconnect,
+        connectAttempts: socket.connectAttempts,
+        authState: socket.authState,
+        authToken: socket.authToken
+      } : undefined,
       ...data
     };
     try {
       return toSafeHTML(
-        Parser.evaluate(
+        execExpression(
           expString,
           options
         )

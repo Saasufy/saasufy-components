@@ -157,7 +157,11 @@ export class AppRouter extends SocketConsumer {
       routeArgs = {};
     }
 
-    routerViewport.innerHTML = renderTemplate(pageTemplate.innerHTML, routeArgs);
+    routerViewport.innerHTML = renderTemplate(
+      pageTemplate.innerHTML,
+      routeArgs,
+      this.socket
+    );
   }
 
   render() {
