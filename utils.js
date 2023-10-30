@@ -182,7 +182,7 @@ let templateFormatters = {
   }
 };
 
-let templateTagsRegExp = /{{[^}]+}}/g;
+let templateTagsRegExp = /{{.*?}}/gs;
 
 function execExpression(expression, options) {
   let keys = Object.keys(options);
@@ -209,6 +209,7 @@ export function renderTemplate(templateString, data, socket) {
       } : undefined,
       ...data
     };
+
     try {
       return toSafeHTML(
         execExpression(
