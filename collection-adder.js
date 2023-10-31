@@ -12,8 +12,9 @@ class CollectionAdder extends SocketConsumer {
       checkbox: Boolean,
       number: Number
     };
-    this.fieldPartsRegExp = /([^,()]+(\([^)]*\))?(=[^,]*)?)/g;
+    this.fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
     this.inputTypeWithParamsRegExp = /^([^()]*)(\(([^)]*)\))?/;
+    this.quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
   }
 
   connectedCallback() {
@@ -51,7 +52,7 @@ class CollectionAdder extends SocketConsumer {
       let nameType = (subParts[0] || '').split(':');
       let name = nameType[0];
       let type = nameType[1] || 'text';
-      let value = subParts.slice(1).join('=');
+      let value = subParts.slice(1).join('=').replace(this.quotedContentRegExp, '$1');
       return {
         name,
         type,
