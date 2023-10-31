@@ -70,7 +70,11 @@ class LogInForm extends SocketConsumer {
       capitaliskLogIn.removeAttribute('error');
       capitaliskLogIn.setAttribute('submit-button-text', 'Loading...');
       try {
-        let logInResponse = await this.socket.invoke('log-in', event.detail);
+        let credentials = {
+          ...event.detail,
+          networkSymbol
+        };
+        let logInResponse = await this.socket.invoke('log-in', credentials);
       } catch (error) {
         capitaliskLogIn.setAttribute('error', `${error.message}.`);
         capitaliskLogIn.removeAttribute('disabled');
