@@ -31,6 +31,7 @@ class ModelInput extends SocketConsumer {
       'model-id',
       'model-field',
       'debounce-delay',
+      'enable-rebound',
       'options',
       'height',
       'hide-error-logs'
@@ -75,6 +76,7 @@ class ModelInput extends SocketConsumer {
     let options = this.getAttribute('options');
     let height = this.getAttribute('height');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
+    let enableRebound = this.hasAttribute('enable-rebound');
     let currentNode = this.parentNode;
     let model;
     let isModelLocal = false;
@@ -100,7 +102,8 @@ class ModelInput extends SocketConsumer {
         socket: this.socket,
         type: modelType,
         id: modelId,
-        fields: [ modelField ]
+        fields: [ modelField ],
+        enableRebound
       });
       if (!hideErrorLogs) {
         (async () => {
