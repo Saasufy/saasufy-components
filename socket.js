@@ -123,7 +123,7 @@ export class SocketConsumer extends HTMLElement {
       throw new Error(
         `The ${
           this.nodeName.toLowerCase()
-        } element failed to obtain a socket - Make sure it is nested inside a socket-provider element`
+        } element failed to obtain a socket - Ensure that it is nested inside a socket-provider element`
       );
     }
     return socket;

@@ -1,4 +1,4 @@
-import { debouncer } from './utils.js';
+import { debouncer, updateConsumerElements } from './utils.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 800;
 
@@ -113,52 +113,6 @@ class InputProvider extends HTMLElement {
     };
   }
 
-  updateConsumerElements(consumers, value) {
-    let parentElement = this.parentElement;
-    if (parentElement) {
-      let consumerParts = consumers.split(',')
-        .filter(part => part)
-        .map(part => {
-          part = part.trim();
-          return part.split(':').map(subPart => subPart.trim());
-        })
-        .filter(([ selector, attributeName ]) => selector);
-
-      for (let [ selector, attributeName ] of consumerParts) {
-        let matchingElements = parentElement.querySelectorAll(selector);
-        if (attributeName) {
-          for (let element of matchingElements) {
-            if (typeof value === 'boolean') {
-              if (value) {
-                element.setAttribute(attributeName, '');
-              } else {
-                element.removeAttribute(attributeName);
-              }
-            } else {
-              element.setAttribute(attributeName, value);
-            }
-          }
-        } else {
-          for (let element of matchingElements) {
-            if (element.nodeName === 'INPUT') {
-              if (element.type === 'checkbox') {
-                if (value) {
-                  element.setAttribute('checked', '');
-                } else {
-                  element.removeAttribute('checked');
-                }
-              } else {
-                element.value = value;
-              }
-            } else {
-              element.innerHTML = value;
-            }
-          }
-        }
-      }
-    }
-  }
-
   updateConsumerElementsOnEdit() {
     let consumers = this.getAttribute('consumers');
     if (!consumers) return;
@@ -175,16 +129,16 @@ class InputProvider extends HTMLElement {
         if (inputElement.type === 'checkbox') {
           let checked = !!inputElement.checked;
           this.lastValue = checked;
-          this.updateConsumerElements(consumers, checked);
+          updateConsumerElements(this.parentElement, consumers, checked);
           return;
         }
         this.lastValue = event.target.value;
         if (event.target.value === '') {
-          this.updateConsumerElements(consumers, '');
+          updateConsumerElements(this.parentElement, consumers, '');
         } else {
           let targetValue = inputElement.type === 'number' ?
             Number(event.target.value) : event.target.value;
-          this.updateConsumerElements(consumers, targetValue);
+          updateConsumerElements(this.parentElement, consumers, targetValue);
         }
       }, debounceDelay);
     };
@@ -197,11 +151,11 @@ class InputProvider extends HTMLElement {
           if (event.target.value === this.lastValue) return;
           this.lastValue = event.target.value;
           if (event.target.value === '') {
-            this.updateConsumerElements(consumers, '');
+            updateConsumerElements(this.parentElement, consumers, '');
           } else {
             let targetValue = inputElement.type === 'number' ?
               Number(event.target.value) : event.target.value;
-            this.updateConsumerElements(consumers, targetValue);
+            updateConsumerElements(this.parentElement, consumers, targetValue);
           }
         }, debounceDelay);
       };

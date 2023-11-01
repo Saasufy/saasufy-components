@@ -1,5 +1,5 @@
 import { SocketConsumer } from './socket.js';
-import { debouncer } from './utils.js';
+import { debouncer, updateConsumerElements } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelInput extends SocketConsumer {
@@ -25,6 +25,7 @@ class ModelInput extends SocketConsumer {
       'model-instance-property',
       'type',
       'placeholder',
+      'consumers',
       'show-error-message',
       'model-type',
       'model-id',
@@ -80,10 +81,19 @@ class ModelInput extends SocketConsumer {
     if (modelInstanceProperty) {
       while (currentNode) {
         model = currentNode[modelInstanceProperty];
+        if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
+          model = null;
+        }
         if (model) break;
         currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }
-      if (!model) return;
+      if (!model) {
+        throw new Error(
+          `The ${
+            this.nodeName.toLowerCase()
+          } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
+        );
+      };
     } else {
       this.socket = this.getSocket();
       model = new AGModel({
@@ -167,25 +177,34 @@ class ModelInput extends SocketConsumer {
 
   syncInputElementWithModel(inputElement, model, fieldName, messageContainerElement) {
     if (model.isLoaded) {
+      let consumers = this.getAttribute('consumers');
       let fieldValue = model.value[fieldName];
       if (inputElement.type === 'checkbox') {
-        inputElement.checked = !!fieldValue;
+        let checked = !!fieldValue;
+        inputElement.checked = checked;
+        updateConsumerElements(this.parentElement, consumers, checked);
       } else {
         let defaultValue = this.getAttribute('default-value') || '';
         inputElement.value = fieldValue == null ? defaultValue : fieldValue;
+        updateConsumerElements(this.parentElement, consumers, inputElement.value);
       }
     }
     let stopSaving = this.saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement);
     let changeConsumer = model.listener('change').createConsumer();
     (async () => {
       for await (let event of changeConsumer) {
-        if (event.resourceField !== fieldName || !event.isRemote) continue;
+        let hasFocus = document.activeElement === this.inputElement;
+        if (event.resourceField !== fieldName || (hasFocus && !event.isRemote)) continue;
+        let consumers = this.getAttribute('consumers');
         let fieldValue = model.value[fieldName];
         if (inputElement.type === 'checkbox') {
-          inputElement.checked = !!fieldValue;
+          let checked = !!fieldValue;
+          inputElement.checked = checked;
+          updateConsumerElements(this.parentElement, consumers, checked);
         } else {
           let defaultValue = this.getAttribute('default-value') || '';
           inputElement.value = fieldValue == null ? defaultValue : fieldValue;
+          updateConsumerElements(this.parentElement, consumers, inputElement.value);
         }
       }
     })();
@@ -212,6 +231,7 @@ class ModelInput extends SocketConsumer {
       messageContainerElement.classList.add('hidden');
     };
 
+    let consumers = this.getAttribute('consumers');
     let debounceDelay = this.getAttribute('debounce-delay');
     debounceDelay = debounceDelay ? Number(debounceDelay) : null;
     let debounce = debouncer();
@@ -221,17 +241,21 @@ class ModelInput extends SocketConsumer {
       debounce(async () => {
         try {
           if (inputElement.type === 'checkbox') {
-            await model.update(fieldName, !!inputElement.checked);
+            let checked = !!inputElement.checked;
+            updateConsumerElements(this.parentElement, consumers, checked);
+            await model.update(fieldName, checked);
             inputElement.classList.remove(errorStyleClass);
             inputElement.classList.add(successStyleClass);
             hideErrorMessage(fieldName);
             return;
           }
           if (event.target.value === '') {
+            updateConsumerElements(this.parentElement, consumers, '');
             await model.delete(fieldName);
           } else {
             let targetValue = inputElement.type === 'number' ?
               Number(event.target.value) : event.target.value;
+            updateConsumerElements(this.parentElement, consumers, targetValue);
             await model.update(fieldName, targetValue);
           }
           inputElement.classList.remove(errorStyleClass);
@@ -253,9 +277,11 @@ class ModelInput extends SocketConsumer {
           try {
             if (event.target.value === '') {
               await model.delete(fieldName);
+              updateConsumerElements(this.parentElement, consumers, '');
             } else {
               let targetValue = inputElement.type === 'number' ?
-              Number(event.target.value) : event.target.value;
+                Number(event.target.value) : event.target.value;
+              updateConsumerElements(this.parentElement, consumers, targetValue);
               await model.update(fieldName, targetValue);
             }
             inputElement.classList.remove(errorStyleClass);

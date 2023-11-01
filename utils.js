@@ -223,6 +223,51 @@ export function renderTemplate(templateString, data, socket) {
   });
 }
 
+export function updateConsumerElements(parentElement, consumers, value) {
+  if (parentElement && consumers) {
+    let consumerParts = consumers.split(',')
+      .filter(part => part)
+      .map(part => {
+        part = part.trim();
+        return part.split(':').map(subPart => subPart.trim());
+      })
+      .filter(([ selector, attributeName ]) => selector);
+
+    for (let [ selector, attributeName ] of consumerParts) {
+      let matchingElements = parentElement.querySelectorAll(selector);
+      if (attributeName) {
+        for (let element of matchingElements) {
+          if (typeof value === 'boolean') {
+            if (value) {
+              element.setAttribute(attributeName, '');
+            } else {
+              element.removeAttribute(attributeName);
+            }
+          } else {
+            element.setAttribute(attributeName, value);
+          }
+        }
+      } else {
+        for (let element of matchingElements) {
+          if (element.nodeName === 'INPUT') {
+            if (element.type === 'checkbox') {
+              if (value) {
+                element.setAttribute('checked', '');
+              } else {
+                element.removeAttribute('checked');
+              }
+            } else {
+              element.value = value;
+            }
+          } else {
+            element.innerHTML = value;
+          }
+        }
+      }
+    }
+  }
+}
+
 export function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }

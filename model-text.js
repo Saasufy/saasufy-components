@@ -42,10 +42,19 @@ class ModelText extends SocketConsumer {
     if (modelInstanceProperty) {
       while (currentNode) {
         model = currentNode[modelInstanceProperty];
+        if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
+          model = null;
+        }
         if (model) break;
         currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }
-      if (!model) return;
+      if (!model) {
+        throw new Error(
+          `The ${
+            this.nodeName.toLowerCase()
+          } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
+        );
+      };
     } else {
       this.socket = this.getSocket();
       model = new AGModel({
@@ -79,7 +88,7 @@ class ModelText extends SocketConsumer {
     let changeConsumer = model.listener('change').createConsumer();
     (async () => {
       for await (let event of changeConsumer) {
-        if (event.resourceField !== modelField || !event.isRemote) continue;
+        if (event.resourceField !== modelField) continue;
         let fieldValue = toSafeHTML(model.value[modelField]);
         this.innerHTML = fieldValue;
       }
