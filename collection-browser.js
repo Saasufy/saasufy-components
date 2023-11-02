@@ -8,6 +8,7 @@ class CollectionBrowser extends SocketConsumer {
   constructor() {
     super();
     this.isReady = false;
+    this.isStale = true;
     this.attachShadow({ mode: 'open' });
 
     this.handleShowModalEvent = (event) => {
@@ -76,12 +77,14 @@ class CollectionBrowser extends SocketConsumer {
 
   goToPreviousPage() {
     if (!this.collection) return;
+    this.isStale = true;
     this.collection.fetchPreviousPage();
     this.setAttribute('collection-page-offset', this.collection.meta.pageOffset);
   }
 
   goToNextPage() {
     if (!this.collection) return;
+    this.isStale = true;
     this.collection.fetchNextPage();
     this.setAttribute('collection-page-offset', this.collection.meta.pageOffset);
   }
@@ -98,6 +101,7 @@ class CollectionBrowser extends SocketConsumer {
       'collection-view-params',
       'collection-page-size',
       'collection-page-offset',
+      'max-show-loader',
       'type-alias',
       'hide-error-logs'
     ];
@@ -108,6 +112,7 @@ class CollectionBrowser extends SocketConsumer {
     if (this.collection && name === 'collection-page-offset') {
       let newOffset = Number(newValue);
       if (newOffset !== this.collection.meta.pageOffset) {
+        this.isStale = true;
         this.collection.fetchPage(newOffset);
       }
       this.updatePageNumberElements();
@@ -161,12 +166,13 @@ class CollectionBrowser extends SocketConsumer {
     let hasLoaders = !!loaderSlot.assignedNodes().length;
 
     if (!this.collection || !this.collection.isLoaded) {
-      if (hasLoaders) {
+      if (hasLoaders && (this.isStale || this.hasAttribute('max-show-loader'))) {
         viewportSlot.classList.add('hidden');
         loaderSlot.classList.remove('hidden');
       }
       return;
     }
+    this.isStale = false;
 
     loaderSlot.classList.add('hidden');
     viewportSlot.classList.remove('hidden');
@@ -221,6 +227,7 @@ class CollectionBrowser extends SocketConsumer {
       .filter(([field]) => field)
     );
     if (this.collection) this.collection.destroy();
+    this.isStale = true;
 
     this.collection = new AGCollection({
       socket: this.socket,
