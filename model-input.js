@@ -139,12 +139,12 @@ class ModelInput extends SocketConsumer {
     if (type === 'select') {
       if (options) {
         let optionElements = options
-        .split(',')
-        .map((option) => {
-          return `<option value="${option}">${option}</option>`;
-        })
-        .join('');
-        this.inputElement.innerHTML = optionElements;
+          .split(',')
+          .map((option) => {
+            return `<option value="${option}">${option}</option>`;
+          })
+          .join('');
+          this.inputElement.innerHTML = optionElements;
       }
     } else if (elementType === 'input') {
       if (inputList) {

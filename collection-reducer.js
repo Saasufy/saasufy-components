@@ -126,8 +126,22 @@ class CollectionReducer extends SocketConsumer {
   }
 
   renderReduction() {
-    if (!this.collection || !this.collection.isLoaded) return;
-    let viewportNode = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
+    let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
+    let loaderSlot = this.shadowRoot.querySelector('slot[name="loader"]');
+    let hasLoaders = !!loaderSlot.assignedNodes().length;
+
+    if (!this.collection || !this.collection.isLoaded) {
+      if (hasLoaders) {
+        viewportSlot.classList.add('hidden');
+        loaderSlot.classList.remove('hidden');
+      }
+      return;
+    }
+
+    loaderSlot.classList.add('hidden');
+    viewportSlot.classList.remove('hidden');
+
+    let viewportNode = viewportSlot.assignedNodes()[0];
     if (!viewportNode) return;
 
     let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
@@ -176,6 +190,12 @@ class CollectionReducer extends SocketConsumer {
     });
 
     this.shadowRoot.innerHTML = `
+      <style>
+        .hidden {
+          display: none;
+        }
+      </style>
+      <slot name="loader"></slot>
       <slot name="item"></slot>
       <slot name="no-item"></slot>
       <slot name="viewport"></slot>

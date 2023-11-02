@@ -30,7 +30,8 @@ class RenderGroup extends HTMLElement {
           display: none;
         }
       </style>
-      <slot${hasPending ? ' class="hidden"': ''}></slot>
+      <slot name="loader"></slot>
+      <slot id="main-slot"${hasPending ? ' class="hidden"': ''}></slot>
     `;
     if (hasPending) {
       this.addEventListener('load', this.loadHandler);
@@ -38,8 +39,10 @@ class RenderGroup extends HTMLElement {
   }
 
   showSlottedElements() {
-    let slot = this.shadowRoot.querySelector('slot');
-    slot.classList.remove('hidden');
+    let loaderSlot = this.shadowRoot.querySelector('slot[name="loader"]');
+    loaderSlot.classList.add('hidden');
+    let mainSlot = this.shadowRoot.querySelector('#main-slot');
+    mainSlot.classList.remove('hidden');
   }
 
   getWaitFor() {
