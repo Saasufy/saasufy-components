@@ -11,31 +11,37 @@ class CollectionBrowser extends SocketConsumer {
     this.attachShadow({ mode: 'open' });
 
     this.handleShowModalEvent = (event) => {
+      event.stopPropagation();
       let modal = this.shadowRoot.querySelector('slot[name="modal"]').assignedNodes()[0];
       modal.show(event.detail.message, event.detail.callback);
     };
 
     this.handleCRUDCreateEvent = (event) => {
+      event.stopPropagation();
       if (this.collection) {
         this.collection.create(event.detail);
       }
     };
 
     this.handleCRUDDeleteEvent = (event) => {
+      event.stopPropagation();
       if (this.collection) {
         this.collection.delete(event.detail);
       }
     };
 
-    this.handleGoToPreviousPageEvent = () => {
+    this.handleGoToPreviousPageEvent = (event) => {
+      event.stopPropagation();
       this.goToPreviousPage();
     };
 
-    this.handleGoToNextPageEvent = () => {
+    this.handleGoToNextPageEvent = (event) => {
+      event.stopPropagation();
       this.goToNextPage();
     };
 
     this.handleGoToPageEvent = (event) => {
+      event.stopPropagation();
       this.goToPage((event.detail || {}).offset);
     };
 
