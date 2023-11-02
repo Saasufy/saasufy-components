@@ -59,6 +59,12 @@ Once a user is authenticated, they will be able to access restricted data (as sp
 It's also possible to specify a `success-location-hash` attribute to trigger a client-side redirect upon successful authentication.
 The change in the location hash can then be detected by an `app-router` to switch to a different page upon successful login.
 
+### log-out
+
+A component which can be placed inside a `socket-provider` to deauthenticate the socket (e.g. on click).
+
+Example usage: `<log-out onclick="logOut()"><a href="javascript:void(0)">Log out</a></log-out>`
+
 ### confirm-modal
 
 A modal component to prompt the user for confirmation before performing sensitive operations.
