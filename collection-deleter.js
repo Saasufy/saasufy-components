@@ -2,7 +2,6 @@ class CollectionDeleter extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.isReady = false;
   }
 
   static get observedAttributes() {
@@ -13,7 +12,6 @@ class CollectionDeleter extends HTMLElement {
   }
 
   connectedCallback() {
-    this.isReady = true;
     this.shadowRoot.innerHTML = `
       <slot></slot>
     `;
@@ -39,10 +37,6 @@ class CollectionDeleter extends HTMLElement {
         bubbles: true
       })
     )
-  }
-
-  disconnectedCallback() {
-
   }
 }
 
