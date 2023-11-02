@@ -24,6 +24,7 @@ class CollectionReducer extends SocketConsumer {
     this.handleSlotChangeEvent = () => {
       this.renderReduction();
     };
+    this.isReady = false;
   }
 
   connectedCallback() {

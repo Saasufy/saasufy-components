@@ -10,6 +10,7 @@ class ModelViewer extends SocketConsumer {
     this.handleSlotChangeEvent = () => {
       this.renderItem();
     };
+    this.isReady = false;
   }
 
   connectedCallback() {

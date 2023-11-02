@@ -12,15 +12,20 @@ Coming soon.
 A top level component which connects to your Saasufy service and inside which you can place other components which depends on Saasufy data.
 A Saasufy component which integrates with data from Saasufy is known as a `socket-consumer` and must always be placed inside a `socket-provider` element (although it does not have to be a direct child).
 
-### collection-adder
-
-A form component for inserting data into collections.
-
 ### collection-browser
 
 Used for rendering collections as lists, tables or other sequences based on a specific view using a template.
 Supports pagination by allowing you to specify custom buttons or links to navigate between pages.
 Can also perform basic CRUD operations such as deleting or creating records by listening for events from child components.
+
+### collection-adder
+
+A form component for inserting data into collections.
+
+### collection-deleter
+
+A component which can be placed anywhere inside a `collection-browser` component to delete a specific item from a collection as a result of a user action (e.g. on click).
+It supports either immediate deletion or deletion upon confirmation; in the latter case, the parent `collection-browser` must have a `confirm-modal` component slotted into its `modal` slot.
 
 ### collection-reducer
 

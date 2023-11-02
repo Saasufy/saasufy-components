@@ -7,6 +7,7 @@ const DEFAULT_RELOAD_DELAY = 0;
 class CollectionBrowser extends SocketConsumer {
   constructor() {
     super();
+    this.isReady = false;
     this.attachShadow({ mode: 'open' });
 
     this.handleShowModalEvent = (event) => {

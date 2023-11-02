@@ -6,6 +6,7 @@ const DEFAULT_AUTH_TIMEOUT = 10000;
 class LogInForm extends SocketConsumer {
   constructor() {
     super();
+    this.isReady = false;
   }
 
   connectedCallback() {

@@ -15,6 +15,7 @@ class CollectionAdder extends SocketConsumer {
     this.fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
     this.inputTypeWithParamsRegExp = /^([^()]*)(\(([^)]*)\))?/;
     this.quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
+    this.isReady = false;
   }
 
   connectedCallback() {

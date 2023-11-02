@@ -16,12 +16,7 @@ class RenderGroup extends HTMLElement {
     };
   }
 
-  disconnectedCallback() {
-    this.removeEventListener('load', this.loadHandler);
-  }
-
   connectedCallback() {
-    this.isReady = true;
     this.loadedElements = {};
     let hasPending = !!this.getWaitFor().length;
     this.shadowRoot.innerHTML = `
@@ -38,6 +33,10 @@ class RenderGroup extends HTMLElement {
     }
   }
 
+  disconnectedCallback() {
+    this.removeEventListener('load', this.loadHandler);
+  }
+
   showSlottedElements() {
     let loaderSlot = this.shadowRoot.querySelector('slot[name="loader"]');
     loaderSlot.classList.add('hidden');
@@ -51,10 +50,6 @@ class RenderGroup extends HTMLElement {
       return [];
     }
     return waitForString.split(',').map(id => id.trim());
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (!this.isReady) return;
   }
 }
 

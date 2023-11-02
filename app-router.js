@@ -8,6 +8,7 @@ export class AppRouter extends SocketConsumer {
     super();
     this.attachShadow({ mode: 'open' });
 
+    this.isReady = false;
     this.pages = {};
     this.pageRouteInfos = [];
     this.debounce = debouncer();

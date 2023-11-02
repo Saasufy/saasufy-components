@@ -4,6 +4,7 @@ class ConfirmModal extends HTMLElement {
   constructor() {
     super();
     this.hidden = true;
+    this.isReady = false;
   }
 
   connectedCallback() {

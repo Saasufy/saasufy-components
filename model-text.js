@@ -3,6 +3,11 @@ import { toSafeHTML } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelText extends SocketConsumer {
+  constructor() {
+    super();
+    this.isReady = false;
+  }
+
   connectedCallback() {
     this.isReady = true;
     this.destroy = () => {};
