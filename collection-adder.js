@@ -82,6 +82,71 @@ class CollectionAdder extends SocketConsumer {
     };
   }
 
+  async submit() {
+    if (!this.isReady) {
+      throw new Error('Collection adder form is not ready to be submitted');
+    }
+    let successMessage = this.getAttribute('success-message');
+    let messageContainer = this.querySelector('.collection-adder-message-container');
+
+    messageContainer.classList.remove('success');
+    messageContainer.classList.remove('error');
+    messageContainer.textContent = '';
+
+    let newModelData = {
+      ...this.modelFieldValues,
+      ...Object.fromEntries(
+        [...this.querySelectorAll('.collection-adder-input')]
+          .filter(input => input.value !== '')
+          .map((input) => {
+            let fieldType = this.fieldTypes[input.name];
+            let Type = this.getTypeCastFunction(fieldType);
+            let value;
+            if (fieldType === 'checkbox') {
+              value = input.checked;
+            } else {
+              value = input.value;
+            }
+            return [ input.name, Type(value) ];
+          })
+      )
+    };
+
+    try {
+      await this.collection.create(newModelData);
+      messageContainer.classList.add('success');
+      messageContainer.classList.remove('error');
+      this.dispatchEvent(
+        new CustomEvent('success', {
+          detail: newModelData
+        })
+      );
+      let form = this.querySelector('.collection-adder-form');
+      form.reset();
+      if (successMessage) {
+        messageContainer.textContent = successMessage;
+      } else {
+        messageContainer.textContent = '';
+      }
+    } catch (error) {
+      messageContainer.classList.add('error');
+      messageContainer.classList.remove('success');
+      messageContainer.textContent = error.message;
+      this.dispatchEvent(
+        new CustomEvent('error', {
+          detail: error
+        })
+      );
+    }
+  }
+
+  reset() {
+    let form = this.querySelector('.collection-adder-form');
+    if (form) {
+      form.reset();
+    }
+  }
+
   render() {
     let submitButtonLabel = this.getAttribute('submit-button-label');
     if (submitButtonLabel == null) {
@@ -94,12 +159,14 @@ class CollectionAdder extends SocketConsumer {
       fieldTypes
     } = this.getFieldDetails(this.getAttribute('collection-fields'));
 
+    this.fieldTypes = fieldTypes;
+
     let {
       fieldNames: modelFieldNames,
       fieldValues: modelFieldValues
     } = this.getFieldDetails(this.getAttribute('model-values'));
 
-    let successMessage = this.getAttribute('success-message');
+    this.modelFieldValues = modelFieldValues;
 
     if (this.collection) this.collection.destroy();
 
@@ -187,59 +254,10 @@ class CollectionAdder extends SocketConsumer {
       });
     }
 
-    let messageContainer = this.querySelector('.collection-adder-message-container');
-
     let form = this.querySelector('.collection-adder-form');
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      messageContainer.classList.remove('success');
-      messageContainer.classList.remove('error');
-      messageContainer.textContent = '';
-
-      let newModelData = {
-        ...modelFieldValues,
-        ...Object.fromEntries(
-          [...event.target.querySelectorAll('.collection-adder-input')]
-            .filter(input => input.value !== '')
-            .map((input) => {
-              let fieldType = fieldTypes[input.name];
-              let Type = this.getTypeCastFunction(fieldType);
-              let value;
-              if (fieldType === 'checkbox') {
-                value = input.checked;
-              } else {
-                value = input.value;
-              }
-              return [ input.name, Type(value) ];
-            })
-        )
-      };
-
-      try {
-        await this.collection.create(newModelData);
-        messageContainer.classList.add('success');
-        messageContainer.classList.remove('error');
-        this.dispatchEvent(
-          new CustomEvent('success', {
-            detail: newModelData
-          })
-        );
-        form.reset();
-        if (successMessage) {
-          messageContainer.textContent = successMessage;
-        } else {
-          messageContainer.textContent = '';
-        }
-      } catch (error) {
-        messageContainer.classList.add('error');
-        messageContainer.classList.remove('success');
-        messageContainer.textContent = error.message;
-        this.dispatchEvent(
-          new CustomEvent('error', {
-            detail: error
-          })
-        );
-      }
+      await this.submit();
     });
   }
 }
