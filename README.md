@@ -81,3 +81,7 @@ A component which can be used to guarantee that certain children components are 
 
 A modal component which exposes a `show-content` property which can be set to true or false to show or hide its content.
 It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder.
+
+### collection-adder-group
+
+A component which can be used to group together multiple `collection-adder` components. It can be used to insert multiple records into a collection via a single button click.
