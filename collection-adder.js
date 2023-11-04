@@ -33,7 +33,9 @@ class CollectionAdder extends SocketConsumer {
       'collection-type',
       'collection-fields',
       'model-values',
-      'submit-button-label'
+      'submit-button-label',
+      'hide-submit-button',
+      'success-message'
     ];
   }
 
@@ -85,6 +87,7 @@ class CollectionAdder extends SocketConsumer {
     if (submitButtonLabel == null) {
       submitButtonLabel = 'Submit';
     }
+    let hideSubmitButton = this.hasAttribute('hide-submit-button');
     let collectionType = this.getAttribute('collection-type');
     let {
       fieldNames,
@@ -95,6 +98,8 @@ class CollectionAdder extends SocketConsumer {
       fieldNames: modelFieldNames,
       fieldValues: modelFieldValues
     } = this.getFieldDetails(this.getAttribute('model-values'));
+
+    let successMessage = this.getAttribute('success-message');
 
     if (this.collection) this.collection.destroy();
 
@@ -167,7 +172,7 @@ class CollectionAdder extends SocketConsumer {
         <div class="collection-adder-message-container"></div>
         <div class="collection-adder-form-content">
           ${items.join('')}
-          <input type="submit" value="${submitButtonLabel}" />
+          ${hideSubmitButton ? '' : `<input type="submit" value="${submitButtonLabel}" />`}
         </div>
       </form>
     `;
@@ -220,6 +225,11 @@ class CollectionAdder extends SocketConsumer {
           })
         );
         form.reset();
+        if (successMessage) {
+          messageContainer.textContent = successMessage;
+        } else {
+          messageContainer.textContent = '';
+        }
       } catch (error) {
         messageContainer.classList.add('error');
         messageContainer.classList.remove('success');

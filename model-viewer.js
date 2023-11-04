@@ -21,7 +21,13 @@ class ModelViewer extends SocketConsumer {
   }
 
   disconnectedCallback() {
-    if (this.model) this.model.destroy();
+    if (this.model && this.isModelLocal) {
+      this.model.destroy();
+    } else {
+      if (this.modelLoadConsumer) this.modelLoadConsumer.kill();
+      if (this.modelChangeConsumer) this.modelChangeConsumer.kill();
+      if (this.modelErrorConsumer) this.modelErrorConsumer.kill();
+    }
     this.shadowRoot.removeEventListener('slotchange', this.handleSlotChangeEvent);
   }
 
@@ -85,16 +91,40 @@ class ModelViewer extends SocketConsumer {
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelFields = this.getAttribute('model-fields') || '';
+    let modelInstanceProperty = this.getAttribute('model-instance-property');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
 
-    if (this.model) this.model.destroy();
+    if (this.model && this.isModelLocal) this.model.destroy();
 
-    this.model = new AGModel({
-      socket: this.socket,
-      type: modelType,
-      id: modelId,
-      fields: modelFields.split(',').map(field => field.trim()).filter(field => field)
-    });
+    let currentNode = this.parentNode;
+    let model;
+    if (modelInstanceProperty) {
+      while (currentNode) {
+        model = currentNode[modelInstanceProperty];
+        if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
+          model = null;
+        }
+        if (model) break;
+        currentNode = currentNode.getRootNode().host || currentNode.parentNode;
+      }
+      if (!model) {
+        throw new Error(
+          `The ${
+            this.nodeName.toLowerCase()
+          } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
+        );
+      };
+      this.model = model;
+      this.isModelLocal = false;
+    } else {
+      this.model = new AGModel({
+        socket: this.socket,
+        type: modelType,
+        id: modelId,
+        fields: modelFields.split(',').map(field => field.trim()).filter(field => field)
+      });
+      this.isModelLocal = true;
+    }
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -109,7 +139,9 @@ class ModelViewer extends SocketConsumer {
     `;
 
     (async () => {
-      await this.model.listener('load').once();
+      this.modelLoadConsumer = this.model.listener('load').createConsumer();
+      let packet = await this.modelLoadConsumer.next();
+      if (packet.done) return;
       if (!this.modelValueExists(this.model.value)) {
         this.renderItem();
       }
@@ -117,15 +149,23 @@ class ModelViewer extends SocketConsumer {
       this.dispatchEvent(new CustomEvent('load', { bubbles: true }));
     })();
 
+    if (this.model.isLoaded) {
+      this.renderItem();
+      this.setAttribute('is-loaded', '');
+      this.dispatchEvent(new CustomEvent('load', { bubbles: true }));
+    }
+
     (async () => {
-      for await (let event of this.model.listener('change')) {
+      this.modelChangeConsumer = this.model.listener('change').createConsumer();
+      for await (let event of this.modelChangeConsumer) {
         this.renderItem();
       }
     })();
 
     if (!hideErrorLogs) {
       (async () => {
-        for await (let { error } of this.model.listener('error')) {
+        this.modelErrorConsumer = this.model.listener('error').createConsumer();
+        for await (let { error } of this.modelErrorConsumer) {
           console.error(
             `Model viewer encountered an error: ${error.message}`
           );
