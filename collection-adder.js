@@ -32,6 +32,7 @@ class CollectionAdder extends SocketConsumer {
     return [
       'collection-type',
       'collection-fields',
+      'field-labels',
       'model-values',
       'submit-button-label',
       'hide-submit-button',
@@ -166,6 +167,10 @@ class CollectionAdder extends SocketConsumer {
       fieldValues: modelFieldValues
     } = this.getFieldDetails(this.getAttribute('model-values'));
 
+    let {
+      fieldValues: modelFieldLabels
+    } = this.getFieldDetails(this.getAttribute('field-labels'));
+
     this.modelFieldValues = modelFieldValues;
 
     if (this.collection) this.collection.destroy();
@@ -186,11 +191,12 @@ class CollectionAdder extends SocketConsumer {
         inputType = inputTypeParts[1];
         inputTypeParams = inputTypeParts[3] ? inputTypeParts[3].split(',') : [];
       }
+      let inputLabel = modelFieldLabels[field] == null ? field : modelFieldLabels[field];
       if (inputType === 'checkbox') {
         items.push(
           `<label>
             ${
-              field
+              inputLabel
             }
             <input class="collection-adder-input" type="${
               inputType
@@ -205,7 +211,7 @@ class CollectionAdder extends SocketConsumer {
             <input class="collection-adder-input" type="text" name="${
               field
             }" placeholder="${
-              field
+              inputLabel
             }" />
             <select class="collection-adder-select">
               <option value="" selected disabled hidden>Options</option>
@@ -218,7 +224,7 @@ class CollectionAdder extends SocketConsumer {
           `<textarea class="collection-adder-input" name="${
             field
           }" placeholder="${
-            field
+            inputLabel
           }"></textarea>`
         );
       } else {
@@ -228,7 +234,7 @@ class CollectionAdder extends SocketConsumer {
           }" name="${
             field
           }" placeholder="${
-            field
+            inputLabel
           }" />`
         );
       }
