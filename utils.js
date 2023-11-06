@@ -268,6 +268,18 @@ export function updateConsumerElements(parentElement, consumers, value) {
   }
 }
 
+export function generateRandomHexString(byteLength) {
+  let byteArray = new Uint8Array(byteLength);
+  crypto.getRandomValues(byteArray);
+  return Array.from(byteArray, byte => {
+    let firstChar = byte >> 4;
+    firstChar = firstChar < 10 ? String(firstChar) : String.fromCharCode(firstChar + 87);
+    let secondChar = byte & 0x0f;
+    secondChar = secondChar < 10 ? String(secondChar) : String.fromCharCode(secondChar + 87);
+    return `${firstChar}${secondChar}`;
+  }).join('');
+}
+
 export function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }
