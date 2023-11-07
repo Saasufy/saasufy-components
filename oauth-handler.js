@@ -37,7 +37,7 @@ class OAuthHandler extends SocketConsumer {
     let expectedOAuthState = sessionStorage.getItem(sessionStorageKey);
     if (!expectedOAuthState) {
       this.innerHTML = `
-        <div class="error">OAuth authentication failed because the state query parameter was missing.</div>
+        <div class="error">OAuth authentication failed because the state was missing.</div>
       `;
       return;
     };
