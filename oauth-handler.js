@@ -4,19 +4,6 @@ import { generateRandomHexString } from './utils.js';
 const DEFAULT_AUTH_TIMEOUT = 10000;
 
 class OAuthHandler extends SocketConsumer {
-  static get observedAttributes() {
-    return [
-      'provider',
-      'code-param-name',
-      'state-param-name',
-      'state-session-storage-key',
-      'success-url',
-      'success-location-hash',
-      'navigate-event-path',
-      'auth-timeout'
-    ];
-  }
-
   successRedirect() {
     let successURL = this.getAttribute('success-url');
     let successLocationHash = this.getAttribute('success-location-hash');
@@ -46,9 +33,19 @@ class OAuthHandler extends SocketConsumer {
       throw new Error('The provider attribute of oauth-handler was not specified');
     }
 
-    let sessionStorageKey = this.getAttribute('state-session-storage-key') || `oauth.${provider}.state`;
+    let sessionStorageKey = this.getAttribute('state-session-storage-key') || 'oauth.state';
     let expectedOAuthState = sessionStorage.getItem(sessionStorageKey);
-    if (!expectedOAuthState) return;
+    if (!expectedOAuthState) {
+      this.innerHTML = `
+        <div class="error">OAuth authentication failed because the state query parameter was missing.</div>
+      `;
+      return;
+    };
+
+    let stateParts = expectedOAuthState.split('-');
+    // Do not process. The state may have been set for a different provider
+    // which is handled on the same page.
+    if (stateParts[0] !== provider) return;
 
     let codeParamName = this.getAttribute('code-param-name') || 'code';
     let stateParamName = this.getAttribute('state-param-name') || 'state';
