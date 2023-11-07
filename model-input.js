@@ -23,6 +23,7 @@ class ModelInput extends SocketConsumer {
       'input-id',
       'list',
       'model-instance-property',
+      'bind-to-model',
       'bind-to-collection',
       'type',
       'placeholder',
@@ -65,8 +66,9 @@ class ModelInput extends SocketConsumer {
 
   render() {
     this.innerHTML = '';
-    let modelInstanceProperty = this.getAttribute('model-instance-property');
+    let bindToModel = this.hasAttribute('bind-to-model');
     let bindToCollection = this.hasAttribute('bind-to-collection');
+    let modelInstanceProperty = this.getAttribute('model-instance-property');
     let showErrorMessage = this.hasAttribute('show-error-message');
     let inputId = this.getAttribute('input-id');
     let inputList = this.getAttribute('list');
@@ -100,6 +102,9 @@ class ModelInput extends SocketConsumer {
       }
     }
     if (!model) {
+      if (bindToModel) {
+        modelInstanceProperty = 'model';
+      }
       currentNode = this.parentNode;
       if (modelInstanceProperty) {
         while (currentNode) {

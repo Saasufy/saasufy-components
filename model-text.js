@@ -37,8 +37,9 @@ class ModelText extends SocketConsumer {
 
   render() {
     this.innerHTML = '';
-    let modelInstanceProperty = this.getAttribute('model-instance-property');
+    let bindToModel = this.hasAttribute('bind-to-model');
     let bindToCollection = this.hasAttribute('bind-to-collection');
+    let modelInstanceProperty = this.getAttribute('model-instance-property');
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
@@ -64,6 +65,9 @@ class ModelText extends SocketConsumer {
       }
     }
     if (!model) {
+      if (bindToModel) {
+        modelInstanceProperty = 'model';
+      }
       currentNode = this.parentNode;
       if (modelInstanceProperty) {
         while (currentNode) {
