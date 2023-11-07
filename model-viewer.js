@@ -104,6 +104,9 @@ class ModelViewer extends SocketConsumer {
         if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
           model = null;
         }
+        if (model && !model.agFields) {
+          model = null;
+        }
         if (model) break;
         currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }

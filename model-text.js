@@ -21,6 +21,7 @@ class ModelText extends SocketConsumer {
   static get observedAttributes() {
     return [
       'model-instance-property',
+      'bind-to-collection',
       'model-type',
       'model-id',
       'model-field',
@@ -37,6 +38,7 @@ class ModelText extends SocketConsumer {
   render() {
     this.innerHTML = '';
     let modelInstanceProperty = this.getAttribute('model-instance-property');
+    let bindToCollection = this.hasAttribute('bind-to-collection');
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
@@ -44,40 +46,63 @@ class ModelText extends SocketConsumer {
     let currentNode = this.parentNode;
     let model;
     let isModelLocal = false;
-    if (modelInstanceProperty) {
+    if (bindToCollection) {
+      let collection;
       while (currentNode) {
-        model = currentNode[modelInstanceProperty];
-        if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
-          model = null;
+        collection = currentNode.collection;
+        if (collection && (collection.type !== modelType || !(collection.fields || []).includes(modelField))) {
+          collection = null;
         }
-        if (model) break;
+        if (collection && (!collection.agModels || !collection.agModels[modelId] || !collection.agModels[modelId].agFields[modelField])) {
+          collection = null;
+        }
+        if (collection) break;
         currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }
-      if (!model) {
-        throw new Error(
-          `The ${
-            this.nodeName.toLowerCase()
-          } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
-        );
-      };
-    } else {
-      this.socket = this.getSocket();
-      model = new AGModel({
-        socket: this.socket,
-        type: modelType,
-        id: modelId,
-        fields: [ modelField ]
-      });
-      if (!hideErrorLogs) {
-        (async () => {
-          for await (let { error } of model.listener('error')) {
-            console.error(
-              `Model input encountered an error: ${error.message}`
-            );
-          }
-        })();
+      if (collection) {
+        model = collection.agModels[modelId];
       }
-      isModelLocal = true;
+    }
+    if (!model) {
+      currentNode = this.parentNode;
+      if (modelInstanceProperty) {
+        while (currentNode) {
+          model = currentNode[modelInstanceProperty];
+          if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
+            model = null;
+          }
+          if (model && !model.agFields) {
+            model = null;
+          }
+          if (model) break;
+          currentNode = currentNode.getRootNode().host || currentNode.parentNode;
+        }
+        if (!model) {
+          throw new Error(
+            `The ${
+              this.nodeName.toLowerCase()
+            } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
+          );
+        };
+      } else {
+        this.socket = this.getSocket();
+        model = new AGModel({
+          socket: this.socket,
+          type: modelType,
+          id: modelId,
+          fields: [ modelField ]
+        });
+        if (!hideErrorLogs) {
+          (async () => {
+            for await (let { error } of model.listener('error')) {
+              console.error(
+                `Model input encountered an error: ${error.message}`
+              );
+            }
+          })();
+        }
+        isModelLocal = true;
+      }
     }
     if (model.isLoaded) {
       this.setAttribute('is-loaded', '');

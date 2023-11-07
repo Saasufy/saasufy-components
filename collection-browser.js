@@ -223,8 +223,8 @@ class CollectionBrowser extends SocketConsumer {
     );
     let viewParams = Object.fromEntries(
       collectionViewParams.split(',')
-      .map(pair => pair.split('='))
-      .filter(([field]) => field)
+        .map(pair => pair.split('='))
+        .filter(([field]) => field)
     );
     if (this.collection) this.collection.destroy();
     this.isStale = true;
@@ -282,6 +282,8 @@ class CollectionBrowser extends SocketConsumer {
 
     (async () => {
       for await (let event of this.collection.listener('change')) {
+        // Ignore change events which originate from this collection instance.
+        if (!event.isRemote) continue;
         this.renderList();
         this.updatePageButtons();
       }
