@@ -161,6 +161,8 @@ class ModelViewer extends SocketConsumer {
     (async () => {
       this.modelChangeConsumer = this.model.listener('change').createConsumer();
       for await (let event of this.modelChangeConsumer) {
+        // Ignore change events which originate from this collection instance.
+        if (!event.isRemote) continue;
         this.renderItem();
       }
     })();
