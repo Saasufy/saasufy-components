@@ -153,7 +153,7 @@ export class AppRouter extends SocketConsumer {
     let maxRedirects = Number(this.getAttribute('max-redirects') || DEFAULT_MAX_REDIRECTS);
 
     let redirectCount;
-    for (redirectCount = 0; redirectCount < maxRedirects; redirectCount++) {
+    for (redirectCount = 0; redirectCount <= maxRedirects; redirectCount++) {
       let authRedirect = this.socket && this.socket.authState === 'authenticated' ?
         pageTemplate.getAttribute('auth-redirect') : null;
       let noAuthRedirect = this.socket && this.socket.authState !== 'authenticated' ?
@@ -213,7 +213,7 @@ export class AppRouter extends SocketConsumer {
       }
     }
 
-    if (redirectCount >= maxRedirects) {
+    if (redirectCount > maxRedirects) {
       throw new Error(
         `The number of redirects exceeded the maximum amount of ${maxRedirects}`
       );
