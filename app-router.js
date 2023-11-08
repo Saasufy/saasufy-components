@@ -154,15 +154,51 @@ export class AppRouter extends SocketConsumer {
 
     let redirectCount;
     for (redirectCount = 0; redirectCount < maxRedirects; redirectCount++) {
-      let redirect = pageTemplate.getAttribute('redirect');
-      let noAuthRedirect = pageTemplate.getAttribute('no-auth-redirect');
-      let authRedirect = pageTemplate.getAttribute('auth-redirect');
+      let authRedirect = this.socket && this.socket.authState === 'authenticated' ?
+        pageTemplate.getAttribute('auth-redirect') : null;
+      let noAuthRedirect = this.socket && this.socket.authState !== 'authenticated' ?
+        pageTemplate.getAttribute('no-auth-redirect') : null;
 
-      if (!redirect && !noAuthRedirect && !authRedirect) break;
+      if (
+        (authRedirect != null || noAuthRedirect != null) &&
+        this.socket &&
+        this.socket.authState !== 'authenticated' &&
+        this.socket.state !== this.socket.OPEN
+      ) {
+        return;
+      }
+
+      let redirect = pageTemplate.getAttribute('redirect');
+
+      if (authRedirect == null && noAuthRedirect == null && redirect == null) break;
 
       let hardRedirect = pageTemplate.hasAttribute('hard-redirect');
 
-      if (redirect) {
+      if (authRedirect != null) {
+        if (hardRedirect) {
+          location.hash = authRedirect;
+          return;
+        }
+        routeArgs = this.computeRouteArgs(pagePath, regExp, params);
+        pagePath = this.substituteRouteAgs(authRedirect, routeArgs);
+        let result = this.getMatchingPage(pagePath, 'auth-redirect');
+        pageTemplate = result.pageTemplate;
+        route = result.route;
+        regExp = result.regExp;
+        params = result.params;
+      } else if (noAuthRedirect != null) {
+        if (hardRedirect) {
+          location.hash = noAuthRedirect;
+          return;
+        }
+        routeArgs = this.computeRouteArgs(pagePath, regExp, params);
+        pagePath = this.substituteRouteAgs(noAuthRedirect, routeArgs);
+        let result = this.getMatchingPage(pagePath, 'no-auth-redirect');
+        pageTemplate = result.pageTemplate;
+        route = result.route;
+        regExp = result.regExp;
+        params = result.params;
+      } else {
         if (hardRedirect) {
           location.hash = redirect;
           return;
@@ -174,39 +210,6 @@ export class AppRouter extends SocketConsumer {
         route = result.route;
         regExp = result.regExp;
         params = result.params;
-      } else {
-        if (this.socket && (authRedirect || noAuthRedirect)) {
-          if (this.socket.authState === 'authenticated') {
-            if (authRedirect) {
-              if (hardRedirect) {
-                location.hash = authRedirect;
-                return;
-              }
-              routeArgs = this.computeRouteArgs(pagePath, regExp, params);
-              pagePath = this.substituteRouteAgs(authRedirect, routeArgs);
-              let result = this.getMatchingPage(pagePath, 'auth-redirect');
-              pageTemplate = result.pageTemplate;
-              route = result.route;
-              regExp = result.regExp;
-              params = result.params;
-            }
-          } else {
-            if (this.socket.state !== this.socket.OPEN) return;
-            if (noAuthRedirect) {
-              if (hardRedirect) {
-                location.hash = noAuthRedirect;
-                return;
-              }
-              routeArgs = this.computeRouteArgs(pagePath, regExp, params);
-              pagePath = this.substituteRouteAgs(noAuthRedirect, routeArgs);
-              let result = this.getMatchingPage(pagePath, 'no-auth-redirect');
-              pageTemplate = result.pageTemplate;
-              route = result.route;
-              regExp = result.regExp;
-              params = result.params;
-            }
-          }
-        }
       }
     }
 
