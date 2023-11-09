@@ -36,6 +36,7 @@ class CollectionAdder extends SocketConsumer {
       'collection-type',
       'collection-fields',
       'field-labels',
+      'option-labels',
       'model-values',
       'submit-button-label',
       'hide-submit-button',
@@ -183,6 +184,10 @@ class CollectionAdder extends SocketConsumer {
       fieldValues: modelFieldLabels
     } = this.getFieldDetails(this.getAttribute('field-labels'));
 
+    let {
+      fieldValues: optionLabels
+    } = this.getFieldDetails(this.getAttribute('option-labels'));
+
     this.modelFieldValues = modelFieldValues;
 
     if (this.collection) this.collection.destroy();
@@ -204,6 +209,7 @@ class CollectionAdder extends SocketConsumer {
         inputTypeParams = inputTypeParts[3] ? inputTypeParts[3].split(',') : [];
       }
       let inputLabel = modelFieldLabels[field] == null ? field : modelFieldLabels[field];
+      let optionLabel = optionLabels[field] == null ? 'Options' : optionLabels[field];
       if (inputType === 'checkbox') {
         items.push(
           `<label>
@@ -224,7 +230,7 @@ class CollectionAdder extends SocketConsumer {
               inputLabel
             }
             <select name="${field}" class="collection-adder-input collection-adder-select">
-              <option value="" selected disabled hidden>Options</option>
+              <option value="" selected disabled hidden>${optionLabel}</option>
               ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
             </select>
           </label>`
@@ -238,7 +244,7 @@ class CollectionAdder extends SocketConsumer {
               inputLabel
             }" />
             <select class="collection-adder-select">
-              <option value="" selected disabled hidden>Options</option>
+              <option value="" selected disabled hidden>${optionLabel}</option>
               ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
             </select>
           </div>`
