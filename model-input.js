@@ -208,19 +208,23 @@ class ModelInput extends SocketConsumer {
     };
   }
 
+  updateInputElement(inputElement, fieldValue) {
+    let consumers = this.getAttribute('consumers');
+    if (inputElement.type === 'checkbox') {
+      let checked = !!fieldValue;
+      inputElement.checked = checked;
+      updateConsumerElements(this.parentElement, consumers, checked);
+    } else {
+      let defaultValue = this.getAttribute('default-value') || '';
+      inputElement.value = fieldValue == null ? defaultValue : fieldValue;
+      updateConsumerElements(this.parentElement, consumers, inputElement.value);
+    }
+  }
+
   syncInputElementWithModel(inputElement, model, fieldName, messageContainerElement) {
     if (model.isLoaded) {
-      let consumers = this.getAttribute('consumers');
       let fieldValue = model.value[fieldName];
-      if (inputElement.type === 'checkbox') {
-        let checked = !!fieldValue;
-        inputElement.checked = checked;
-        updateConsumerElements(this.parentElement, consumers, checked);
-      } else {
-        let defaultValue = this.getAttribute('default-value') || '';
-        inputElement.value = fieldValue == null ? defaultValue : fieldValue;
-        updateConsumerElements(this.parentElement, consumers, inputElement.value);
-      }
+      this.updateInputElement(inputElement, fieldValue);
     }
     let stopSaving = this.saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement);
     let changeConsumer = model.listener('change').createConsumer();
@@ -228,17 +232,8 @@ class ModelInput extends SocketConsumer {
       for await (let event of changeConsumer) {
         let hasFocus = document.activeElement === this.inputElement;
         if (event.resourceField !== fieldName || (hasFocus && !event.isRemote)) continue;
-        let consumers = this.getAttribute('consumers');
         let fieldValue = model.value[fieldName];
-        if (inputElement.type === 'checkbox') {
-          let checked = !!fieldValue;
-          inputElement.checked = checked;
-          updateConsumerElements(this.parentElement, consumers, checked);
-        } else {
-          let defaultValue = this.getAttribute('default-value') || '';
-          inputElement.value = fieldValue == null ? defaultValue : fieldValue;
-          updateConsumerElements(this.parentElement, consumers, inputElement.value);
-        }
+        this.updateInputElement(inputElement, fieldValue);
       }
     })();
     return () => {
@@ -304,7 +299,7 @@ class ModelInput extends SocketConsumer {
     inputElement.addEventListener('change', onInputChange);
 
     let onInputKeyUp;
-    if (inputElement.type !== 'checkbox') {
+    if (inputElement.type !== 'checkbox' && inputElement.type !== 'select') {
       onInputKeyUp = async (event) => {
         debounce(async () => {
           try {

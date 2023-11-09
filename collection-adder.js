@@ -10,7 +10,10 @@ class CollectionAdder extends SocketConsumer {
       text: String,
       textarea: String,
       checkbox: Boolean,
-      number: Number
+      number: Number,
+      radio: String,
+      select: String,
+      'text-select': String
     };
     this.fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
     this.inputTypeWithParamsRegExp = /^([^()]*)(\(([^)]*)\))?/;
@@ -94,8 +97,17 @@ class CollectionAdder extends SocketConsumer {
     messageContainer.classList.remove('error');
     messageContainer.textContent = '';
 
+    let radioInputs = [...this.querySelectorAll('.collection-adder-radio')];
+    let radioData = {};
+    for (let radio of radioInputs) {
+      if (radio.checked) {
+        radioData[radio.name] = radio.value;
+      }
+    }
+
     let newModelData = {
       ...this.modelFieldValues,
+      ...radioData,
       ...Object.fromEntries(
         [...this.querySelectorAll('.collection-adder-input')]
           .filter(input => input.value !== '')
@@ -205,6 +217,18 @@ class CollectionAdder extends SocketConsumer {
             }" />
           </label>`
         );
+      } else if (inputType === 'select') {
+        items.push(
+          `<label>
+            ${
+              inputLabel
+            }
+            <select name="${field}" class="collection-adder-input collection-adder-select">
+              <option value="" selected disabled hidden>Options</option>
+              ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
+            </select>
+          </label>`
+        );
       } else if (inputType === 'text-select') {
         items.push(
           `<div class="collection-adder-select-text-row">
@@ -215,9 +239,32 @@ class CollectionAdder extends SocketConsumer {
             }" />
             <select class="collection-adder-select">
               <option value="" selected disabled hidden>Options</option>
-              ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`)}
+              ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
             </select>
           </div>`
+        );
+      } else if (inputType === 'radio') {
+        items.push(
+          `
+            ${
+              inputLabel
+            }
+            ${
+              inputTypeParams.map(
+                param => (
+                  `<label>
+                    <input class="collection-adder-radio" type="${
+                      inputType
+                    }" name="${
+                      field
+                    }" value=${
+                      param
+                    } />
+                    ${param}
+                  </label>`
+                )
+              ).join('')
+            }`
         );
       } else if (inputType === 'textarea') {
         items.push(
