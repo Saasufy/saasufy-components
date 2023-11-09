@@ -154,7 +154,7 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 
 **Attributes**
 
-- `collection-type` (required): Specifies the type of collection to be used, which defines the dataset you want to work with. This should match a `Model` available in your Saasufy service (as specified in `socket-provider`).
+- `collection-type` (required): Specifies the type of collection to be used, which defines the dataset you want to work with. This should match a `Model` available in your Saasufy service.
 - `collection-fields` (required): A comma-separated list of fields from the `Model` that you want to display or use. This lets you pick specific pieces of data from your collection to work with.
 - `collection-view` (required): Determines the view of the collection. This should match one of the `Views` defined in your Saasufy service under that specific `Model`.
 - `collection-view-params` (required): Parameters for the view, specified as comma-separated key-value pairs (e.g., key1=value1,key2=value2). These parameters can customize the behavior of the collection view. The keys must match `paramFields` specified in your Saasufy service under the relevant `View`.
