@@ -52,7 +52,7 @@ An alternative approach is to download Saasufy components using `npm install saa
 ### app-router
 
 A component which allows you build apps which have multiple pages. Inside it, you should specify a template for each page in your app along with the route/path to bind each page to.
-This component also supports simple redirects as well as redirects based on the user's current authentication state. Redirects can be `soft` or `hard`; a soft redirect does not change the current URL/path, a hard redirect does.
+This component also supports simple redirects as well as redirects based on the user's current authentication state. Redirects can be soft or hard; a soft redirect does not change the current URL/path, a hard redirect does.
 
 **Example usage**
 
