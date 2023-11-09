@@ -108,7 +108,7 @@ A Saasufy component which integrates with data from Saasufy is known as a `socke
 **Example usage**
 
 ```html
-<socket-provider url="wss://example.com:8000/socketcluster/" auth-token-name="exampleToken">
+<socket-provider url="wss://saasufy.com/sid7890/socketcluster/">
   <!-- Elements which rely on Saasufy data go here. -->
 </socket-provider>
 ```
