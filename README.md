@@ -3,7 +3,7 @@ Components for Saasufy
 
 ## Overview
 
-Many Saasufy components use a combination of `<template slot="item">` (`Template`) and `<div slot="viewport">` (`Viewport`). Both of these are known as `slotted` elements.
+Many Saasufy components use a combination of `<template slot="item">` and `<div slot="viewport">`. Both of these are known as `slotted` elements.
 
 A `<template slot="item">` is an inert/hidden element which the component uses to format its output. The `<div slot="viewport">` is an element which contains the rendered output of the component.
 
