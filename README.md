@@ -127,7 +127,13 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 **Example usage**
 
 ```html
-<collection-browser collection-type="Chat" collection-fields="username,message,createdAt" collection-view="recentView" collection-page-size="50" collection-view-params="">
+<collection-browser
+  collection-type="Chat"
+  collection-fields="username,message,createdAt"
+  collection-view="recentView"
+  collection-page-size="50"
+  collection-view-params=""
+>
   <template slot="item">
     <div>
       <div class="chat-username">
