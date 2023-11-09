@@ -4,9 +4,14 @@ Components for Saasufy
 ## Overview
 
 Many Saasufy components use a combination of `<template slot="item">` (`Template`) and `<div slot="viewport">` (`Viewport`). Both of these are known as `slotted` elements.
+
 A `<template slot="item">` is an inert/hidden element which the component uses to format its output. The `<div slot="viewport">` is an element which contains the rendered output of the component.
-Components which follow this pattern take provided templates as input and render them inside the specified `<div slot="viewport">` element. Note that the viewport can be any element and not necessarily a `div`,
-The most important thing to remember is that the element marked with the `slot="item"` attribute serves as a template for your component and the element marked with `slot="viewport"` serves as a container for its output. A component's output consists of instances of your template after they've been populated with data from the component.
+
+Components which follow this pattern take templates as input and render them inside the specified `<div slot="viewport">` element. Note that the viewport can be any element and not necessarily a `div`,
+
+The most important thing to remember is that the element marked with the `slot="item"` attribute serves as a template for your component and the element marked with `slot="viewport"` serves as a container for its output.
+
+A component's output consists of instances of your template after they've been populated with data from the component.
 You can apply custom CSS/styling to elements that are rendered inside a viewport - It may be useful to add a custom `class` attribute to your viewport element to allow targeting using CSS selectors.
 
 ## How to use
