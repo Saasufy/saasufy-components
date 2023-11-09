@@ -131,8 +131,8 @@ Can also perform basic CRUD operations such as deleting or creating records by l
   collection-type="Chat"
   collection-fields="username,message,createdAt"
   collection-view="recentView"
-  collection-page-size="50"
   collection-view-params=""
+  collection-page-size="50"
 >
   <template slot="item">
     <div>
