@@ -18,6 +18,12 @@ export function toSafeHTML(text) {
   return text;
 }
 
+export function toExpression(html) {
+  return html.replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
 export function debouncer() {
   let debounceTimeout = null;
   return function (callback, duration) {
@@ -213,7 +219,7 @@ export function renderTemplate(templateString, data, socket) {
     try {
       return toSafeHTML(
         execExpression(
-          expString,
+          toExpression(expString),
           options
         )
       );

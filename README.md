@@ -223,10 +223,15 @@ A general purpose modal component.
 
 A component which can be used to guarantee that certain children components are always rendered at the same time (once they are loaded) to provide a smooth user experience.
 
+### if-group
+
+A modal component which exposes a `show-content` property which can be set to true or false to show or hide its content.
+It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. Unlike `conditional-group`, this component requires a template and a viewport to be slotted in. The content of the template will not be processed unless the `show-content` condition is met.
+
 ### conditional-group
 
 A modal component which exposes a `show-content` property which can be set to true or false to show or hide its content.
-It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder.
+It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. Unlike `if-group`, this component does not require a template, however, the trade-off is that the slotted content will be pre-processed by the browser even when the expression is false. This may not be suitable if you want to (for example) render child images conditionally because the browser will preload images based on their `src` attributes, even if they are not shown.
 
 ### collection-adder-group
 

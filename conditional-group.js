@@ -23,7 +23,16 @@ class ConditionalGroup extends HTMLElement {
 
   render() {
     let showContent = this.getAttribute('show-content');
-    this.shadowRoot.innerHTML = showContent != null && showContent !== 'false' ? '<slot></slot>' : '';
+    if (
+      !showContent ||
+      showContent === 'false' ||
+      showContent === 'null' ||
+      showContent === 'undefined'
+    ) {
+      this.shadowRoot.innerHTML = '';
+      return;
+    }
+    this.shadowRoot.innerHTML = '<slot></slot>';
   }
 }
 
