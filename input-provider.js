@@ -28,7 +28,9 @@ class InputProvider extends HTMLElement {
       'debounce-delay',
       'options',
       'value',
-      'height'
+      'height',
+      'autocapitalize',
+      'autocorrect'
     ];
   }
 
@@ -59,6 +61,8 @@ class InputProvider extends HTMLElement {
   render() {
     this.innerHTML = '';
     let inputId = this.getAttribute('input-id');
+    let autocapitalize = this.getAttribute('autocapitalize');
+    let autocorrect = this.getAttribute('autocorrect');
     let inputList = this.getAttribute('list');
     let type = this.getAttribute('type') || 'text';
     let placeholder = this.getAttribute('placeholder');
@@ -96,6 +100,12 @@ class InputProvider extends HTMLElement {
     }
     if (inputId) {
       this.inputElement.setAttribute('id', inputId);
+    }
+    if (autocapitalize) {
+      this.inputElement.setAttribute('autocapitalize', autocapitalize);
+    }
+    if (autocorrect) {
+      this.inputElement.setAttribute('autocorrect', autocorrect);
     }
     if (placeholder) {
       this.inputElement.setAttribute('placeholder', placeholder);

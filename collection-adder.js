@@ -40,7 +40,10 @@ class CollectionAdder extends SocketConsumer {
       'model-values',
       'submit-button-label',
       'hide-submit-button',
-      'success-message'
+      'success-message',
+      'autocapitalize',
+      'autocorrect',
+      'trim-spaces'
     ];
   }
 
@@ -106,6 +109,8 @@ class CollectionAdder extends SocketConsumer {
       }
     }
 
+    let trimSpaces = this.hasAttribute('trim-spaces');
+
     let newModelData = {
       ...this.modelFieldValues,
       ...radioData,
@@ -121,7 +126,11 @@ class CollectionAdder extends SocketConsumer {
             } else {
               value = input.value;
             }
-            return [ input.name, Type(value) ];
+            let sanitizedValue = Type(value);
+            if (trimSpaces && typeof sanitizedValue === 'string') {
+              sanitizedValue = sanitizedValue.trim();
+            }
+            return [ input.name, sanitizedValue ];
           })
       )
     };
@@ -188,6 +197,15 @@ class CollectionAdder extends SocketConsumer {
       fieldValues: optionLabels
     } = this.getFieldDetails(this.getAttribute('option-labels'));
 
+    let autocapitalize = this.getAttribute('autocapitalize');
+    let autocorrect = this.getAttribute('autocorrect');
+
+    let extraAttributesString = `${
+      autocapitalize ? ` autocapitalize="${autocapitalize}"` : ''
+    }${
+      autocorrect ? ` autocorrect="${autocorrect}"` : ''
+    }`;
+
     this.modelFieldValues = modelFieldValues;
 
     if (this.collection) this.collection.destroy();
@@ -242,7 +260,7 @@ class CollectionAdder extends SocketConsumer {
               field
             }" placeholder="${
               inputLabel
-            }" />
+            }"${extraAttributesString} />
             <select class="collection-adder-select">
               <option value="" selected disabled hidden>${optionLabel}</option>
               ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
@@ -278,7 +296,7 @@ class CollectionAdder extends SocketConsumer {
             field
           }" placeholder="${
             inputLabel
-          }"></textarea>`
+          }"${extraAttributesString}></textarea>`
         );
       } else {
         items.push(
@@ -288,7 +306,7 @@ class CollectionAdder extends SocketConsumer {
             field
           }" placeholder="${
             inputLabel
-          }" />`
+          }"${extraAttributesString} />`
         );
       }
     }

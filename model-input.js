@@ -36,7 +36,9 @@ class ModelInput extends SocketConsumer {
       'enable-rebound',
       'options',
       'height',
-      'hide-error-logs'
+      'hide-error-logs',
+      'autocapitalize',
+      'autocorrect'
     ];
   }
 
@@ -71,6 +73,8 @@ class ModelInput extends SocketConsumer {
     let modelInstanceProperty = this.getAttribute('model-instance-property');
     let showErrorMessage = this.hasAttribute('show-error-message');
     let inputId = this.getAttribute('input-id');
+    let autocapitalize = this.getAttribute('autocapitalize');
+    let autocorrect = this.getAttribute('autocorrect');
     let inputList = this.getAttribute('list');
     let type = this.getAttribute('type') || 'text';
     let placeholder = this.getAttribute('placeholder');
@@ -187,6 +191,12 @@ class ModelInput extends SocketConsumer {
     }
     if (inputId) {
       this.inputElement.setAttribute('id', inputId);
+    }
+    if (autocapitalize) {
+      this.inputElement.setAttribute('autocapitalize', autocapitalize);
+    }
+    if (autocorrect) {
+      this.inputElement.setAttribute('autocorrect', autocorrect);
     }
     if (placeholder) {
       this.inputElement.setAttribute('placeholder', placeholder);
