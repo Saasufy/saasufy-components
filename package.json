@@ -17,8 +17,8 @@
   "author": "Jonathan Gros-Dubois",
   "license": "MIT",
   "dependencies": {
-    "ag-collection": "^4.0.0",
-    "ag-model": "^2.0.0",
+    "ag-collection": "^4.1.0",
+    "ag-model": "^2.1.0",
     "capitalisk-auth-client": "^1.5.1",
     "socketcluster-client": "^19.1.0"
   },

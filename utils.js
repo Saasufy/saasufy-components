@@ -61,6 +61,9 @@ export function createReactiveCollection(collectionOptions, callback) {
   (async () => {
     let changes = {};
     for await (let event of collection.listener('change')) {
+      // Ignore change events which originate from this collection instance.
+      if (!event.isRemote) continue;
+
       if (event.resourceId != null && changes[event.resourceId] !== false) {
         changes[event.resourceId] = event.isRemote;
       }
@@ -265,6 +268,8 @@ export function updateConsumerElements(parentElement, consumers, value) {
             } else {
               element.value = value;
             }
+          } else if (element.nodeName === 'MODEL-INPUT') {
+            element.value = value;
           } else {
             element.innerHTML = value;
           }

@@ -21,7 +21,9 @@ class ModelText extends SocketConsumer {
   static get observedAttributes() {
     return [
       'model-instance-property',
+      'collection-instance-property',
       'bind-to-collection',
+      'bind-to-model',
       'model-type',
       'model-id',
       'model-field',
@@ -38,8 +40,9 @@ class ModelText extends SocketConsumer {
   render() {
     this.innerHTML = '';
     let bindToModel = this.hasAttribute('bind-to-model');
-    let bindToCollection = this.hasAttribute('bind-to-collection');
     let modelInstanceProperty = this.getAttribute('model-instance-property');
+    let bindToCollection = this.hasAttribute('bind-to-collection');
+    let collectionInstanceProperty = this.getAttribute('collection-instance-property');
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
@@ -48,13 +51,16 @@ class ModelText extends SocketConsumer {
     let model;
     let isModelLocal = false;
     if (bindToCollection) {
+      collectionInstanceProperty = 'collection';
+    }
+    if (collectionInstanceProperty) {
       let collection;
       while (currentNode) {
-        collection = currentNode.collection;
-        if (collection && (collection.type !== modelType || !(collection.fields || []).includes(modelField))) {
+        collection = currentNode[collectionInstanceProperty];
+        if (collection && collection.type !== modelType) {
           collection = null;
         }
-        if (collection && (!collection.agModels || !collection.agModels[modelId] || !collection.agModels[modelId].agFields[modelField])) {
+        if (collection && (!collection.agModels || !collection.agModels[modelId])) {
           collection = null;
         }
         if (collection) break;
@@ -62,6 +68,9 @@ class ModelText extends SocketConsumer {
       }
       if (collection) {
         model = collection.agModels[modelId];
+        if (!model.agFields[modelField]) {
+          model.addField(modelField);
+        }
       }
     }
     if (!model) {
@@ -85,7 +94,7 @@ class ModelText extends SocketConsumer {
           throw new Error(
             `The ${
               this.nodeName.toLowerCase()
-            } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
+            } element failed to bind to a model - Ensure that the element is nested inside a parent element which exposes a model instance of the same type with a ${modelField} field`
           );
         };
       } else {
@@ -100,7 +109,7 @@ class ModelText extends SocketConsumer {
           (async () => {
             for await (let { error } of model.listener('error')) {
               console.error(
-                `Model input encountered an error: ${error.message}`
+                `Model text encountered an error: ${error.message}`
               );
             }
           })();

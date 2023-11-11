@@ -114,7 +114,7 @@ class ModelViewer extends SocketConsumer {
         throw new Error(
           `The ${
             this.nodeName.toLowerCase()
-          } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
+          } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant fields`
         );
       };
       this.model = model;

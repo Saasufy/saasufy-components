@@ -23,6 +23,7 @@ class ModelInput extends SocketConsumer {
       'input-id',
       'list',
       'model-instance-property',
+      'collection-instance-property',
       'bind-to-model',
       'bind-to-collection',
       'type',
@@ -36,6 +37,8 @@ class ModelInput extends SocketConsumer {
       'enable-rebound',
       'options',
       'height',
+      'default-value',
+      'value',
       'hide-error-logs',
       'autocapitalize',
       'autocorrect'
@@ -44,8 +47,12 @@ class ModelInput extends SocketConsumer {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
-    this.destroy();
-    this.render();
+    if (name === 'value') {
+      this.value = newValue;
+    } else {
+      this.destroy();
+      this.render();
+    }
   }
 
   triggerChange() {
@@ -69,8 +76,9 @@ class ModelInput extends SocketConsumer {
   render() {
     this.innerHTML = '';
     let bindToModel = this.hasAttribute('bind-to-model');
-    let bindToCollection = this.hasAttribute('bind-to-collection');
     let modelInstanceProperty = this.getAttribute('model-instance-property');
+    let bindToCollection = this.hasAttribute('bind-to-collection');
+    let collectionInstanceProperty = this.getAttribute('collection-instance-property');
     let showErrorMessage = this.hasAttribute('show-error-message');
     let inputId = this.getAttribute('input-id');
     let autocapitalize = this.getAttribute('autocapitalize');
@@ -89,13 +97,16 @@ class ModelInput extends SocketConsumer {
     let model;
     let isModelLocal = false;
     if (bindToCollection) {
+      collectionInstanceProperty = 'collection';
+    }
+    if (collectionInstanceProperty) {
       let collection;
       while (currentNode) {
-        collection = currentNode.collection;
-        if (collection && (collection.type !== modelType || !(collection.fields || []).includes(modelField))) {
+        collection = currentNode[collectionInstanceProperty];
+        if (collection && collection.type !== modelType) {
           collection = null;
         }
-        if (collection && (!collection.agModels || !collection.agModels[modelId] || !collection.agModels[modelId].agFields[modelField])) {
+        if (collection && (!collection.agModels || !collection.agModels[modelId])) {
           collection = null;
         }
         if (collection) break;
@@ -103,6 +114,9 @@ class ModelInput extends SocketConsumer {
       }
       if (collection) {
         model = collection.agModels[modelId];
+        if (!model.agFields[modelField]) {
+          model.addField(modelField);
+        }
       }
     }
     if (!model) {
@@ -126,7 +140,7 @@ class ModelInput extends SocketConsumer {
           throw new Error(
             `The ${
               this.nodeName.toLowerCase()
-            } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant field`
+            } element failed to bind to a model - Ensure that the element is nested inside a parent element which exposes a model instance of the same type with a ${modelField} field`
           );
         };
       } else {
