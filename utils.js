@@ -291,6 +291,57 @@ export function generateRandomHexString(byteLength) {
   }).join('');
 }
 
+export const fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
+export const quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
+
+export const typeCastFunctions = {
+  text: String,
+  textarea: String,
+  checkbox: Boolean,
+  number: Number,
+  radio: String,
+  select: String,
+  'text-select': String
+};
+
+export function getTypeCastFunction(type) {
+  return typeCastFunctions[type] || ((value) => value);
+}
+
+export function convertStringToFieldParams(string) {
+  let parts = ((string || '').match(fieldPartsRegExp) || []).map(field => field.trim());
+  let fieldTypeValues = parts.map((part) => {
+    let subParts = part.split('=');
+    let nameType = (subParts[0] || '').split(':');
+    let name = nameType[0];
+    let type = nameType[1] || 'text';
+    let value = subParts.slice(1).join('=').replace(quotedContentRegExp, '$1');
+    return {
+      name,
+      type,
+      value
+    }
+  });
+  let fieldNames = fieldTypeValues.map(item => item.name);
+  let fieldTypes = Object.fromEntries(
+    fieldTypeValues.map(item => [ item.name, item.type ])
+  );
+  let fieldValues = Object.fromEntries(
+    fieldTypeValues.map(
+      (item) => {
+        let type = fieldTypes[item.name];
+        let Type = getTypeCastFunction(type);
+        return [ item.name, Type(item.value) ];
+      }
+    )
+  );
+  return {
+    fieldNames,
+    fieldTypes,
+    fieldValues
+  };
+}
+
 export function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }

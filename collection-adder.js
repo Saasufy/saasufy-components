@@ -1,4 +1,5 @@
 import { SocketConsumer } from './socket.js';
+import { convertStringToFieldParams, getTypeCastFunction } from './utils.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 
 class CollectionAdder extends SocketConsumer {
@@ -6,18 +7,7 @@ class CollectionAdder extends SocketConsumer {
     super();
     this.options = options || {};
 
-    this.typeCastFunctions = {
-      text: String,
-      textarea: String,
-      checkbox: Boolean,
-      number: Number,
-      radio: String,
-      select: String,
-      'text-select': String
-    };
-    this.fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
     this.inputTypeWithParamsRegExp = /^([^()]*)(\(([^)]*)\))?/;
-    this.quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
     this.isReady = false;
   }
 
@@ -52,44 +42,6 @@ class CollectionAdder extends SocketConsumer {
     this.render();
   }
 
-  getTypeCastFunction(type) {
-    return this.typeCastFunctions[type] || ((value) => value);
-  }
-
-  getFieldDetails(string) {
-    let parts = ((string || '').match(this.fieldPartsRegExp) || []).map(field => field.trim());
-    let fieldTypeValues = parts.map((part) => {
-      let subParts = part.split('=');
-      let nameType = (subParts[0] || '').split(':');
-      let name = nameType[0];
-      let type = nameType[1] || 'text';
-      let value = subParts.slice(1).join('=').replace(this.quotedContentRegExp, '$1');
-      return {
-        name,
-        type,
-        value
-      }
-    });
-    let fieldNames = fieldTypeValues.map(item => item.name);
-    let fieldTypes = Object.fromEntries(
-      fieldTypeValues.map(item => [ item.name, item.type ])
-    );
-    let fieldValues = Object.fromEntries(
-      fieldTypeValues.map(
-        (item) => {
-          let type = fieldTypes[item.name];
-          let Type = this.getTypeCastFunction(type);
-          return [ item.name, Type(item.value) ];
-        }
-      )
-    );
-    return {
-      fieldNames,
-      fieldTypes,
-      fieldValues
-    };
-  }
-
   async submit() {
     if (!this.isReady) {
       throw new Error('Collection adder form is not ready to be submitted');
@@ -119,7 +71,7 @@ class CollectionAdder extends SocketConsumer {
           .filter(input => input.value !== '')
           .map((input) => {
             let fieldType = this.fieldTypes[input.name];
-            let Type = this.getTypeCastFunction(fieldType);
+            let Type = getTypeCastFunction(fieldType);
             let value;
             if (fieldType === 'checkbox') {
               value = input.checked;
@@ -180,22 +132,22 @@ class CollectionAdder extends SocketConsumer {
     let {
       fieldNames,
       fieldTypes
-    } = this.getFieldDetails(this.getAttribute('collection-fields'));
+    } = convertStringToFieldParams(this.getAttribute('collection-fields'));
 
     this.fieldTypes = fieldTypes;
 
     let {
       fieldNames: modelFieldNames,
       fieldValues: modelFieldValues
-    } = this.getFieldDetails(this.getAttribute('model-values'));
+    } = convertStringToFieldParams(this.getAttribute('model-values'));
 
     let {
       fieldValues: modelFieldLabels
-    } = this.getFieldDetails(this.getAttribute('field-labels'));
+    } = convertStringToFieldParams(this.getAttribute('field-labels'));
 
     let {
       fieldValues: optionLabels
-    } = this.getFieldDetails(this.getAttribute('option-labels'));
+    } = convertStringToFieldParams(this.getAttribute('option-labels'));
 
     let autocapitalize = this.getAttribute('autocapitalize');
     let autocorrect = this.getAttribute('autocorrect');
