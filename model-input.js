@@ -61,6 +61,14 @@ class ModelInput extends SocketConsumer {
 
   set value(newValue) {
     if (this.inputElement) {
+      if (this.inputElement.type === 'checkbox') {
+        let oldValue = this.inputElement.checked;
+        this.inputElement.checked = newValue;
+        if (oldValue !== newValue) {
+          this.triggerChange();
+        }
+        return;
+      }
       let oldValue = this.inputElement.value;
       this.inputElement.value = newValue;
       if (oldValue !== newValue) {
@@ -70,7 +78,13 @@ class ModelInput extends SocketConsumer {
   }
 
   get value() {
-    return (this.inputElement && this.inputElement.value) || '';
+    if (!this.inputElement) {
+      return '';
+    }
+    if (this.inputElement.type === 'checkbox') {
+      return this.inputElement.checked;
+    }
+    return this.inputElement.value;
   }
 
   render() {
