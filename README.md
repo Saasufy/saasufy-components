@@ -1,6 +1,43 @@
 # Saasufy Components
 Components for Saasufy
 
+## Components table of content
+
+### Application state
+- [app-router](#app-router)
+- [socket-provider](#socket-provider)
+
+### Collections of resources
+- [collection-browser](#collection-browser)
+- [collection-adder](#collection-adder)
+- [collection-deleter](#collection-deleter)
+- [collection-reducer](#collection-reducer)
+
+### Single resources
+- [model-input](#model-input)
+- [model-text](#model-text)
+- [model-viewer](#model-viewer)
+
+### User input
+- [input-provider](#input-provider)
+
+### Authentication
+- [log-in-form](#log-in-form)
+- [log-out](#log-out)
+- [oauth-link](#oauth-link)
+- [oauth-handler](#oauth-handler)
+
+### Display groups
+- [render-group](#render-group)
+- [conditional-group](#conditional-group)
+- [if-group](#if-group)
+- [switch-group](#switch-group)
+- [collection-adder-group](#collection-adder-group)
+
+### Modal windows
+- [confirm-modal](#confirm-modal)
+- [overlay-modal](#overlay-modal)
+
 ## Overview
 
 Many Saasufy components use a combination of `<template slot="item">` and `<div slot="viewport">`. Both of these are known as `slotted` elements.
@@ -51,41 +88,6 @@ Linking the scripts directly from `saasufy.com` as shown above is the simplest w
 An alternative approach is to download Saasufy components using `npm install saasufy-components` and then link to them from your own hosting provider.
 
 ## Components
-
-### Application state
-- [app-router](#app-router)
-- [socket-provider](#socket-provider)
-
-### Collections of resources
-- [collection-browser](#collection-browser)
-- [collection-adder](#collection-adder)
-- [collection-deleter](#collection-deleter)
-- [collection-reducer](#collection-reducer)
-
-### Single resources
-- [model-input](#model-input)
-- [model-text](#model-text)
-- [model-viewer](#model-viewer)
-
-### User input
-- [input-provider](#input-provider)
-
-### Authentication
-- [log-in-form](#log-in-form)
-- [log-out](#log-out)
-- [oauth-link](#oauth-link)
-- [oauth-handler](#oauth-handler)
-
-### Display groups
-- [render-group](#render-group)
-- [conditional-group](#conditional-group)
-- [if-group](#if-group)
-- [switch-group](#switch-group)
-- [collection-adder-group](#collection-adder-group)
-
-### Modal windows
-- [confirm-modal](#confirm-modal)
-- [overlay-modal](#overlay-modal)
 
 ### app-router
 
