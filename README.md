@@ -239,7 +239,7 @@ It supports either immediate deletion or deletion upon confirmation; in the latt
 
 ```html
 <!-- Must be placed somewhere inside a collection-browser component, typically inside the slotted item template. -->
-<collection-deleter class="cross-button" model-id="{{Product.id}}" confirm-message="Are you sure you want to delete {{Product.name}}?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
+<collection-deleter class="cross-button" model-id="{{Product.id}}" confirm-message="Are you sure you want to delete {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
 ```
 
 **Attributes**
