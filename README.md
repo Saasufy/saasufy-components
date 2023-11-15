@@ -192,7 +192,7 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 
 **Attributes**
 
-- `collection-type` (required): Specifies the type of collection to be used, which defines the dataset you want to work with. This should match a `Model` available in your Saasufy service.
+- `collection-type` (required): Specifies the type of collection to display. This should match a `Model` name available in your Saasufy service.
 - `collection-fields` (required): A comma-separated list of fields from the `Model` that you want to display or use. This lets you pick specific pieces of data from your collection to work with.
 - `collection-view` (required): Determines the view of the collection. This should match one of the `Views` defined in your Saasufy service under that specific `Model`.
 - `collection-view-params` (required): Parameters for the view, specified as comma-separated key-value pairs (e.g., key1=value1,key2=value2). These parameters can customize the behavior of the collection view. The keys must match `paramFields` specified in your Saasufy service under the relevant `View`.
@@ -206,10 +206,46 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 
 A form component for inserting data into collections.
 
+**Example usage**
+
+```html
+<collection-adder
+  collection-type="Product"
+  collection-fields="name,brand,qty"
+  model-values="categoryName=electronics"
+  submit-button-label="Create"
+  trim-spaces
+></collection-adder>
+```
+
+**Attributes**
+
+- `collection-type` (required): Specifies the type of collection to add the resource to when the form is submitted. This should match a `Model` name available in your Saasufy service.
+- `collection-fields`: A comma-separated list of fields from the `Model` to display as input elements inside the form for the user to fill in. Each field name in this list can optionally be followed by an input element type after a `:` character. For example `collection-fields="qty:number, size:select(small,medium,large)` will create one input element with `type="number"` and one with `type=select` with options `small`, `medium` or `large`. To make a select field optional, you can prefix the list of options with a comma; e.g. `size:select(,small,medium,large)`.
+- `model-values`: An optional list of key-value pairs in the format `field1=value1,field2=value2` to add to the newly created resource alongside the values collected from the user via the form.
+- `submit-button-label`: Text to display on the submit button. If not specified, defaults to `Submit`.
+- `hide-submit-button`: Adding this attribute will hide the submit button from the form.
+- `success-message`: A message to show the user if the resource has been successfully added to the collection after submitting the form.
+- `autocapitalize`: Can be set to `off` to disable auto-capitalization of the first input character on mobile devices.
+- `autocorrect`: Can be set to `off` to disable auto-correction of input on mobile devices.
+- `trim-spaces`: If this attribute exists on the element, then leading and trailing spaces will be trimmed from each input element's value before submitting the form.
+
 ### collection-deleter
 
 A component which can be placed anywhere inside a `collection-browser` component to delete a specific item from a collection as a result of a user action (e.g. on click).
 It supports either immediate deletion or deletion upon confirmation; in the latter case, the parent `collection-browser` must have a `confirm-modal` component slotted into its `modal` slot.
+
+**Example usage**
+
+```html
+<!-- Must be placed somewhere inside a collection-browser component, typically inside the slotted item template. -->
+<collection-deleter class="cross-button" model-id="{{Product.id}}" confirm-message="Are you sure you want to delete {{Product.name}}?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
+```
+
+**Attributes**
+
+- `model-id` (required): Specifies the ID of the resource to delete from the parent collection when this component is activated. This can be achieved by invoking either the `deleteItem()` or `confirmDeleteItem()` function from inside an event handler. The example above shows how to achieve deletion via the `onclick` event. You can either invoke `deleteItem()` to delete the resource immediately or you can invoke `confirmDeleteItem()` to require additional confirmation prior to deletion.
+- `confirm-message`: The confirmation message to show the user when this component's `confirmDeleteItem()` function is invoked,
 
 ### collection-reducer
 
