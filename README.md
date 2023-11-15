@@ -1,8 +1,6 @@
 # Saasufy Components
 Components for Saasufy
 
-## Components table of content
-
 ### Application state
 - [app-router](#app-router)
 - [socket-provider](#socket-provider)
