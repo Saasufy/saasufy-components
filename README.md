@@ -32,6 +32,8 @@ To use components, you just need to include them into your `.html` file inside y
 <script src="https://saasufy.com/node_modules/saasufy-components/confirm-modal.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/render-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/conditional-group.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/if-group.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/switch-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/collection-adder-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/log-in-form.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/log-out.js" type="module" defer></script>
@@ -48,6 +50,26 @@ Linking the scripts directly from `saasufy.com` as shown above is the simplest w
 An alternative approach is to download Saasufy components using `npm install saasufy-components` and then link to them from your own hosting provider.
 
 ## Components
+
+1. [app-router](#app-router)
+2. [socket-provider](#socket-provider)
+3. [collection-browser](#collection-browser)
+4. [collection-adder](#collection-adder)
+5. [collection-deleter](#collection-deleter)
+6. [collection-reducer](#collection-reducer)
+7. [model-input](#model-input)
+8. [model-text](#model-text)
+9. [model-viewer](#model-viewer)
+10. [input-provider](#input-provider)
+11. [log-in-form](#log-in-form)
+12. [log-out](#log-out)
+13. [confirm-modal](#confirm-modal)
+14. [overlay-modal](#overlay-modal)
+15. [render-group](#render-group)
+16. [if-group](#if-group)
+17. [switch-group](#switch-group)
+18. [conditional-group](#conditional-group)
+19. [collection-adder-group](#collection-adder-group)
 
 ### app-router
 
