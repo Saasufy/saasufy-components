@@ -29,16 +29,17 @@ To use components, you just need to include them into your `.html` file inside y
 <script src="https://saasufy.com/node_modules/saasufy-components/model-text.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/model-viewer.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/input-provider.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/confirm-modal.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/log-in-form.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/log-out.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/oauth-link.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/oauth-handler.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/render-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/conditional-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/if-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/switch-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/collection-adder-group.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/log-in-form.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/log-out.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/oauth-link.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/oauth-handler.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/confirm-modal.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/overlay-modal.js" type="module" defer></script>
 ```
 
 You should only add the script tags for the components which your page uses to avoid wasting bandwidth and unnecessarily delaying page load for your users.
@@ -51,25 +52,40 @@ An alternative approach is to download Saasufy components using `npm install saa
 
 ## Components
 
-1. [app-router](#app-router)
-2. [socket-provider](#socket-provider)
-3. [collection-browser](#collection-browser)
-4. [collection-adder](#collection-adder)
-5. [collection-deleter](#collection-deleter)
-6. [collection-reducer](#collection-reducer)
-7. [model-input](#model-input)
-8. [model-text](#model-text)
-9. [model-viewer](#model-viewer)
-10. [input-provider](#input-provider)
-11. [log-in-form](#log-in-form)
-12. [log-out](#log-out)
-13. [confirm-modal](#confirm-modal)
-14. [overlay-modal](#overlay-modal)
-15. [render-group](#render-group)
-16. [if-group](#if-group)
-17. [switch-group](#switch-group)
-18. [conditional-group](#conditional-group)
-19. [collection-adder-group](#collection-adder-group)
+### Application state
+- [app-router](#app-router)
+- [socket-provider](#socket-provider)
+
+### Collections of resources
+- [collection-browser](#collection-browser)
+- [collection-adder](#collection-adder)
+- [collection-deleter](#collection-deleter)
+- [collection-reducer](#collection-reducer)
+
+### Single resources
+- [model-input](#model-input)
+- [model-text](#model-text)
+- [model-viewer](#model-viewer)
+
+### User input
+- [input-provider](#input-provider)
+
+### Authentication
+- [log-in-form](#log-in-form)
+- [log-out](#log-out)
+- [oauth-link](#oauth-link)
+- [oauth-handler](#oauth-handler)
+
+### Display groups
+- [render-group](#render-group)
+- [conditional-group](#conditional-group)
+- [if-group](#if-group)
+- [switch-group](#switch-group)
+- [collection-adder-group](#collection-adder-group)
+
+### Modal windows
+- [confirm-modal](#confirm-modal)
+- [overlay-modal](#overlay-modal)
 
 ### app-router
 
@@ -233,13 +249,14 @@ A component which can be placed inside a `socket-provider` to deauthenticate the
 
 Example usage: `<log-out onclick="logOut()"><a href="javascript:void(0)">Log out</a></log-out>`
 
-### confirm-modal
+### oauth-link
 
-A modal component to prompt the user for confirmation before performing sensitive operations.
+A link to initiate an OAuth flow to authenticate a user as part of log in. Can support a range of different OAuth providers.
 
-### overlay-modal
+### oauth-handler
 
-A general purpose modal component.
+This component handles the final stage of OAuth and then redirects the user to the relevant page/URL if successful.
+When using an OAuth provider, the callback URL which you register with the provider must lead the user back to a page which contains this `oauth-handler` component.
 
 ### render-group
 
@@ -263,3 +280,11 @@ It's intended to be placed inside a `model-viewer`, `collection-browser` or `col
 ### collection-adder-group
 
 A component which can be used to group together multiple `collection-adder` components. It can be used to insert multiple records into a collection via a single button click.
+
+### confirm-modal
+
+A modal component to prompt the user for confirmation before performing sensitive operations.
+
+### overlay-modal
+
+A general purpose modal component.
