@@ -239,13 +239,41 @@ It supports either immediate deletion or deletion upon confirmation; in the latt
 
 ```html
 <!-- Must be placed somewhere inside a collection-browser component, typically inside the slotted item template. -->
-<collection-deleter class="cross-button" model-id="{{Product.id}}" confirm-message="Are you sure you want to delete {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
+<collection-deleter model-id="{{Product.id}}" confirm-message="Are you sure you want to delete the {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
 ```
 
 **Attributes**
 
 - `model-id` (required): Specifies the ID of the resource to delete from the parent collection when this component is activated. This can be achieved by invoking either the `deleteItem()` or `confirmDeleteItem()` function from inside an event handler. The example above shows how to achieve deletion via the `onclick` event. You can either invoke `deleteItem()` to delete the resource immediately or you can invoke `confirmDeleteItem()` to require additional confirmation prior to deletion.
 - `confirm-message`: The confirmation message to show the user when this component's `confirmDeleteItem()` function is invoked,
+
+If `confirmDeleteItem()` is used, then the parent `collection-browser` must have a `modal` component slotted into it like this:
+
+```html
+<collection-browser
+  collection-type="Product"
+  collection-fields="name,qty"
+  collection-view="alphabeticalView"
+  collection-view-params=""
+  collection-page-size="50"
+>
+  <template slot="item">
+    <div>
+      <div class="chat-message">{{Product.name}}</div>
+      <collection-deleter model-id="{{Product.id}}" confirm-message="Are you sure you want to delete the {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
+    </div>
+  </template>
+
+  <div slot="viewport" class="chat-viewport"></div>
+
+  <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
+  <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
+
+  <div slot="loader" class="loading-spinner-container">
+    <div class="spinning">&#8635;</div>
+  </div>
+</collection-browser>
+```
 
 ### collection-reducer
 
