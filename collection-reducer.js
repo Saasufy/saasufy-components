@@ -7,6 +7,9 @@ const DEFAULT_RELOAD_DELAY = 0;
 class CollectionReducer extends SocketConsumer {
   constructor() {
     super();
+    this.isReady = false;
+    this.isStale = true;
+    this.activeLoader = null;
     this.attachShadow({ mode: 'open' });
 
     this.handleGoToPreviousPageEvent = () => {
@@ -24,12 +27,12 @@ class CollectionReducer extends SocketConsumer {
     this.handleSlotChangeEvent = () => {
       this.renderReduction();
     };
-    this.isReady = false;
   }
 
   connectedCallback() {
     this.isReady = true;
     this.socket = this.getSocket();
+    this.activeLoader = null;
     this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
     this.addEventListener('goToPreviousPage', this.handleGoToPreviousPageEvent);
     this.addEventListener('goToNextPage', this.handleGoToNextPageEvent);
@@ -47,12 +50,14 @@ class CollectionReducer extends SocketConsumer {
 
   goToPreviousPage() {
     if (!this.collection) return;
+    this.isStale = true;
     this.collection.fetchPreviousPage();
     this.setAttribute('collection-page-offset', this.collection.meta.pageOffset);
   }
 
   goToNextPage() {
     if (!this.collection) return;
+    this.isStale = true;
     this.collection.fetchNextPage();
     this.setAttribute('collection-page-offset', this.collection.meta.pageOffset);
   }
@@ -69,6 +74,7 @@ class CollectionReducer extends SocketConsumer {
       'collection-view-params',
       'collection-page-size',
       'collection-page-offset',
+      'max-show-loader',
       'type-alias',
       'hide-error-logs'
     ];
@@ -79,6 +85,7 @@ class CollectionReducer extends SocketConsumer {
     if (this.collection && name === 'collection-page-offset') {
       let newOffset = Number(newValue);
       if (newOffset !== this.collection.meta.pageOffset) {
+        this.isStale = true;
         this.collection.fetchPage(newOffset);
       }
       this.updatePageNumberElements();
@@ -128,22 +135,26 @@ class CollectionReducer extends SocketConsumer {
 
   renderReduction() {
     let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
-    let loaderSlot = this.shadowRoot.querySelector('slot[name="loader"]');
-    let hasLoaders = !!loaderSlot.assignedNodes().length;
-
-    if (!this.collection || !this.collection.isLoaded) {
-      if (hasLoaders) {
-        viewportSlot.classList.add('hidden');
-        loaderSlot.classList.remove('hidden');
-      }
-      return;
-    }
-
-    loaderSlot.classList.add('hidden');
-    viewportSlot.classList.remove('hidden');
 
     let viewportNode = viewportSlot.assignedNodes()[0];
     if (!viewportNode) return;
+
+    let loaderSlot = this.shadowRoot.querySelector('slot[name="loader"]');
+    let loaderNode = loaderSlot.assignedNodes()[0];
+
+    if (!this.collection || !this.collection.isLoaded) {
+      if (
+        loaderNode &&
+        this.activeLoader !== loaderNode &&
+        (this.isStale || this.hasAttribute('max-show-loader'))
+      ) {
+        this.activeLoader = loaderNode;
+        viewportNode.innerHTML = loaderNode.innerHTML;
+      }
+      return;
+    }
+    this.isStale = false;
+    this.activeLoader = null;
 
     let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
     let noItemTemplate = this.shadowRoot.querySelector('slot[name="no-item"]').assignedNodes()[0];
@@ -174,10 +185,11 @@ class CollectionReducer extends SocketConsumer {
     );
     let viewParams = Object.fromEntries(
       collectionViewParams.split(',')
-      .map(pair => pair.split('='))
-      .filter(([field]) => field)
+        .map(pair => pair.split('='))
+        .filter(([field]) => field)
     );
     if (this.collection) this.collection.destroy();
+    this.isStale = true;
 
     this.collection = new AGCollection({
       socket: this.socket,
@@ -191,11 +203,6 @@ class CollectionReducer extends SocketConsumer {
     });
 
     this.shadowRoot.innerHTML = `
-      <style>
-        .hidden {
-          display: none;
-        }
-      </style>
       <slot name="loader"></slot>
       <slot name="item"></slot>
       <slot name="no-item"></slot>

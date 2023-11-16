@@ -9,6 +9,7 @@ class CollectionBrowser extends SocketConsumer {
     super();
     this.isReady = false;
     this.isStale = true;
+    this.activeLoader = null;
     this.attachShadow({ mode: 'open' });
 
     this.handleShowModalEvent = (event) => {
@@ -46,7 +47,7 @@ class CollectionBrowser extends SocketConsumer {
       this.goToPage((event.detail || {}).offset);
     };
 
-    this.handleSlotChangeEvent = () => {
+    this.handleSlotChangeEvent = (event) => {
       this.renderList();
     };
   }
@@ -54,6 +55,7 @@ class CollectionBrowser extends SocketConsumer {
   connectedCallback() {
     this.isReady = true;
     this.socket = this.getSocket();
+    this.activeLoader = null;
     this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
     this.addEventListener('showModal', this.handleShowModalEvent);
     this.addEventListener('crudCreate', this.handleCRUDCreateEvent);
@@ -162,23 +164,26 @@ class CollectionBrowser extends SocketConsumer {
 
   renderList() {
     let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
+
+    let viewportNode = viewportSlot.assignedNodes()[0];
+    if (!viewportNode) return;
+
     let loaderSlot = this.shadowRoot.querySelector('slot[name="loader"]');
-    let hasLoaders = !!loaderSlot.assignedNodes().length;
+    let loaderNode = loaderSlot.assignedNodes()[0];
 
     if (!this.collection || !this.collection.isLoaded) {
-      if (hasLoaders && (this.isStale || this.hasAttribute('max-show-loader'))) {
-        viewportSlot.classList.add('hidden');
-        loaderSlot.classList.remove('hidden');
+      if (
+        loaderNode &&
+        this.activeLoader !== loaderNode &&
+        (this.isStale || this.hasAttribute('max-show-loader'))
+      ) {
+        this.activeLoader = loaderNode;
+        viewportNode.innerHTML = loaderNode.innerHTML;
       }
       return;
     }
     this.isStale = false;
-
-    loaderSlot.classList.add('hidden');
-    viewportSlot.classList.remove('hidden');
-
-    let viewportNode = viewportSlot.assignedNodes()[0];
-    if (!viewportNode) return;
+    this.activeLoader = null;
 
     let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
     let noItemTemplate = this.shadowRoot.querySelector('slot[name="no-item"]').assignedNodes()[0];
@@ -241,11 +246,6 @@ class CollectionBrowser extends SocketConsumer {
     });
 
     this.shadowRoot.innerHTML = `
-      <style>
-        .hidden {
-          display: none;
-        }
-      </style>
       <slot name="loader"></slot>
       <slot name="item"></slot>
       <slot name="no-item"></slot>

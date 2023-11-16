@@ -182,11 +182,13 @@ Can also perform basic CRUD operations such as deleting or creating records by l
     </div>
   </template>
 
-  <div slot="viewport" class="chat-viewport"></div>
+  <template slot="loader">
+    <div class="loading-spinner-container">
+      <div class="spinning">&#8635;</div>
+    </div>
+  </template>
 
-  <div slot="loader" class="loading-spinner-container">
-    <div class="spinning">&#8635;</div>
-  </div>
+  <div slot="viewport" class="chat-viewport"></div>
 </collection-browser>
 ```
 
@@ -268,10 +270,6 @@ If `confirmDeleteItem()` is used, then the parent `collection-browser` must have
 
   <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
   <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
-
-  <div slot="loader" class="loading-spinner-container">
-    <div class="spinning">&#8635;</div>
-  </div>
 </collection-browser>
 ```
 

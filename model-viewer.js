@@ -11,11 +11,13 @@ class ModelViewer extends SocketConsumer {
       this.renderItem();
     };
     this.isReady = false;
+    this.activeLoader = null;
   }
 
   connectedCallback() {
     this.isReady = true;
     this.socket = this.getSocket();
+    this.activeLoader = null;
     this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
     this.render();
   }
@@ -53,22 +55,22 @@ class ModelViewer extends SocketConsumer {
 
   renderItem() {
     let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
+
+    let viewportNode = viewportSlot.assignedNodes()[0];
+    if (!viewportNode) return;
+
     let loaderSlot = this.shadowRoot.querySelector('slot[name="loader"]');
-    let hasLoaders = !!loaderSlot.assignedNodes().length;
+    let loaderNode = loaderSlot.assignedNodes()[0];
 
     if (!this.model || !this.model.isLoaded) {
-      if (hasLoaders) {
-        viewportSlot.classList.add('hidden');
-        loaderSlot.classList.remove('hidden');
+      if (loaderNode && this.activeLoader !== loaderNode) {
+        this.activeLoader = loaderNode;
+        viewportNode.innerHTML = loaderNode.innerHTML;
       }
       return;
     }
 
-    loaderSlot.classList.add('hidden');
-    viewportSlot.classList.remove('hidden');
-
-    let viewportNode = viewportSlot.assignedNodes()[0];
-    if (!viewportNode) return;
+    this.activeLoader = null;
 
     let itemTemplate = this.shadowRoot.querySelector('slot[name="item"]').assignedNodes()[0];
     let modelValue = this.model.value;
@@ -130,11 +132,6 @@ class ModelViewer extends SocketConsumer {
     }
 
     this.shadowRoot.innerHTML = `
-      <style>
-        .hidden {
-          display: none;
-        }
-      </style>
       <slot name="loader"></slot>
       <slot name="item"></slot>
       <slot name="no-item"></slot>
