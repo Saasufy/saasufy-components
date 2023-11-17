@@ -1,6 +1,6 @@
 import { SocketConsumer } from './socket.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
-import { renderTemplate } from './utils.js';
+import { renderTemplate, convertStringToFieldParams } from './utils.js';
 
 const DEFAULT_RELOAD_DELAY = 0;
 
@@ -226,11 +226,8 @@ class CollectionBrowser extends SocketConsumer {
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
-    let viewParams = Object.fromEntries(
-      collectionViewParams.split(',')
-        .map(pair => pair.split('='))
-        .filter(([field]) => field)
-    );
+    let { fieldValues: viewParams } = convertStringToFieldParams(collectionViewParams);
+
     if (this.collection) this.collection.destroy();
     this.isStale = true;
 
