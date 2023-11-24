@@ -584,7 +584,14 @@ It's intended to be placed inside a `model-viewer`, `collection-browser` or `col
 **Example usage**
 
 ```html
-
+<if-group show-content="{{!!Product.isVisible}}">
+  <template slot="content">
+    <div>Name: {{Product.name}}</div>
+    <div>Description: {{Product.desc}}</div>
+    <div>Quantity: {{Product.qty}}</div>
+  </template>
+  <div slot="viewport"></div>
+</if-group>
 ```
 
 ### switch-group
