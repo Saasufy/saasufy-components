@@ -13,7 +13,7 @@ class ConfirmModal extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return [ 'message', 'title', 'confirm-button-label' ];
+    return [ 'message', 'title', 'confirm-button-label', 'cancel-button-label' ];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -32,9 +32,10 @@ class ConfirmModal extends HTMLElement {
   }
 
   render() {
-    let message = this.getAttribute('message');
+    let message = this.getAttribute('message') || '';
     let title = this.getAttribute('title') || '';
     let confirmButtonLabel = this.getAttribute('confirm-button-label') || 'Confirm';
+    let cancelButtonLabel = this.getAttribute('cancel-button-label') || 'Cancel';
 
     this.innerHTML = `
       <overlay-modal class="${this.hidden ? 'hidden' : 'visible'}">
@@ -43,7 +44,7 @@ class ConfirmModal extends HTMLElement {
           <div>${message}</div>
           <div class="confirm-modal-buttons-container">
             <input class="modal-confirm-button" type="button" value="${confirmButtonLabel}" />
-            <input class="modal-cancel-button" type="button" value="Cancel" />
+            <input class="modal-cancel-button" type="button" value="${cancelButtonLabel}" />
           </div>
         </div>
       </overlay-modal>

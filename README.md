@@ -27,7 +27,6 @@ Components for Saasufy
 
 ### Display groups
 - [render-group](#render-group)
-- [conditional-group](#conditional-group)
 - [if-group](#if-group)
 - [switch-group](#switch-group)
 - [collection-adder-group](#collection-adder-group)
@@ -69,7 +68,6 @@ To use components, you just need to include them into your `.html` file inside y
 <script src="https://saasufy.com/node_modules/saasufy-components/oauth-link.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/oauth-handler.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/render-group.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/conditional-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/if-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/switch-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/collection-adder-group.js" type="module" defer></script>
@@ -545,28 +543,139 @@ When using an OAuth provider, the callback URL which you register with the provi
 
 A component which can be used to guarantee that certain children components are always rendered at the same time (once they are loaded) to provide a smooth user experience.
 
-### conditional-group
+**Example usage**
 
-A component which exposes a `show-content` property which can be set to true or false to show or hide its content.
-It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. Unlike `if-group`, this component does not require a template, however, the trade-off is that the slotted content will be pre-processed by the browser even when the expression is false. This may not be suitable if you want to (for example) render child images conditionally because the browser will preload images based on their `src` attributes, even if they are not shown.
+```html
+<render-group wait-for="1,2,3">
+  <model-input
+    type="text"
+    load-id="1"
+    model-type="Product"
+    model-id="{{productId}}"
+    model-field="name"
+  ></model-input>
+  <model-input
+    type="text"
+    load-id="2"
+    model-type="Product"
+    model-id="{{productId}}"
+    model-field="desc"
+  ></model-input>
+  <model-input
+    type="number"
+    load-id="3"
+    model-type="Product"
+    model-id="{{productId}}"
+    model-field="qty"
+  ></model-input>
+</render-group>
+```
+
+**Attributes**
+
+- `wait-for` (required): A list of components to wait for before rendering based on their `load-id` attributes.
+The `render-group` will only render its content once all the components specified via this attribute have finished loading their data.
 
 ### if-group
 
 A component which exposes a `show-content` property which can be set to true or false to show or hide its content.
-It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. Unlike `conditional-group`, this component requires a template and a viewport to be slotted in. The content of the template will not be processed unless the `show-content` condition is met.
+It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. This component requires a template and a viewport to be slotted in. The content of the template will not be processed unless the `show-content` condition is met.
+
+**Example usage**
+
+```html
+
+```
 
 ### switch-group
 
 A component which exposes a `show-cases` property which can be set to key-value pairs in the format `key1=true,key2=false`. It can be used to conditionally display multiple slotted elements based on multiple conditions. It helps to keep HTML clean when the conditions are complex.
 This element is intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false values of the `show-cases` attribute can be computed using template `{{expression}}` placeholders. This component requires one or more templates and a viewport to be slotted in. The content of the templates will not be processed unless the `show-cases` condition is met. All templates must have a `slot="content"` attribute and a name attribute in the format `name="key1"` where the value `key1` corresponds to the key specified inside the `show-cases` attribute of the `switch-group`.
 
+**Example usage**
+
+```html
+<switch-group show-cases="image={{!!Section.imageURL}},text={{!!Section.text}}">
+  <template slot="content" name="image">
+    <img src="{{Section.imageURL}}" alt="{{Section.imageDesc}}" />
+  </template>
+  <template slot="content" name="text">
+    <div>{{Section.text}}</div>
+  </template>
+  <div slot="viewport"></div>
+</switch-group>
+```
+
 ### collection-adder-group
 
 A component which can be used to group together multiple `collection-adder` components. It can be used to insert multiple records into a collection via a single button click.
 
+**Example usage**
+
+```html
+<!--
+  This collection-adder-group adds two pre-defined records into a Product
+  collection using a single button click. This example assumes that the name
+  field is the only required field in the Product model.
+-->
+<collection-adder-group>
+  <collection-adder
+    slot="collection-adder"
+    collection-type="Product"
+    model-values="name=Flour"
+    hide-submit-button
+  ></collection-adder>
+  <collection-adder
+    slot="collection-adder"
+    collection-type="Product"
+    model-values="name=Egg"
+    hide-submit-button
+  ></collection-adder>
+  <collection-adder
+    slot="collection-adder"
+    collection-type="Product"
+    model-values="name=Milk"
+    hide-submit-button
+  ></collection-adder>
+  <div slot="error-container"></div>
+  <input slot="submit-button" type="button" value="Add pancake ingredients">
+</collection-adder-group>
+```
+
 ### confirm-modal
 
-A modal component to prompt the user for confirmation before performing sensitive operations.
+A modal component to prompt the user for confirmation before performing sensitive operations. Can be slotted into a `collection-browser` component.
+
+**Example usage**
+
+```html
+<collection-browser
+  collection-type="Product"
+  collection-fields="name,qty"
+  collection-view="alphabeticalView"
+  collection-view-params=""
+  collection-page-size="50"
+>
+  <template slot="item">
+    <div>
+      <div class="chat-message">{{Product.name}}</div>
+      <collection-deleter model-id="{{Product.id}}" confirm-message="Are you sure you want to delete the {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
+    </div>
+  </template>
+
+  <div slot="viewport" class="chat-viewport"></div>
+
+  <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
+  <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
+</collection-browser>
+```
+
+**Attributes**
+
+- `title`: The text to show in the modal's title bar.
+- `message`: The text to show as the modal's main content.
+- `confirm-button-label`: The text to use as the confirm button label.
+- `cancel-button-label`: The text to use as the cancel button label.
 
 ### overlay-modal
 
