@@ -332,9 +332,64 @@ In the example above, the name of the first element can be accessed with `{{Cate
 
 Used for displaying and editing a single field of a model instance in real time.
 
+**Example usage**
+
+```html
+<model-input
+  type="text"
+  model-type="Product"
+  model-id="{{productId}}"
+  model-field="name"
+  placeholder="Product name"
+></model-input>
+```
+
+**Attributes**
+
+- `model-type` (required): Specifies the type of model to bind to. This should match a `Model` available in your Saasufy service.
+- `model-id` (required): The id of the model instance/record to bind to.
+- `model-field` (required): The field of the model instance/record to bind to for reading and updating.
+- `debounce-delay`: The delay in milliseconds to wait before sending an update to the server. This is useful to batch multiple updates together (as is common when user is typing). Default is 300ms.
+- `enable-rebound`: By default, real-time updates performed via `model-input` components are not sent back to the publishing client as it is assumed that state changes are either localized to a single `model-input` component or shared with other components on the same page via the use of `consumers`, `bind-to-collection` or `bind-to-model` attributes. There may be situations where you have a specific value displayed in multiple places on the same page/screen and want them to be updated in real-time to reflect the latest value of the model field. For convenience, you can add the `enable-rebound` attribute to the `model-input` component to force real-time updates to rebound back to the publisher and this will ensure that all components on the page will receive real-time updates (will sync with each other) without having to explicitly bind them together via the front end. Note that enabling rebound comes with additional performance overheads.
+- `input-id`: Can be used to set an `id` attribute on the inner `input` element.
+- `list`: If specified, this sets the list attribute of the inner `input` element to provide input suggestions (only works with standard input elements).
+- `bind-to-model`: If this attribute exists, the `model-input` component will attempt to host its model data within the nearest compatible `model-viewer` parent component instead of creating its own model internally. This can improve efficiency/reuse of model data and provide a better user experience. For example, if the `model-input` element is re-rendered, it will not have to re-fetch its data as it will be kept inside its parent `model-viewer` component.
+- `bind-to-collection`: If this attribute exists, the `model-input` component will attempt to host its model data within the nearest compatible `collection-browser` or `collection-reducer` parent component instead of creating its own model internally. This can improve efficiency/reuse of model data and provide a better user experience. For example, if the `model-input` element is re-rendered, it will not have to re-fetch its data as it will be kept inside its parent `collection-browser` or `collection-reducer` component. Note that the parent component will take over the responsibility for cleaning up the model; this includes scenarios where the user loads a different page of the collection/view where the specified model instance is no longer present.
+- `type`: The type of the input component; can be `text`, `number`, `select`, `textarea` or `checkbox`.
+- `placeholder`: Can be used to set the placeholder text on the inner input element.
+- `consumers`: This allows you to connect this `model-input` to other elements on your page which share the same parent element. It takes a list of selectors with optional attributes to target. For example `.my-input:value` will find all elements with a `my-input` class and update their `value` attributes with the value of the `model-input` component in real-time. You can specify multiple selectors separated by commas such as `.my-input,my-div` - In this case, because attribute names are not specified, values will be injected into the `value` attribute (for input elements) or into the `innerHTML` property (for other kinds of elements). The default attribute/property depends on the element type.
+- `show-error-message`: If this attribute is present, an error message will be displayed above the input if it fails to update the value.
+- `options`: A comma-separated list of options to provide - This only works if the input type is `select`.
+- `height`: Allows you to set the height of the inner `input` element programmatically.
+- `default-value`: A default value to show the user if the underlying model field's value is null or undefined. Note that setting a default value will not affect the underlying model's value.
+- `value`: Used to set the model's value.
+- `hide-error-logs`: By default, this component will log errors to the console. If set, this attribute will suppress such errors from showing up on the console.
+- `autocapitalize`: Can be `on` or `off` - It will set the autocapitalize attribute on the inner input element. This is useful for mobile devices to enable or disable auto-capitalization of the first character which is typed into the input element.
+- `autocorrect`: Can be `on` or `off` - It will set the autocorrect attribute on the inner input element. This is useful for mobile devices to enable or disable auto-correct.
+
 ### model-text
 
 Used to displaying a field of a model instance in real time.
+
+**Example usage**
+
+```html
+<model-text
+  type="text"
+  model-type="Product"
+  model-id="{{productId}}"
+  model-field="name"
+></model-text>
+```
+
+**Attributes**
+
+- `model-type` (required): Specifies the type of model to bind to. This should match a `Model` available in your Saasufy service.
+- `model-id` (required): The id of the model instance/record to bind to.
+- `model-field` (required): The field of the model instance/record to bind to for reading.
+- `bind-to-model`: If this attribute exists, the `model-text` component will attempt to fetch its model data from the nearest compatible `model-viewer` parent component instead of creating its own model internally. This can improve efficiency/reuse of model data and provide a better user experience. For example, if the `model-text` element is re-rendered, it will not have to re-fetch its data as it will be kept inside its parent `model-viewer` component.
+- `bind-to-collection`: If this attribute exists, the `model-text` component will attempt to fetch its model data from the nearest compatible `collection-browser` or `collection-reducer` parent component instead of creating its own model internally. This can improve efficiency/reuse of model data and provide a better user experience. For example, if the `model-text` element is re-rendered, it will not have to re-fetch its data as it will be kept inside its parent `collection-browser` or `collection-reducer` component. Note that the parent component will take over the responsibility for cleaning up the model; this includes scenarios where the user loads a different page of the collection/view where the specified model instance is no longer present.
+- `hide-error-logs`: By default, this component will log errors to the console. If set, this attribute will suppress such errors from showing up on the console.
 
 ### model-viewer
 
