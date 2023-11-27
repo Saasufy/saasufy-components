@@ -135,20 +135,21 @@ class InputProvider extends HTMLElement {
 
     let onInputChange = (event) => {
       debounce(async () => {
+        let providerTemplate = this.getAttribute('provider-template');
         if (event.target.value === this.lastValue) return;
         if (inputElement.type === 'checkbox') {
           let checked = !!inputElement.checked;
           this.lastValue = checked;
-          updateConsumerElements(this.parentElement, consumers, checked);
+          updateConsumerElements(consumers, checked, providerTemplate);
           return;
         }
         this.lastValue = event.target.value;
         if (event.target.value === '') {
-          updateConsumerElements(this.parentElement, consumers, '');
+          updateConsumerElements(consumers, '', providerTemplate);
         } else {
           let targetValue = inputElement.type === 'number' ?
             Number(event.target.value) : event.target.value;
-          updateConsumerElements(this.parentElement, consumers, targetValue);
+          updateConsumerElements(consumers, targetValue, providerTemplate);
         }
       }, debounceDelay);
     };
@@ -158,14 +159,15 @@ class InputProvider extends HTMLElement {
     if (inputElement.type !== 'checkbox') {
       onInputKeyUp = async (event) => {
         debounce(async () => {
+          let providerTemplate = this.getAttribute('provider-template');
           if (event.target.value === this.lastValue) return;
           this.lastValue = event.target.value;
           if (event.target.value === '') {
-            updateConsumerElements(this.parentElement, consumers, '');
+            updateConsumerElements(consumers, '', providerTemplate);
           } else {
             let targetValue = inputElement.type === 'number' ?
               Number(event.target.value) : event.target.value;
-            updateConsumerElements(this.parentElement, consumers, targetValue);
+            updateConsumerElements(consumers, targetValue, providerTemplate);
           }
         }, debounceDelay);
       };

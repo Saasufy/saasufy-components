@@ -232,8 +232,8 @@ export function renderTemplate(templateString, data, socket) {
   });
 }
 
-export function updateConsumerElements(parentElement, consumers, value) {
-  if (parentElement && consumers) {
+export function updateConsumerElements(consumers, value, template) {
+  if (consumers) {
     let consumerParts = consumers.split(',')
       .filter(part => part)
       .map(part => {
@@ -242,8 +242,15 @@ export function updateConsumerElements(parentElement, consumers, value) {
       })
       .filter(([ selector, attributeName ]) => selector);
 
+    if (template) {
+      value = renderTemplate(
+        template,
+        { value }
+      );
+    }
+
     for (let [ selector, attributeName ] of consumerParts) {
-      let matchingElements = parentElement.querySelectorAll(selector);
+      let matchingElements = document.querySelectorAll(selector);
       if (attributeName) {
         for (let element of matchingElements) {
           if (typeof value === 'boolean') {

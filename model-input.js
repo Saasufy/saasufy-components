@@ -248,14 +248,15 @@ class ModelInput extends SocketConsumer {
 
   updateInputElement(inputElement, fieldValue) {
     let consumers = this.getAttribute('consumers');
+    let providerTemplate = this.getAttribute('provider-template');
     if (inputElement.type === 'checkbox') {
       let checked = !!fieldValue;
       inputElement.checked = checked;
-      updateConsumerElements(this.parentElement, consumers, checked);
+      updateConsumerElements(consumers, checked, providerTemplate);
     } else {
       let defaultValue = this.getAttribute('default-value') || '';
       inputElement.value = fieldValue == null ? defaultValue : fieldValue;
-      updateConsumerElements(this.parentElement, consumers, inputElement.value);
+      updateConsumerElements(consumers, inputElement.value, providerTemplate);
     }
   }
 
@@ -305,10 +306,11 @@ class ModelInput extends SocketConsumer {
     let onInputChange = (event) => {
       if (event.target.value === String(model.value[fieldName])) return;
       debounce(async () => {
+        let providerTemplate = this.getAttribute('provider-template');
         try {
           if (inputElement.type === 'checkbox') {
             let checked = !!inputElement.checked;
-            updateConsumerElements(this.parentElement, consumers, checked);
+            updateConsumerElements(consumers, checked, providerTemplate);
             await model.update(fieldName, checked);
             inputElement.classList.remove(errorStyleClass);
             inputElement.classList.add(successStyleClass);
@@ -316,12 +318,12 @@ class ModelInput extends SocketConsumer {
             return;
           }
           if (event.target.value === '') {
-            updateConsumerElements(this.parentElement, consumers, '');
+            updateConsumerElements(consumers, '', providerTemplate);
             await model.delete(fieldName);
           } else {
             let targetValue = inputElement.type === 'number' ?
               Number(event.target.value) : event.target.value;
-            updateConsumerElements(this.parentElement, consumers, targetValue);
+            updateConsumerElements(consumers, targetValue, providerTemplate);
             await model.update(fieldName, targetValue);
           }
           inputElement.classList.remove(errorStyleClass);
@@ -340,14 +342,15 @@ class ModelInput extends SocketConsumer {
     if (inputElement.type !== 'checkbox' && inputElement.type !== 'select') {
       onInputKeyUp = async (event) => {
         debounce(async () => {
+          let providerTemplate = this.getAttribute('provider-template');
           try {
             if (event.target.value === '') {
               await model.delete(fieldName);
-              updateConsumerElements(this.parentElement, consumers, '');
+              updateConsumerElements(consumers, '', providerTemplate);
             } else {
               let targetValue = inputElement.type === 'number' ?
                 Number(event.target.value) : event.target.value;
-              updateConsumerElements(this.parentElement, consumers, targetValue);
+              updateConsumerElements(consumers, targetValue, providerTemplate);
               await model.update(fieldName, targetValue);
             }
             inputElement.classList.remove(errorStyleClass);
