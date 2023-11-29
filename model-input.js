@@ -8,6 +8,7 @@ class ModelInput extends SocketConsumer {
     this.isReady = false;
     this.inputElement = null;
   }
+
   connectedCallback() {
     this.isReady = true;
     this.destroy = () => {};
@@ -22,10 +23,7 @@ class ModelInput extends SocketConsumer {
     return [
       'input-id',
       'list',
-      'model-instance-property',
-      'collection-instance-property',
-      'bind-to-model',
-      'bind-to-collection',
+      'socket-instance-property',
       'type',
       'placeholder',
       'consumers',
@@ -89,10 +87,7 @@ class ModelInput extends SocketConsumer {
 
   render() {
     this.innerHTML = '';
-    let bindToModel = this.hasAttribute('bind-to-model');
-    let modelInstanceProperty = this.getAttribute('model-instance-property');
-    let bindToCollection = this.hasAttribute('bind-to-collection');
-    let collectionInstanceProperty = this.getAttribute('collection-instance-property');
+    let socketInstanceProperty = this.getAttribute('socket-instance-property');
     let showErrorMessage = this.hasAttribute('show-error-message');
     let inputId = this.getAttribute('input-id');
     let autocapitalize = this.getAttribute('autocapitalize');
@@ -107,76 +102,43 @@ class ModelInput extends SocketConsumer {
     let height = this.getAttribute('height');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let enableRebound = this.hasAttribute('enable-rebound');
-    let currentNode = this.parentNode;
-    let model;
-    let isModelLocal = false;
-    if (bindToCollection) {
-      collectionInstanceProperty = 'collection';
-    }
-    if (collectionInstanceProperty) {
-      let collection;
+
+    let socket;
+    if (socketInstanceProperty) {
+      let currentNode = this.parentNode;
       while (currentNode) {
-        collection = currentNode[collectionInstanceProperty];
-        if (collection && collection.type !== modelType) {
-          collection = null;
-        }
-        if (collection && (!collection.agModels || !collection.agModels[modelId])) {
-          collection = null;
-        }
-        if (collection) break;
+        socket = currentNode[socketInstanceProperty];
+        if (socket) break;
         currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }
-      if (collection) {
-        model = collection.agModels[modelId];
-        if (!model.agFields[modelField]) {
-          model.addField(modelField);
-        }
-      }
+      if (!socket) {
+        throw new Error(
+          `The ${
+            this.nodeName.toLowerCase()
+          } element failed to bind to a socket via the ${
+            socketInstanceProperty
+          } socket-instance-property`
+        );
+      };
+    } else {
+      socket = this.getSocket();
     }
-    if (!model) {
-      if (bindToModel) {
-        modelInstanceProperty = 'model';
-      }
-      currentNode = this.parentNode;
-      if (modelInstanceProperty) {
-        while (currentNode) {
-          model = currentNode[modelInstanceProperty];
-          if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
-            model = null;
-          }
-          if (model && !model.agFields) {
-            model = null;
-          }
-          if (model) break;
-          currentNode = currentNode.getRootNode().host || currentNode.parentNode;
-        }
-        if (!model) {
-          throw new Error(
-            `The ${
-              this.nodeName.toLowerCase()
-            } element failed to bind to a model - Ensure that the element is nested inside a parent element which exposes a model instance of the same type with a ${modelField} field`
+    this.socket = socket;
+    let model = new AGModel({
+      socket: this.socket,
+      type: modelType,
+      id: modelId,
+      fields: [ modelField ],
+      enableRebound
+    });
+    if (!hideErrorLogs) {
+      (async () => {
+        for await (let { error } of model.listener('error')) {
+          console.error(
+            `Model input encountered an error: ${error.message}`
           );
-        };
-      } else {
-        this.socket = this.getSocket();
-        model = new AGModel({
-          socket: this.socket,
-          type: modelType,
-          id: modelId,
-          fields: [ modelField ],
-          enableRebound
-        });
-        if (!hideErrorLogs) {
-          (async () => {
-            for await (let { error } of model.listener('error')) {
-              console.error(
-                `Model input encountered an error: ${error.message}`
-              );
-            }
-          })();
         }
-        isModelLocal = true;
-      }
+      })();
     }
     if (model.isLoaded) {
       this.setAttribute('is-loaded', '');
@@ -240,9 +202,7 @@ class ModelInput extends SocketConsumer {
     this.destroy = () => {
       destroyInputSync();
       this.isLoadedConsumer && this.isLoadedConsumer.kill();
-      if (isModelLocal) {
-        model.destroy();
-      }
+      model.destroy();
     };
   }
 
@@ -304,8 +264,9 @@ class ModelInput extends SocketConsumer {
     let debounce = debouncer();
 
     let onInputChange = (event) => {
-      if (event.target.value === String(model.value[fieldName])) return;
       debounce(async () => {
+        if (event.target.value === String(model.value[fieldName] || '')) return;
+
         let providerTemplate = this.getAttribute('provider-template');
         try {
           if (inputElement.type === 'checkbox') {
@@ -342,6 +303,8 @@ class ModelInput extends SocketConsumer {
     if (inputElement.type !== 'checkbox' && inputElement.type !== 'select') {
       onInputKeyUp = async (event) => {
         debounce(async () => {
+          if (event.target.value === String(model.value[fieldName] || '')) return;
+
           let providerTemplate = this.getAttribute('provider-template');
           try {
             if (event.target.value === '') {

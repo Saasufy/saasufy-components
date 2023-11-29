@@ -89,6 +89,10 @@ export function createReactiveCollection(collectionOptions, callback) {
     }
   })();
 
+  if (collection.isLoaded) {
+    collection.safeValue = collection.value.map(toSafeModelValue);
+  }
+
   return collection;
 }
 
@@ -120,6 +124,10 @@ export function createReactiveModel(modelOptions, callback) {
     }
   })();
 
+  if (model.isLoaded) {
+    model.safeValue = toSafeModelValue(model.value);
+  }
+
   return model;
 }
 
@@ -142,6 +150,10 @@ export function createCollection(collectionOptions) {
     }
   })();
 
+  if (collection.isLoaded) {
+    collection.safeValue = collection.value.map(toSafeModelValue);
+  }
+
   return collection;
 }
 
@@ -161,6 +173,10 @@ export function createModel(modelOptions) {
       model.safeValue = toSafeModelValue(model.value);
     }
   })();
+
+  if (model.isLoaded) {
+    model.safeValue = toSafeModelValue(model.value);
+  }
 
   return model;
 }

@@ -16,19 +16,14 @@ class ModelViewer extends SocketConsumer {
 
   connectedCallback() {
     this.isReady = true;
-    this.socket = this.getSocket();
     this.activeLoader = null;
     this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
     this.render();
   }
 
   disconnectedCallback() {
-    if (this.model && this.isModelLocal) {
+    if (this.model) {
       this.model.destroy();
-    } else {
-      if (this.modelLoadConsumer) this.modelLoadConsumer.kill();
-      if (this.modelChangeConsumer) this.modelChangeConsumer.kill();
-      if (this.modelErrorConsumer) this.modelErrorConsumer.kill();
     }
     this.shadowRoot.removeEventListener('slotchange', this.handleSlotChangeEvent);
   }
@@ -93,43 +88,38 @@ class ModelViewer extends SocketConsumer {
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelFields = this.getAttribute('model-fields') || '';
-    let modelInstanceProperty = this.getAttribute('model-instance-property');
+    let socketInstanceProperty = this.getAttribute('socket-instance-property');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
 
-    if (this.model && this.isModelLocal) this.model.destroy();
+    if (this.model) this.model.destroy();
 
-    let currentNode = this.parentNode;
-    let model;
-    if (modelInstanceProperty) {
+    let socket;
+    if (socketInstanceProperty) {
+      let currentNode = this.parentNode;
       while (currentNode) {
-        model = currentNode[modelInstanceProperty];
-        if (model && modelType && (model.type !== modelType || !(model.fields || []).includes(modelField))) {
-          model = null;
-        }
-        if (model && !model.agFields) {
-          model = null;
-        }
-        if (model) break;
+        socket = currentNode[socketInstanceProperty];
+        if (socket) break;
         currentNode = currentNode.getRootNode().host || currentNode.parentNode;
       }
-      if (!model) {
+      if (!socket) {
         throw new Error(
           `The ${
             this.nodeName.toLowerCase()
-          } element failed to obtain a model via the specified model-instance-property - Ensure that the element is nested inside a parent element which exposes a model instance of the same type which has the relevant fields`
+          } element failed to bind to a socket via the ${
+            socketInstanceProperty
+          } socket-instance-property`
         );
       };
-      this.model = model;
-      this.isModelLocal = false;
     } else {
-      this.model = new AGModel({
-        socket: this.socket,
-        type: modelType,
-        id: modelId,
-        fields: modelFields.split(',').map(field => field.trim()).filter(field => field)
-      });
-      this.isModelLocal = true;
+      socket = this.getSocket();
     }
+    this.socket = socket;
+    this.model = new AGModel({
+      socket: this.socket,
+      type: modelType,
+      id: modelId,
+      fields: modelFields.split(',').map(field => field.trim()).filter(field => field)
+    });
 
     this.shadowRoot.innerHTML = `
       <slot name="loader"></slot>
