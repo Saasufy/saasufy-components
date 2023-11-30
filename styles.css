@@ -1,0 +1,207 @@
+body {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #e37042;
+}
+
+input[type=text],input[type=password],input[type=number],select,textarea {
+  border: 1px solid #999999;
+  border-radius: 5px;
+}
+
+input[type=text]:focus,input[type=password]:focus,input[type=number]:focus,select:focus,textarea:focus {
+  border-color: #00a5e5;
+  outline-color: #00a5e5;
+}
+
+input[type=text].error:focus,input[type=password].error:focus,input[type=number].error:focus,select.error:focus,textarea.error:focus {
+  border-color: #ff0000;
+  outline-color: #ff0000;
+}
+
+input[type=text].warning:focus,input[type=password].warning:focus,input[type=number].warning:focus,select.warning:focus,textarea.warning:focus {
+  border-color: #ee9900;
+  outline-color: #ee9900;
+}
+
+input[type=text].success:focus,input[type=password].success:focus,input[type=number].success:focus,select.success:focus,textarea.success:focus {
+  border-color: #009900;
+  outline-color: #009900;
+}
+
+input[type=text],input[type=password],input[type=button],input[type=submit],input[type=number],textarea {
+  padding: 10px;
+  font-size: 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
+
+input[type=submit]:not(input[disabled]),input[type=button]:not(input[disabled]) {
+  cursor: pointer;
+}
+
+.passphrase-container input {
+  max-width: 107px;
+}
+
+.log-in-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.passphrase-container {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+capitalisk-passphrase-input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  font-size: 40px;
+  color: #999999;
+}
+
+.multisig-indicator.spinning {
+  display: inline-block;
+}
+
+.spinning {
+  display: inline-block;
+  animation: spin 1s infinite linear;
+}
+
+.multisig-indicator.error {
+  color: #ff0000;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+collection-adder .collection-adder-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+collection-adder .collection-adder-form-content > label {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0 5px 0;
+  align-self: flex-start;
+}
+
+.label-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+}
+
+collection-browser {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+collection-browser > [slot=viewport] {
+  display: flex;
+  flex-direction: column;
+  grid-area: a;
+}
+
+[slot=next-page],[slot=previous-page] {
+  cursor: pointer;
+}
+
+collection-browser > [slot=previous-page] {
+  cursor: pointer;
+  flex-shrink: 1;
+  width: auto;
+}
+
+collection-browser > [slot=page-number] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 30px;
+}
+
+collection-browser > [slot=next-page] {
+  cursor: pointer;
+  flex-shrink: 1;
+  width: auto;
+}
+
+.container-vertical {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.container-horizontal {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.container-narrow {
+  max-width: 500px;
+}
+
+.container-medium {
+  max-width: 1000px;
+}
+
+.container-wide {
+  max-width: 1500px;
+}
+
+.container-centered-main {
+  justify-content: center;
+}
+
+.container-centered-cross {
+  align-items: center;
+}
+
+.container-spaced-small {
+  gap: 5px;
+}
+
+.container-spaced-medium {
+  gap: 10px;
+}
+
+.container-spaced-large {
+  gap: 20px;
+}
+
+.container-spaced-very-large {
+  gap: 30px;
+}
