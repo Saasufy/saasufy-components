@@ -50,6 +50,8 @@ You can apply custom CSS/styling to elements that are rendered inside a viewport
 
 ## How to use
 
+### Components
+
 To use components, you just need to include them into your `.html` file inside your `<head>` tag like this:
 
 ```html
@@ -82,6 +84,14 @@ You should always include the `socket.js` script as shown above whenever you use
 
 Linking the scripts directly from `saasufy.com` as shown above is the simplest way to get started as it doesn't require loading anything or hosting the scripts yourself.
 An alternative approach is to download Saasufy components using `npm install saasufy-components` and then link to them from your own hosting provider.
+
+### Styling
+
+This project does not impose any specific approach to styling components, however, it comes with an optional `styles.css` stylesheet which can be added inside your `<head>` tag like this:
+
+```html
+<link href="https://saasufy.com/node_modules/saasufy-components/styles.css" rel="stylesheet" />
+```
 
 ## Components
 
