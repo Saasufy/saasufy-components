@@ -90,6 +90,12 @@ An alternative approach is to download Saasufy components using `npm install saa
 A component which allows you build apps which have multiple pages. Inside it, you should specify a template for each page in your app along with the route/path to bind each page to.
 This component also supports simple redirects as well as redirects based on the user's current authentication state. Redirects can be soft or hard; a soft redirect does not change the current URL/path, a hard redirect does.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/app-router.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -141,6 +147,12 @@ So for example, if your `index.html` file is served up from the URL `http://mywe
 A top level component which connects to your Saasufy service and inside which you can place other components which depends on Saasufy data.
 A Saasufy component which integrates with data from Saasufy is known as a `socket-consumer` and must always be placed inside a `socket-provider` element (although it does not have to be a direct child).
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/socket.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -159,6 +171,12 @@ A Saasufy component which integrates with data from Saasufy is known as a `socke
 Used for rendering collections as lists, tables or other sequences based on a specific view using a template.
 Supports pagination by allowing you to specify custom buttons or links to navigate between pages.
 Can also perform basic CRUD operations such as deleting or creating records by listening for events from child components.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/collection-browser.js" type="module" defer></script>
+```
 
 **Example usage**
 
@@ -206,6 +224,12 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 
 A form component for inserting data into collections.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/collection-adder.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -234,6 +258,12 @@ A form component for inserting data into collections.
 
 A component which can be placed anywhere inside a `collection-browser` component to delete a specific item from a collection as a result of a user action (e.g. on click).
 It supports either immediate deletion or deletion upon confirmation; in the latter case, the parent `collection-browser` must have a `confirm-modal` component slotted into its `modal` slot.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/collection-deleter.js" type="module" defer></script>
+```
 
 **Example usage**
 
@@ -275,6 +305,12 @@ If `confirmDeleteItem()` is used, then the parent `collection-browser` must have
 
 Similar to the `collection-browser` component but designed to render collections in combined format. For example, to combine values from multiple records into a single item.
 A common use case is to extract and join values to pass to other child components via their attributes.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/collection-reducer.js" type="module" defer></script>
+```
 
 **Example usage**
 
@@ -330,6 +366,12 @@ In the example above, the name of the first element can be accessed with `{{Cate
 
 Used for displaying and editing a single field of a model instance in real time.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/model-input.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -368,6 +410,12 @@ Used for displaying and editing a single field of a model instance in real time.
 
 Used to displaying a field of a model instance in real time.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/model-text.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -389,6 +437,12 @@ Used to displaying a field of a model instance in real time.
 ### model-viewer
 
 Used for rendering a single model resource using a template. This is the single-model alternative to the `collection-browser` which works with collections of models.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/model-viewer.js" type="module" defer></script>
+```
 
 **Example usage**
 
@@ -424,6 +478,12 @@ An input component which can pass data to other components (or HTML elements) vi
 A common use case for it is to pass user input to `collection-browser` or `model-viewer` components to then fetch data from Saasufy.
 This component can be configured to provide its data to multiple components (consumers) via custom attributes.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/input-provider.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -458,6 +518,12 @@ Once a user is authenticated, they will be able to access restricted data (as sp
 It's also possible to specify a `success-location-hash` attribute to trigger a client-side redirect upon successful authentication.
 The change in the location hash can then be detected by an `app-router` to switch to a different page upon successful login.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/log-in-form.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -484,6 +550,12 @@ The change in the location hash can then be detected by an `app-router` to switc
 
 A component which can be placed inside a `socket-provider` to deauthenticate the socket (e.g. on click).
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/log-out.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -493,6 +565,12 @@ A component which can be placed inside a `socket-provider` to deauthenticate the
 ### oauth-link
 
 A link to initiate an OAuth flow to authenticate a user as part of log in. Can support a range of different OAuth providers.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/oauth-link.js" type="module" defer></script>
+```
 
 **Example usage**
 
@@ -519,6 +597,12 @@ A link to initiate an OAuth flow to authenticate a user as part of log in. Can s
 This component handles the final stage of OAuth and then redirects the user to the relevant page/URL if successful.
 When using an OAuth provider, the callback URL which you register with the provider must lead the user back to a page which contains this `oauth-handler` component.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/oauth-handler.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -539,6 +623,12 @@ When using an OAuth provider, the callback URL which you register with the provi
 ### render-group
 
 A component which can be used to guarantee that certain children components are always rendered at the same time (once they are loaded) to provide a smooth user experience.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/render-group.js" type="module" defer></script>
+```
 
 **Example usage**
 
@@ -578,6 +668,12 @@ The `render-group` will only render its content once all the components specifie
 A component which exposes a `show-content` property which can be set to true or false to show or hide its content.
 It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. This component requires a template and a viewport to be slotted in. The content of the template will not be processed unless the `show-content` condition is met.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/if-group.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -596,6 +692,12 @@ It's intended to be placed inside a `model-viewer`, `collection-browser` or `col
 A component which exposes a `show-cases` property which can be set to key-value pairs in the format `key1=true,key2=false`. It can be used to conditionally display multiple slotted elements based on multiple conditions. It helps to keep HTML clean when the conditions are complex.
 This element is intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false values of the `show-cases` attribute can be computed using template `{{expression}}` placeholders. This component requires one or more templates and a viewport to be slotted in. The content of the templates will not be processed unless the `show-cases` condition is met. All templates must have a `slot="content"` attribute and a name attribute in the format `name="key1"` where the value `key1` corresponds to the key specified inside the `show-cases` attribute of the `switch-group`.
 
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/switch-group.js" type="module" defer></script>
+```
+
 **Example usage**
 
 ```html
@@ -613,6 +715,12 @@ This element is intended to be placed inside a `model-viewer`, `collection-brows
 ### collection-adder-group
 
 A component which can be used to group together multiple `collection-adder` components. It can be used to insert multiple records into a collection via a single button click.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/collection-adder-group.js" type="module" defer></script>
+```
 
 **Example usage**
 
@@ -649,6 +757,12 @@ A component which can be used to group together multiple `collection-adder` comp
 ### confirm-modal
 
 A modal component to prompt the user for confirmation before performing sensitive operations. Can be slotted into a `collection-browser` component.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/confirm-modal.js" type="module" defer></script>
+```
 
 **Example usage**
 
