@@ -194,6 +194,35 @@ collection-browser > [slot=next-page] {
   align-items: center;
 }
 
+.container-padded-small {
+  padding: 5px;
+}
+
+.container-padded-medium {
+  padding: 10px;
+}
+
+.container-padded-large {
+  padding: 20px;
+}
+
+.container-margined-small {
+  margin: 5px;
+}
+
+.container-margined-medium {
+  margin: 10px;
+}
+
+.container-margined-large {
+  margin: 20px;
+}
+
+.container-unpadded-sides {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .container-spaced-small {
   gap: 5px;
 }
