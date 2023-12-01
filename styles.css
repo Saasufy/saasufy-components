@@ -166,12 +166,14 @@ collection-browser > [slot=next-page] {
   display: flex;
   flex-direction: column;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .container-horizontal {
   display: flex;
   flex-direction: row;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .container-narrow {
