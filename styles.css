@@ -7,11 +7,11 @@ a {
   color: #e37042;
 }
 
-.error {
+div.error,span.error,p.error {
   color: #ff0000;
 }
 
-.success {
+div.success,span.success,p.success {
   color: #009900;
 }
 
