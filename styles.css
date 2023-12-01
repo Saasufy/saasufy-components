@@ -65,6 +65,10 @@ input[type=submit]:not(input[disabled]),input[type=button]:not(input[disabled]) 
   flex-wrap: wrap;
 }
 
+capitalisk-log-in #is-multisig {
+  vertical-align: middle;
+}
+
 capitalisk-passphrase-input {
   display: flex;
   flex-direction: column;
@@ -109,7 +113,7 @@ collection-adder .collection-adder-form-content > label {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
   padding: 5px 0 5px 0;
   align-self: flex-start;
 }
@@ -118,7 +122,7 @@ collection-adder .collection-adder-form-content > label {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
   align-self: flex-start;
 }
 
