@@ -7,6 +7,14 @@ a {
   color: #e37042;
 }
 
+.error {
+  color: #ff0000;
+}
+
+.success {
+  color: #009900;
+}
+
 input[type=text],input[type=password],input[type=number],select,textarea {
   border: 1px solid #999999;
   border-radius: 5px;
@@ -47,6 +55,14 @@ input[type=checkbox] {
 
 input[type=submit]:not(input[disabled]),input[type=button]:not(input[disabled]) {
   cursor: pointer;
+}
+
+input.error,textarea.error {
+  border: 1px solid #ff0000;
+}
+
+input.warning,textarea.warning {
+  border: 1px solid #ee9900;
 }
 
 .passphrase-container input {
