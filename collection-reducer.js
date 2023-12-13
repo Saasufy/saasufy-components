@@ -74,6 +74,7 @@ class CollectionReducer extends SocketConsumer {
       'collection-view-params',
       'collection-page-size',
       'collection-page-offset',
+      'collection-get-count',
       'max-show-loader',
       'type-alias',
       'hide-error-logs'
@@ -165,7 +166,7 @@ class CollectionReducer extends SocketConsumer {
       let type = this.getAttribute('type-alias') || this.collection.type;
       let itemString = renderTemplate(
         itemTemplate.innerHTML,
-        { [type]: this.collection.value },
+        { [type]: this.collection.value, [`$${type}`]: this.collection.meta },
         this.socket
       );
       viewportNode.innerHTML = itemString;
@@ -179,6 +180,7 @@ class CollectionReducer extends SocketConsumer {
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionViewParams = this.getAttribute('collection-view-params') || '';
     let collectionPageOffset = this.getAttribute('collection-page-offset');
+    let collectionGetCount = this.hasAttribute('collection-get-count');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
@@ -196,7 +198,8 @@ class CollectionReducer extends SocketConsumer {
       viewParams,
       pageSize: Number(collectionPageSize || 10),
       pageOffset: Number(collectionPageOffset || 0),
-      changeReloadDelay: collectionReloadDelay
+      changeReloadDelay: collectionReloadDelay,
+      getCount: collectionGetCount
     });
 
     this.shadowRoot.innerHTML = `
