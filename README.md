@@ -738,7 +738,7 @@ A component which can be used to group together multiple `collection-adder` comp
 
 ```html
 <!--
-  This collection-adder-group adds two pre-defined records into a Product
+  This collection-adder-group adds multiple pre-defined records into a Product
   collection using a single button click. This example assumes that the name
   field is the only required field in the Product model.
 -->
