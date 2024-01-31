@@ -26,6 +26,7 @@ class ModelInput extends SocketConsumer {
       'socket-instance-property',
       'type',
       'placeholder',
+      'accept',
       'consumers',
       'show-error-message',
       'model-type',
@@ -95,6 +96,7 @@ class ModelInput extends SocketConsumer {
     let inputList = this.getAttribute('list');
     let type = this.getAttribute('type') || 'text';
     let placeholder = this.getAttribute('placeholder');
+    let accept = this.getAttribute('accept');
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
@@ -191,6 +193,9 @@ class ModelInput extends SocketConsumer {
     if (placeholder) {
       this.inputElement.setAttribute('placeholder', placeholder);
     }
+    if (accept) {
+      this.inputElement.setAttribute('accept', accept);
+    }
     let errorMessageContainer = null;
     if (showErrorMessage) {
       errorMessageContainer = document.createElement('div');
@@ -215,8 +220,11 @@ class ModelInput extends SocketConsumer {
       updateConsumerElements(consumers, checked, providerTemplate);
     } else {
       let defaultValue = this.getAttribute('default-value') || '';
-      inputElement.value = fieldValue == null ? defaultValue : fieldValue;
-      updateConsumerElements(consumers, inputElement.value, providerTemplate);
+      let elementValue = fieldValue == null ? defaultValue : fieldValue;
+      if (inputElement.type !== 'file') {
+        inputElement.value = elementValue;
+      }
+      updateConsumerElements(consumers, elementValue, providerTemplate);
     }
   }
 
@@ -278,12 +286,28 @@ class ModelInput extends SocketConsumer {
             hideErrorMessage(fieldName);
             return;
           }
-          if (event.target.value === '') {
+          let inputValue;
+          if (inputElement.type === 'file' && inputElement.files && inputElement.files.length) {
+            let reader = new FileReader();
+            let readerLoadPromise = new Promise((resolve, reject) => {
+              reader.addEventListener('load', () => {
+                resolve(reader.result);
+              });
+              reader.addEventListener('error', () => {
+                reject(new Error('Failed to read file'));
+              });
+            });
+            reader.readAsDataURL(inputElement.files[0]);
+            inputValue = await readerLoadPromise;
+          } else {
+            inputValue = event.target.value;
+          }
+          if (inputValue === '') {
             updateConsumerElements(consumers, '', providerTemplate);
             await model.delete(fieldName);
           } else {
             let targetValue = inputElement.type === 'number' ?
-              Number(event.target.value) : event.target.value;
+              Number(inputValue) : inputValue;
             updateConsumerElements(consumers, targetValue, providerTemplate);
             await model.update(fieldName, targetValue);
           }

@@ -404,7 +404,7 @@ Used for displaying and editing a single field of a model instance in real time.
 - `debounce-delay`: The delay in milliseconds to wait before sending an update to the server. This is useful to batch multiple updates together (as is common when user is typing). Default is 300ms.
 - `input-id`: Can be used to set an `id` attribute on the inner `input` element.
 - `list`: If specified, this sets the list attribute of the inner `input` element to provide input suggestions (only works with standard input elements).
-- `type`: The type of the input component; can be `text`, `number`, `select`, `textarea` or `checkbox`.
+- `type`: The type of the input component; can be `text`, `number`, `select`, `textarea`, `checkbox` or `file`.
 - `placeholder`: Can be used to set the placeholder text on the inner input element.
 - `consumers`: This allows you to connect this `model-input` to other elements on your page. It takes a list of selectors with optional attributes to target. For example `.my-input:value` will find all elements with a `my-input` class and update their `value` attributes with the value of the `model-input` component in real-time. You can specify multiple selectors separated by commas such as `.my-input,my-div` - In this case, because attribute names are not specified, values will be injected into the `value` attribute (for input elements) or into the `innerHTML` property (for other kinds of elements). The default attribute/property depends on the element type.
 - `provider-template`: A template string within which the `{{value}}` can be injected before passing to consumers.
@@ -417,6 +417,7 @@ Used for displaying and editing a single field of a model instance in real time.
 - `autocapitalize`: Can be `on` or `off` - It will set the auto-capitalize attribute on the inner input element. This is useful for mobile devices to enable or disable auto-capitalization of the first character which is typed into the input element.
 - `autocorrect`: Can be `on` or `off` - It will set the auto-correct attribute on the inner input element. This is useful for mobile devices to enable or disable auto-correct.
 - `enable-rebound`: By default, for efficiency reasons, real-time updates performed via `model-input` components are not sent back to the publishing client; it is usually unnecessary because state changes are shared locally between all components which are bound to the same `socket-provider`. You can add the `enable-rebound` attribute to the `model-input` component to force real-time updates to rebound back to the publisher to support more advanced scenarios. Note that enabling rebound comes with additional performance overheads.
+- `accept`: This attribute should only be used if the `type` is set to `file`; it serves to constrain the types of files which can be selected by the user.
 
 ### model-text
 
