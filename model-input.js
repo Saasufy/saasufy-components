@@ -105,6 +105,7 @@ class ModelInput extends SocketConsumer {
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let enableRebound = this.hasAttribute('enable-rebound');
     let hasConsumers = this.hasAttribute('consumers');
+    let writeOnly = type === 'file' && !hasConsumers;
 
     let socket;
     if (socketInstanceProperty) {
@@ -128,7 +129,7 @@ class ModelInput extends SocketConsumer {
     }
     this.socket = socket;
 
-    let modelFieldList = hasConsumers ? [ modelField ] : [];
+    let modelFieldList = writeOnly ? [] : [ modelField ];
 
     let model = new AGModel({
       socket: this.socket,
