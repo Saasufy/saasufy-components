@@ -104,6 +104,7 @@ class ModelInput extends SocketConsumer {
     let height = this.getAttribute('height');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let enableRebound = this.hasAttribute('enable-rebound');
+    let hasConsumers = this.hasAttribute('consumers');
 
     let socket;
     if (socketInstanceProperty) {
@@ -126,11 +127,14 @@ class ModelInput extends SocketConsumer {
       socket = this.getSocket();
     }
     this.socket = socket;
+
+    let modelFieldList = hasConsumers ? [ modelField ] : [];
+
     let model = new AGModel({
       socket: this.socket,
       type: modelType,
       id: modelId,
-      fields: [ modelField ],
+      fields: modelFieldList,
       enableRebound
     });
     if (!hideErrorLogs) {
