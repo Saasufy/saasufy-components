@@ -63,31 +63,47 @@ class CollectionAdder extends SocketConsumer {
 
     let trimSpaces = this.hasAttribute('trim-spaces');
 
-    let newModelData = {
-      ...this.modelFieldValues,
-      ...radioData,
-      ...Object.fromEntries(
-        [...this.querySelectorAll('.collection-adder-input')]
-          .filter(input => input.value !== '')
-          .map((input) => {
-            let fieldType = this.fieldTypes[input.name];
-            let Type = getTypeCastFunction(fieldType);
-            let value;
-            if (fieldType === 'checkbox') {
-              value = input.checked;
-            } else {
-              value = input.value;
-            }
-            let sanitizedValue = Type(value);
-            if (trimSpaces && typeof sanitizedValue === 'string') {
-              sanitizedValue = sanitizedValue.trim();
-            }
-            return [ input.name, sanitizedValue ];
-          })
-      )
-    };
-
     try {
+      let newModelData = {
+        ...this.modelFieldValues,
+        ...radioData,
+        ...Object.fromEntries(
+          await Promise.all(
+            [...this.querySelectorAll('.collection-adder-input')].filter(
+              input => input.value !== ''
+            )
+            .map(
+              async (input) => {
+                let fieldType = this.fieldTypes[input.name];
+                let Type = getTypeCastFunction(fieldType);
+                let value;
+                if (input.type === 'file' && input.files && input.files.length) {
+                  let reader = new FileReader();
+                  let readerLoadPromise = new Promise((resolve, reject) => {
+                    reader.addEventListener('load', () => {
+                      resolve(reader.result);
+                    });
+                    reader.addEventListener('error', () => {
+                      reject(new Error('Failed to read file'));
+                    });
+                  });
+                  reader.readAsDataURL(input.files[0]);
+                  value = await readerLoadPromise;
+                } else if (fieldType === 'checkbox') {
+                  value = input.checked;
+                } else {
+                  value = input.value;
+                }
+                let sanitizedValue = Type(value);
+                if (trimSpaces && typeof sanitizedValue === 'string') {
+                  sanitizedValue = sanitizedValue.trim();
+                }
+                return [ input.name, sanitizedValue ];
+              }
+            )
+          )
+        )
+      };
       await this.collection.create(newModelData);
       messageContainer.classList.add('success');
       messageContainer.classList.remove('error');
@@ -249,6 +265,14 @@ class CollectionAdder extends SocketConsumer {
           }" placeholder="${
             inputLabel
           }"${extraAttributesString}></textarea>`
+        );
+      } else if (inputType === 'file') {
+        items.push(
+          `<input class="collection-adder-input" type="${
+            inputType
+          }" name="${
+            field
+          }"${extraAttributesString} />`
         );
       } else {
         items.push(
