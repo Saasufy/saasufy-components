@@ -235,7 +235,7 @@ class ModelInput extends SocketConsumer {
   }
 
   verifyValue(fieldValue, optionList, inputElement, messageContainerElement) {
-    if (optionList && !optionList.includes(fieldValue)) {
+    if (optionList && fieldValue != null && !optionList.includes(fieldValue)) {
       inputElement.classList.add('error');
       inputElement.classList.remove('success');
       if (messageContainerElement) {
