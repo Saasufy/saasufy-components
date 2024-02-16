@@ -26,12 +26,12 @@ input[type=text]:focus,input[type=password]:focus,input[type=number]:focus,selec
   outline-color: #00a5e5;
 }
 
-input[type=text].error:focus,input[type=password].error:focus,input[type=number].error:focus,select.error:focus,textarea.error:focus {
+input[type=text].error,input[type=password].error,input[type=number].error,select.error,textarea.error {
   border-color: #ff0000;
   outline-color: #ff0000;
 }
 
-input[type=text].warning:focus,input[type=password].warning:focus,input[type=number].warning:focus,select.warning:focus,textarea.warning:focus {
+input[type=text].warning,input[type=password].warning,input[type=number].warning,select.warning,textarea.warning {
   border-color: #ee9900;
   outline-color: #ee9900;
 }

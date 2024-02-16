@@ -167,10 +167,11 @@ class ModelInput extends SocketConsumer {
       elementType = 'input';
     }
     this.inputElement = document.createElement(elementType);
+    let optionList = null;
     if (type === 'select') {
       if (options) {
-        let optionElements = options
-          .split(',')
+        optionList = options.split(',');
+        let optionElements = optionList
           .map((option) => {
             return `<option value="${option}">${option}</option>`;
           })
@@ -208,7 +209,7 @@ class ModelInput extends SocketConsumer {
       this.appendChild(errorMessageContainer);
     }
     this.appendChild(this.inputElement);
-    let destroyInputSync = this.syncInputElementWithModel(this.inputElement, model, modelField, errorMessageContainer);
+    let destroyInputSync = this.syncInputElementWithModel(this.inputElement, model, modelField, errorMessageContainer, optionList);
     this.destroy = () => {
       destroyInputSync();
       this.isLoadedConsumer && this.isLoadedConsumer.kill();
@@ -233,9 +234,22 @@ class ModelInput extends SocketConsumer {
     }
   }
 
-  syncInputElementWithModel(inputElement, model, fieldName, messageContainerElement) {
+  verifyValue(fieldValue, optionList, inputElement, messageContainerElement) {
+    if (optionList && !optionList.includes(fieldValue)) {
+      inputElement.classList.add('error');
+      inputElement.classList.remove('success');
+      if (messageContainerElement) {
+        messageContainerElement.textContent = 'Invalid selection';
+        messageContainerElement.classList.add('error');
+        messageContainerElement.classList.remove('hidden');
+      }
+    }
+  }
+
+  syncInputElementWithModel(inputElement, model, fieldName, messageContainerElement, optionList) {
     if (model.isLoaded) {
       let fieldValue = model.value[fieldName];
+      this.verifyValue(fieldValue, optionList, inputElement, messageContainerElement);
       this.updateInputElement(inputElement, fieldValue);
     }
     let stopSaving = this.saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement);
@@ -245,6 +259,7 @@ class ModelInput extends SocketConsumer {
         let hasFocus = document.activeElement === this.inputElement;
         if (event.resourceField !== fieldName || (hasFocus && !event.isRemote)) continue;
         let fieldValue = model.value[fieldName];
+        this.verifyValue(fieldValue, optionList, inputElement, messageContainerElement);
         this.updateInputElement(inputElement, fieldValue);
       }
     })();
