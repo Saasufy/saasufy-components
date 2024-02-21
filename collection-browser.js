@@ -104,6 +104,7 @@ class CollectionBrowser extends SocketConsumer {
       'collection-page-size',
       'collection-page-offset',
       'collection-get-count',
+      'auto-reset-page-offset',
       'max-show-loader',
       'type-alias',
       'hide-error-logs'
@@ -112,15 +113,23 @@ class CollectionBrowser extends SocketConsumer {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
-    if (this.collection && name === 'collection-page-offset') {
-      let newOffset = Number(newValue);
-      if (newOffset !== this.collection.meta.pageOffset) {
-        this.isStale = true;
-        this.collection.fetchPage(newOffset);
+    if (name === 'collection-page-offset') {
+      if (this.collection) {
+        let newOffset = Number(newValue);
+        if (newOffset !== this.collection.meta.pageOffset) {
+          this.isStale = true;
+          this.collection.fetchPage(newOffset);
+        }
+        this.updatePageNumberElements();
+        this.updatePageButtons();
       }
-      this.updatePageNumberElements();
-      this.updatePageButtons();
     } else {
+      let autoResetPageOffset = this.hasAttribute('auto-reset-page-offset');
+      if (autoResetPageOffset) {
+        if (this.collection) this.collection.destroy();
+        delete this.collection;
+        this.goToPage(0);
+      }
       this.render();
     }
   }
