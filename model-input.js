@@ -169,7 +169,7 @@ class ModelInput extends SocketConsumer {
     this.inputElement = document.createElement(elementType);
     let optionList = null;
     if (type === 'select') {
-      if (options) {
+      if (options != null) {
         optionList = options.split(',');
         let optionElements = optionList
           .map((option) => {
