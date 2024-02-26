@@ -193,9 +193,6 @@ let templateFormatters = {
   fallback: (...args) => {
     return args.filter(arg => arg)[0];
   },
-  joinFields: (list, field, sep) => {
-    return list.map(item => item[field]).join(sep);
-  },
   date: (timestamp) => {
     let date = new Date(timestamp);
     let year = date.getFullYear();
@@ -204,6 +201,12 @@ let templateFormatters = {
     let hour = date.getHours();
     let minutes = date.getMinutes();
     return `${month} ${day}, ${year} at ${hour}:${minutes.toString().padStart(2, '0')}`;
+  },
+  joinFields: (list, field, sep) => {
+    return list.map(item => item[field]).join(sep);
+  },
+  combineFilters: (filterMap, useOr) => {
+    return Object.values(filterMap || {}).join(useOr ? ' %OR% ' : ' %AND% ');
   }
 };
 
@@ -293,6 +296,8 @@ export function updateConsumerElements(consumers, value, template) {
             }
           } else if (element.nodeName === 'MODEL-INPUT') {
             element.value = value;
+          } else if (element.nodeName === 'INPUT-COMBINER') {
+            element.setAttribute('value', value);
           } else {
             element.innerHTML = value;
           }
