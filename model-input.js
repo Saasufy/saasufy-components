@@ -60,6 +60,9 @@ class ModelInput extends SocketConsumer {
 
   set value(newValue) {
     if (this.inputElement) {
+      if (newValue && this.hasAttribute('computable-value')) {
+        newValue = renderTemplate(newValue);
+      }
       if (this.inputElement.type === 'checkbox') {
         let oldValue = this.inputElement.checked;
         this.inputElement.checked = newValue;
@@ -223,14 +226,14 @@ class ModelInput extends SocketConsumer {
     if (inputElement.type === 'checkbox') {
       let checked = !!fieldValue;
       inputElement.checked = checked;
-      updateConsumerElements(consumers, checked, providerTemplate);
+      updateConsumerElements(consumers, checked, providerTemplate, this.getAttribute('name'));
     } else {
       let defaultValue = this.getAttribute('default-value') || '';
       let elementValue = fieldValue == null ? defaultValue : fieldValue;
       if (inputElement.type !== 'file') {
         inputElement.value = elementValue;
       }
-      updateConsumerElements(consumers, elementValue, providerTemplate);
+      updateConsumerElements(consumers, elementValue, providerTemplate, this.getAttribute('name'));
     }
   }
 
@@ -299,7 +302,7 @@ class ModelInput extends SocketConsumer {
         try {
           if (inputElement.type === 'checkbox') {
             let checked = !!inputElement.checked;
-            updateConsumerElements(consumers, checked, providerTemplate);
+            updateConsumerElements(consumers, checked, providerTemplate, this.getAttribute('name'));
             await model.update(fieldName, checked);
             inputElement.classList.remove(errorStyleClass);
             inputElement.classList.add(successStyleClass);
@@ -323,12 +326,12 @@ class ModelInput extends SocketConsumer {
             inputValue = event.target.value;
           }
           if (inputValue === '') {
-            updateConsumerElements(consumers, '', providerTemplate);
+            updateConsumerElements(consumers, '', providerTemplate, this.getAttribute('name'));
             await model.delete(fieldName);
           } else {
             let targetValue = inputElement.type === 'number' ?
               Number(inputValue) : inputValue;
-            updateConsumerElements(consumers, targetValue, providerTemplate);
+            updateConsumerElements(consumers, targetValue, providerTemplate, this.getAttribute('name'));
             await model.update(fieldName, targetValue);
           }
           inputElement.classList.remove(errorStyleClass);
@@ -353,11 +356,11 @@ class ModelInput extends SocketConsumer {
           try {
             if (event.target.value === '') {
               await model.delete(fieldName);
-              updateConsumerElements(consumers, '', providerTemplate);
+              updateConsumerElements(consumers, '', providerTemplate, this.getAttribute('name'));
             } else {
               let targetValue = inputElement.type === 'number' ?
                 Number(event.target.value) : event.target.value;
-              updateConsumerElements(consumers, targetValue, providerTemplate);
+              updateConsumerElements(consumers, targetValue, providerTemplate, this.getAttribute('name'));
               await model.update(fieldName, targetValue);
             }
             inputElement.classList.remove(errorStyleClass);

@@ -1,4 +1,8 @@
-import { debouncer, updateConsumerElements } from './utils.js';
+import {
+  debouncer,
+  renderTemplate,
+  updateConsumerElements
+} from './utils.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 800;
 
@@ -46,6 +50,9 @@ class InputProvider extends HTMLElement {
 
   set value(newValue) {
     if (this.inputElement) {
+      if (newValue && this.hasAttribute('computable-value')) {
+        newValue = renderTemplate(newValue);
+      }
       let oldValue = this.inputElement.value;
       this.inputElement.value = newValue;
       if (oldValue !== newValue) {
@@ -135,21 +142,22 @@ class InputProvider extends HTMLElement {
 
     let onInputChange = (event) => {
       debounce(async () => {
+        let elementName = this.getAttribute('name');
         let providerTemplate = this.getAttribute('provider-template');
         if (event.target.value === this.lastValue) return;
         if (inputElement.type === 'checkbox') {
           let checked = !!inputElement.checked;
           this.lastValue = checked;
-          updateConsumerElements(consumers, checked, providerTemplate);
+          updateConsumerElements(consumers, checked, providerTemplate, elementName);
           return;
         }
         this.lastValue = event.target.value;
         if (event.target.value === '') {
-          updateConsumerElements(consumers, '', providerTemplate);
+          updateConsumerElements(consumers, '', providerTemplate, elementName);
         } else {
           let targetValue = inputElement.type === 'number' ?
             Number(event.target.value) : event.target.value;
-          updateConsumerElements(consumers, targetValue, providerTemplate);
+          updateConsumerElements(consumers, targetValue, providerTemplate, elementName);
         }
       }, debounceDelay);
     };
@@ -159,15 +167,16 @@ class InputProvider extends HTMLElement {
     if (inputElement.type !== 'checkbox') {
       onInputKeyUp = async (event) => {
         debounce(async () => {
+          let elementName = this.getAttribute('name');
           let providerTemplate = this.getAttribute('provider-template');
           if (event.target.value === this.lastValue) return;
           this.lastValue = event.target.value;
           if (event.target.value === '') {
-            updateConsumerElements(consumers, '', providerTemplate);
+            updateConsumerElements(consumers, '', providerTemplate, elementName);
           } else {
             let targetValue = inputElement.type === 'number' ?
               Number(event.target.value) : event.target.value;
-            updateConsumerElements(consumers, targetValue, providerTemplate);
+            updateConsumerElements(consumers, targetValue, providerTemplate, elementName);
           }
         }, debounceDelay);
       };

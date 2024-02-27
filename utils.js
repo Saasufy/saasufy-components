@@ -251,7 +251,7 @@ export function renderTemplate(templateString, data, socket) {
   });
 }
 
-export function updateConsumerElements(consumers, value, template) {
+export function updateConsumerElements(consumers, value, template, sourceElementName) {
   if (consumers) {
     let consumerParts = consumers.split(',')
       .filter(part => part)
@@ -297,7 +297,10 @@ export function updateConsumerElements(consumers, value, template) {
           } else if (element.nodeName === 'MODEL-INPUT') {
             element.value = value;
           } else if (element.nodeName === 'INPUT-COMBINER') {
-            element.setAttribute('value', value);
+            element.setAttribute(
+              'value',
+              sourceElementName ? `${sourceElementName}:${value}` : value
+            );
           } else {
             element.innerHTML = value;
           }
