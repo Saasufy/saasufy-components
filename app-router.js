@@ -14,6 +14,7 @@ export class AppRouter extends SocketConsumer {
     this.pageRouteInfos = [];
     this.debounce = debouncer();
     this.debounceDelay = DEFAULT_DEBOUNCE_DELAY;
+    this.lastPageState = null;
 
     this.hashStartRegex = /^#/;
 
@@ -30,12 +31,15 @@ export class AppRouter extends SocketConsumer {
       }
 
       this.pageRouteInfos = Object.keys(this.pages).map((route) => {
+        let pageTemplate = this.pages[route];
+        let allowPartialMatch = pageTemplate.hasAttribute('partial-route');
         return {
-          regExp: new RegExp(`^${route.replace(/\/:[^\/]+/g, '/([^/]*)').replace(/\//g, '\\/')}$`, 'g'),
+          regExp: new RegExp(`^${route.replace(/\/:[^\/]+/g, '/([^/]*)').replace(/\//g, '\\/')}${allowPartialMatch ? '' : '$'}`, 'g'),
           route,
           params: [ ...route.matchAll(/:[^\/]*/g) ].map(paramMatch => paramMatch[0].replace(':', ''))
         };
       });
+
       if (!this.socket || this.socket.state === this.socket.OPEN) {
         this.debounce(this.renderCurrentPage, this.debounceDelay);
       }
@@ -52,6 +56,7 @@ export class AppRouter extends SocketConsumer {
 
   static get observedAttributes() {
     return [
+      'target-page',
       'default-page',
       'debounce-delay',
       'max-redirects'
@@ -65,6 +70,8 @@ export class AppRouter extends SocketConsumer {
       } else {
         this.debounceDelay = DEFAULT_DEBOUNCE_DELAY;
       }
+    } else if (name === 'target-page') {
+      location.hash = newValue;
     } else if (this.isReady) {
       this.renderCurrentPage();
     }
@@ -224,6 +231,16 @@ export class AppRouter extends SocketConsumer {
     } else {
       routeArgs = {};
     }
+
+
+    let pageState = JSON.stringify({
+      route,
+      routeArgs
+    });
+
+    if (pageState === this.lastPageState) return;
+
+    this.lastPageState = pageState;
 
     routerViewport.innerHTML = renderTemplate(
       pageTemplate.innerHTML,
