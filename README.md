@@ -419,6 +419,7 @@ Used for displaying and editing a single field of a model instance in real time.
 - `height`: Allows you to set the height of the inner `input` element programmatically.
 - `default-value`: A default value to show the user if the underlying model field's value is null or undefined. Note that setting a default value will not affect the underlying model's value.
 - `value`: Used to set the model's value.
+- `computable-value`: If this attribute is present, it will be possible to execute expressions using the `{{expression}}` syntax inside the `value` attribute.
 - `hide-error-logs`: By default, this component will log errors to the console. If set, this attribute will suppress such errors from showing up on the console.
 - `autocapitalize`: Can be `on` or `off` - It will set the auto-capitalize attribute on the inner input element. This is useful for mobile devices to enable or disable auto-capitalization of the first character which is typed into the input element.
 - `autocorrect`: Can be `on` or `off` - It will set the auto-correct attribute on the inner input element. This is useful for mobile devices to enable or disable auto-correct.
@@ -526,6 +527,7 @@ This component can be configured to provide its data to multiple components (con
 - `options`: A comma-separated list of options to provide - This only works if the input type is `select`.
 - `height`: Allows you to set the height of the inner `input` element programmatically.
 - `value`: Used to set the input's value.
+- `computable-value`: If this attribute is present, it will be possible to execute expressions using the `{{expression}}` syntax inside the `value` attribute.
 - `autocapitalize`: Can be `on` or `off` - It will set the auto-capitalize attribute on the inner input element. This is useful for mobile devices to enable or disable auto-capitalization of the first character which is typed into the input element.
 - `autocorrect`: Can be `on` or `off` - It will set the auto-correct attribute on the inner input element. This is useful for mobile devices to enable or disable auto-correct.
 
@@ -546,21 +548,26 @@ This component can be configured to provide its data to multiple components (con
 The following example shows how to bind multiple `input-provider` components to an `input-combiner`.
 In this example, the `input-combiner` component forwards the combined, formatted values to the `collection-view-params` attribute of a `company-browser` component.
 
+Note that the `value` inside the `provider-template` attribute of the `input-combiner` is an object with keys that represent the `name` attribute of the different source `input-provider` components.
+The `combineFilters` function produces a combined query string (joined with `%AND%`) by iterating over the `value` object which holds different parts of the query as provided by different `input-provider` components.
+
 ```html
 <input-provider
   class="desc-input"
+  name="desc"
   type="text"
   consumers=".search-combiner"
-  provider-template="desc:description contains (?i){{value}}"
+  provider-template="description contains (?i){{value}}"
   value=""
   placeholder="Description filter"
 ></input-provider>
 
 <input-provider
   class="city-input"
+  name="city"
   type="text"
   consumers=".search-combiner"
-  provider-template="city:city contains (?i){{value}}"
+  provider-template="city contains (?i){{value}}"
   value=""
   placeholder="City filter"
 ></input-provider>
