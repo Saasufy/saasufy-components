@@ -146,9 +146,12 @@ So for example, if your `index.html` file is served up from the URL `http://mywe
 
 - `default-page`: The path/route of the default page to send the user to in case no routes are matched. Commonly used to point to a `/page-not-found` page. For the home page, it's typically recommended to create a page template with `route-path=""` instead.
 - `debounce-delay`: The number of milliseconds to wait before changing the route. This can help to avoid multiple renders if the route changes rapidly (e.g. when doing hard redirects). Defaults to 100ms.
+- `target-page`: A convenience attribute which can be used to programmatically change the `location.hash` in the address bar.
 
 **Attributes of slotted page templates**
 
+- `route-path`: The path of the page. Supports custom URL parameters in the format `/org/:orgId/user/:userId`.
+- `partial-route`: An optional attribute which, if specified, will allow the `route-path` to be matched partially from the start. This can be used to ignore the ending of a path which is not relevant to the page in order to avoid unnecessary re-renders.
 - `redirect`: An optional path/route which this page should redirect to. Note that the content of this page will not be shown so it should always be empty.
 - `auth-redirect`: An optional path/route which this page should redirect to if the user is authenticated. If the user is not authenticated, then the content of the template will be displayed as normal.
 - `no-auth-redirect`: An optional path/route which this page should redirect to if the user is not authenticated. If the user is authenticated, then the content of the template will be displayed as normal.
