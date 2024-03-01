@@ -153,7 +153,6 @@ collection-browser {
 collection-browser > [slot=viewport] {
   display: flex;
   flex-direction: column;
-  grid-area: a;
 }
 
 [slot=next-page],[slot=previous-page] {
