@@ -253,7 +253,7 @@ A form component for inserting data into collections.
 <collection-adder
   collection-type="Product"
   collection-fields="name,brand,qty"
-  model-values="categoryName=electronics"
+  model-values="categoryName=electronics,isNew:boolean=true"
   submit-button-label="Create"
   trim-spaces
 ></collection-adder>
@@ -263,7 +263,7 @@ A form component for inserting data into collections.
 
 - `collection-type` (required): Specifies the type of collection to add the resource to when the form is submitted. This should match a `Model` available in your Saasufy service.
 - `collection-fields`: A comma-separated list of fields from the `Model` to display as input elements inside the form for the user to fill in. Each field name in this list can optionally be followed by an input element type after a `:` character. For example `collection-fields="qty:number, size:select(small,medium,large)` will create one input element with `type="number"` and one with `type=select` with options `small`, `medium` or `large`. To make a select field optional, you can prefix the list of options with a comma; e.g. `size:select(,small,medium,large)`.
-- `model-values`: An optional list of key-value pairs in the format `field1=value1,field2=value2` to add to the newly created resource alongside the values collected from the user via the form.
+- `model-values`: An optional list of key-value pairs in the format `field1=value1,field2=value2` to add to the newly created resource alongside the values collected from the user via the form. For non-string values, the type should be provided in the format `fieldName:type=value`; supported types are `string`, `number` and `boolean`.
 - `submit-button-label`: Text to display on the submit button. If not specified, defaults to `Submit`.
 - `hide-submit-button`: Adding this attribute will hide the submit button from the form.
 - `success-message`: A message to show the user if the resource has been successfully added to the collection after submitting the form.

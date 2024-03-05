@@ -154,6 +154,7 @@ class CollectionAdder extends SocketConsumer {
 
     let {
       fieldNames: modelFieldNames,
+      fieldTypes: modelFieldTypes,
       fieldValues: modelFieldValues
     } = convertStringToFieldParams(this.getAttribute('model-values'));
 
@@ -174,7 +175,17 @@ class CollectionAdder extends SocketConsumer {
       autocorrect ? ` autocorrect="${autocorrect}"` : ''
     }`;
 
-    this.modelFieldValues = modelFieldValues;
+    this.modelFieldValues = Object.fromEntries(
+      Object.entries(modelFieldValues).map(([key, value]) => {
+        if (modelFieldTypes[key] === 'boolean') {
+          return [ key, value !== 'false' && value !== '' ];
+        }
+        if (modelFieldTypes[key] === 'number') {
+          return [ key, Number(value) ];
+        }
+        return [ key, value ];
+      })
+    );
 
     if (this.collection) this.collection.destroy();
 
