@@ -34,7 +34,7 @@ export class AppRouter extends SocketConsumer {
         let pageTemplate = this.pages[route];
         let allowPartialMatch = pageTemplate.hasAttribute('partial-route');
         return {
-          regExp: new RegExp(`^${route.replace(/\/:[^\/]+/g, '/([^/]*)').replace(/\//g, '\\/')}${allowPartialMatch ? '' : '$'}`, 'g'),
+          regExp: new RegExp(`${allowPartialMatch ? '' : '^'}${route.replace(/\/:[^\/]+/g, '/([^/]*)').replace(/\//g, '\\/')}${allowPartialMatch ? '' : '$'}`, 'g'),
           route,
           params: [ ...route.matchAll(/:[^\/]*/g) ].map(paramMatch => paramMatch[0].replace(':', ''))
         };
