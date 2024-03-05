@@ -263,7 +263,7 @@ A form component for inserting data into collections.
 
 - `collection-type` (required): Specifies the type of collection to add the resource to when the form is submitted. This should match a `Model` available in your Saasufy service.
 - `collection-fields`: A comma-separated list of fields from the `Model` to display as input elements inside the form for the user to fill in. Each field name in this list can optionally be followed by an input element type after a `:` character. For example `collection-fields="qty:number, size:select(small,medium,large)` will create one input element with `type="number"` and one with `type=select` with options `small`, `medium` or `large`. To make a select field optional, you can prefix the list of options with a comma; e.g. `size:select(,small,medium,large)`.
-- `model-values`: An optional list of key-value pairs in the format `field1=value1,field2=value2` to add to the newly created resource alongside the values collected from the user via the form. For non-string values, the type should be provided in the format `fieldName:type=value`; supported types are `string`, `number` and `boolean`.
+- `model-values`: An optional list of key-value pairs in the format `field1=value1,field2=value2` to add to the newly created resource alongside the values collected from the user via the form. For non-string values, the type should be provided in the format `fieldName:type=value`; supported types are `string`, `number` and `boolean`. Unlike `collection-fields` which are rendered as input elements in the form, `model-values` are not shown to the user.
 - `submit-button-label`: Text to display on the submit button. If not specified, defaults to `Submit`.
 - `hide-submit-button`: Adding this attribute will hide the submit button from the form.
 - `success-message`: A message to show the user if the resource has been successfully added to the collection after submitting the form.
@@ -283,6 +283,13 @@ It supports either immediate deletion or deletion upon confirmation; in the latt
 ```
 
 **Example usage**
+
+```html
+<!-- Must be placed somewhere inside a collection-browser component, typically inside the slotted item template. -->
+<collection-deleter model-id="{{Product.id}}" onclick="deleteItem()">&#x2715;</collection-deleter>
+```
+
+OR (with confirmation step)
 
 ```html
 <!-- Must be placed somewhere inside a collection-browser component, typically inside the slotted item template. -->
