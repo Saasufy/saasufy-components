@@ -40,8 +40,12 @@ class InputProvider extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
-    this.destroy();
-    this.render();
+    if (name === 'value') {
+      this.value = newValue;
+    } else {
+      this.destroy();
+      this.render();
+    }
   }
 
   triggerChange() {
@@ -53,7 +57,20 @@ class InputProvider extends HTMLElement {
       if (newValue && this.hasAttribute('computable-value')) {
         newValue = renderTemplate(newValue);
       }
-      let oldValue = this.inputElement.value;
+      let oldValue;
+      if (this.inputElement.type === 'checkbox') {
+        oldValue = this.inputElement.checked;
+        if (typeof newValue === 'string') {
+          this.inputElement.checked = newValue !== 'false' && newValue !== '';
+        } else {
+          this.inputElement.checked = newValue;
+        }
+        if (oldValue !== newValue) {
+          this.triggerChange();
+        }
+        return;
+      }
+      oldValue = this.inputElement.value;
       this.inputElement.value = newValue;
       if (oldValue !== newValue) {
         this.triggerChange();
@@ -62,7 +79,13 @@ class InputProvider extends HTMLElement {
   }
 
   get value() {
-    return (this.inputElement && this.inputElement.value) || '';
+    if (!this.inputElement) {
+      return '';
+    }
+    if (this.inputElement.type === 'checkbox') {
+      return this.inputElement.checked;
+    }
+    return this.inputElement.value || '';
   }
 
   render() {

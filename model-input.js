@@ -63,15 +63,20 @@ class ModelInput extends SocketConsumer {
       if (newValue && this.hasAttribute('computable-value')) {
         newValue = renderTemplate(newValue);
       }
+      let oldValue;
       if (this.inputElement.type === 'checkbox') {
-        let oldValue = this.inputElement.checked;
-        this.inputElement.checked = newValue;
+        oldValue = this.inputElement.checked;
+        if (typeof newValue === 'string') {
+          this.inputElement.checked = newValue !== 'false' && newValue !== '';
+        } else {
+          this.inputElement.checked = newValue;
+        }
         if (oldValue !== newValue) {
           this.triggerChange();
         }
         return;
       }
-      let oldValue = this.inputElement.value;
+      oldValue = this.inputElement.value;
       this.inputElement.value = newValue;
       if (oldValue !== newValue) {
         this.triggerChange();
