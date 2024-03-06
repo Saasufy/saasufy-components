@@ -202,14 +202,24 @@ class CollectionBrowser extends SocketConsumer {
 
     let items = [];
 
+    let type = this.getAttribute('type-alias') || this.collection.type;
+
     if (firstItemTemplate) {
-      items.push(firstItemTemplate.innerHTML);
+      let itemString = renderTemplate(
+        firstItemTemplate.innerHTML,
+        { [`$${type}`]: this.collection.meta },
+        this.socket
+      );
+      items.push(itemString);
     }
     if (noItemTemplate && !this.collection.value.length) {
-      items.push(noItemTemplate.innerHTML);
+      let itemString = renderTemplate(
+        noItemTemplate.innerHTML,
+        { [`$${type}`]: this.collection.meta },
+        this.socket
+      );
+      items.push(itemString);
     } else if (itemTemplate) {
-      let type = this.getAttribute('type-alias') || this.collection.type;
-
       for (let modelItem of this.collection.value) {
         let itemString = renderTemplate(
           itemTemplate.innerHTML,
