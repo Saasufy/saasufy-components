@@ -100,7 +100,7 @@ This project does not impose any specific approach to styling components, howeve
 The following utility functions can be used anywhere inside template `{{expression}}` placeholders:
 
 - Generate a unique random ID in UUID format: `{{uuid.v4()}}`
-- Generate a deterministic ID in UUID-compatible format: `{{computeId('value1', 'value2')}}`
+- Generate a deterministic ID in UUID-compatible format derived from one or more values: `{{computeId('value1', 'value2')}}`
 - Convert text to a format suitable for use inside a URL: `{{url('This is a test')}}`
 - Convert text to lower case: `{{lowerCase('TEST')}}`
 - Convert text to upper case: `{{upperCase('test')}}`
