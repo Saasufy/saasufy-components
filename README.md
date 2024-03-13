@@ -95,6 +95,21 @@ This project does not impose any specific approach to styling components, howeve
 <link href="https://saasufy.com/node_modules/saasufy-components/styles.css" rel="stylesheet" />
 ```
 
+### Utility functions
+
+The following utility functions can be used anywhere inside template `{{expression}}` placeholders:
+
+- Generate a unique random ID in UUID format: `{{uuid.v4()}}`
+- Generate a deterministic ID in UUID-compatible format: `{{computeId('value1', 'value2')}}`
+- Convert text to a format suitable for use inside a URL: `{{url('This is a test')}}`
+- Convert text to lower case: `{{lowerCase('TEST')}}`
+- Convert text to upper case: `{{upperCase('test')}}`
+- Convert first letter of text to upper case: `{{capitalize('test')}}`
+- Remove leading and trailing spaces from text: `{{trim('   test   ')}}`
+- Specify one or more fallback values in case values are null or undefined: `{{fallback(Product.imageSrc, 'path/to/default-image.png')}}`
+- Format UNIX timestamp as a human-readable date: `{{date(Product.updatedAt)}}`
+- Given an array of objects, extract the values from the specified field and join them together into a single comma-separated string: `{{joinFields(Product, 'name')}}`
+
 ## Components
 
 ### app-router
