@@ -1,5 +1,7 @@
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
+import * as uuid from '/node_modules/uuid/dist/esm-browser/index.js';
+import { sha256 } from './sha256.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 300;
 const DEFAULT_RELOAD_DELAY = 0;
@@ -181,6 +183,26 @@ export function createModel(modelOptions) {
   return model;
 }
 
+function computeId(...parts) {
+  let encoder = new TextEncoder();
+  let data = encoder.encode(parts.join('-'));
+  let start = Date.now();
+  let hashBuffer = sha256(data);
+  let hashArray = Array.from(new Uint8Array(hashBuffer));
+  let hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+  let idHex = hashHex.slice(0, 32);
+
+  let third = (
+    (parseInt(idHex.slice(12, 16), 16) & 0x0fff) | 0x4000
+  ).toString(16);
+
+  let fourth = (
+    (parseInt(idHex.slice(16, 20), 16) & 0x3fff) | 0x8000
+  ).toString(16);
+
+  return `${idHex.slice(0, 8)}-${idHex.slice(8, 12)}-${third}-${fourth}-${idHex.slice(20, 32)}`;
+}
+
 let templateFormatters = {
   url: (value) => String(value).toLowerCase().replace(/ /g, '-'),
   lowerCase: (value) => String(value).toLowerCase(),
@@ -207,7 +229,8 @@ let templateFormatters = {
   },
   combineFilters: (filterMap, useOr) => {
     return Object.values(filterMap || {}).join(useOr ? ' %OR% ' : ' %AND% ');
-  }
+  },
+  computeId
 };
 
 let templateTagsRegExp = /{{.*?}}/gs;
@@ -228,6 +251,7 @@ export function renderTemplate(templateString, data, socket) {
     let expString = match.slice(2, -2);
     let options = {
       ...templateFormatters,
+      uuid,
       socket: socket ? {
         state: socket.state,
         pendingReconnect: socket.pendingReconnect,

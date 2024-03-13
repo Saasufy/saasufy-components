@@ -20,7 +20,8 @@
     "ag-collection": "^5.0.2",
     "ag-model": "^3.0.1",
     "capitalisk-auth-client": "^1.5.1",
-    "socketcluster-client": "^19.1.0"
+    "socketcluster-client": "^19.1.0",
+    "uuid": "^8.3.2"
   },
   "bugs": {
     "url": "https://github.com/Saasufy/saasufy-components/issues"
