@@ -77,6 +77,7 @@ To use components, you just need to include them into your `.html` file inside y
 <script src="https://saasufy.com/node_modules/saasufy-components/collection-adder-group.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/confirm-modal.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/overlay-modal.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/download-link.js" type="module" defer></script>
 ```
 
 You should only add the script tags for the components which your page uses to avoid wasting bandwidth and unnecessarily delaying page load for your users.
@@ -895,3 +896,28 @@ A modal component to prompt the user for confirmation before performing sensitiv
 ### overlay-modal
 
 A general purpose modal component.
+
+### download-link
+
+A component to download a file from a model. The file must be stored on the model instance in base64 format.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/download-link.js" type="module" defer></script>
+```
+
+**Example usage**
+
+```html
+<download-link model-type="Image" model-id="dce962f8-34f1-4a82-95b9-377e42b57e2d" model-field="src" file-name="my-image.png">
+  <a href="javascript: void(0)">Download image</a>
+</download-link>
+```
+
+**Attributes**
+
+- `model-type` (required): Specifies the type of model to download the file from. This should match a `Model` available in your Saasufy service.
+- `model-id` (required): The id of the model instance/record to download the file from.
+- `model-field` (required): The field of the model instance/record where the file is stored in base64 format (with content type).
+- `file-name` (required): The default name of the file to save as. The file extension is optional.

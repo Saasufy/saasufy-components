@@ -20,7 +20,7 @@ class DownloadLink extends SocketConsumer {
         data = await socket.invoke('crud', {
           action: 'read',
           type: modelType,
-          id: 'dce962f8-34f1-4a82-95b9-377e42b57e2d',
+          id: modelId,
           field: modelField
         });
       } catch (error) {
@@ -34,7 +34,15 @@ class DownloadLink extends SocketConsumer {
 
       this.removeAttribute('is-loading');
 
-      if (typeof data !== 'string') return;
+      if (typeof data !== 'string') {
+        this.setAttribute('failed', '');
+        if (!this.hasAttribute('hide-error-logs')) {
+          console.error(
+            'Failed to download file because it did not exist'
+          );
+        }
+        return;
+      };
 
       let dataParts = data.match(dataTypeRegExp);
       if (!dataParts) {
