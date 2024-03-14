@@ -24,7 +24,7 @@ class ConfirmModal extends HTMLElement {
   show(message, confirmCallback) {
     let overlayModal = this.querySelector('overlay-modal');
     if (overlayModal) {
-      overlayModal.classList.remove('hidden');
+      overlayModal.removeAttribute('style');
     }
     this.confirmCallback = confirmCallback;
     this.hidden = false;
@@ -38,7 +38,7 @@ class ConfirmModal extends HTMLElement {
     let cancelButtonLabel = this.getAttribute('cancel-button-label') || 'Cancel';
 
     this.innerHTML = `
-      <overlay-modal class="${this.hidden ? 'hidden' : 'visible'}">
+      <overlay-modal${this.hidden ? ' style="display: none;"' : ''}>
         <div slot="title">${title}</div>
         <div class="confirm-modal-content" slot="content">
           <div>${message}</div>
@@ -52,16 +52,16 @@ class ConfirmModal extends HTMLElement {
 
     let overlayModal = this.querySelector('overlay-modal');
     overlayModal.addEventListener('close', () => {
-      overlayModal.classList.add('hidden');
+      overlayModal.style.display = 'none';
     });
     let cancelButton = this.querySelector('.modal-cancel-button');
     cancelButton.addEventListener('click', () => {
-      overlayModal.classList.add('hidden');
+      overlayModal.style.display = 'none';
       this.dispatchEvent(new CustomEvent('cancel'));
     });
     let confirmButton = this.querySelector('.modal-confirm-button');
     confirmButton.addEventListener('click', () => {
-      overlayModal.classList.add('hidden');
+      overlayModal.style.display = 'none';
       this.dispatchEvent(new CustomEvent('confirm'));
       this.confirmCallback && this.confirmCallback();
     });
