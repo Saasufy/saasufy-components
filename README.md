@@ -315,7 +315,8 @@ OR (with confirmation step)
 **Attributes**
 
 - `model-id` (required): Specifies the ID of the resource to delete from the parent collection when this component is activated. This can be achieved by invoking either the `deleteItem()` or `confirmDeleteItem()` function from inside an event handler. The example above shows how to achieve deletion via the `onclick` event. You can either invoke `deleteItem()` to delete the resource immediately or you can invoke `confirmDeleteItem()` to require additional confirmation prior to deletion.
-- `confirm-message`: The confirmation message to show the user when this component's `confirmDeleteItem()` function is invoked,
+- `onclick` (required): The logic to execute to delete the item. Should be either `deleteItem()` or `confirmDeleteItem()`.
+- `confirm-message`: The confirmation message to show the user when this component's `confirmDeleteItem()` function is invoked.
 
 If `confirmDeleteItem()` is used, then the parent `collection-browser` must have a `confirm-modal` element slotted into it as shown here:
 
