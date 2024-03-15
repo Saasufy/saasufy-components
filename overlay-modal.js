@@ -39,6 +39,7 @@ class OverlayModal extends HTMLElement {
         .modal-title-bar {
           display: var(--title-bar-display, flex);
           justify-content: space-between;
+          align-items: center;
           width: 100%;
           padding: 10px;
           color: #ffffff;
