@@ -320,6 +320,8 @@ export function updateConsumerElements(consumers, value, template, sourceElement
             }
           } else if (element.nodeName === 'MODEL-INPUT') {
             element.value = value;
+          } else if (element.nodeName === 'INPUT-TRANSFORMER') {
+            element.setAttribute('value', value);
           } else if (element.nodeName === 'INPUT-COMBINER') {
             element.setAttribute(
               'value',

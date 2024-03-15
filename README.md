@@ -19,6 +19,7 @@ Components for Saasufy
 ### User input
 - [input-provider](#input-provider)
 - [input-combiner](#input-combiner)
+- [input-transformer](#input-transformer)
 
 ### Authentication
 - [log-in-form](#log-in-form)
@@ -67,6 +68,7 @@ To use components, you just need to include them into your `.html` file inside y
 <script src="https://saasufy.com/node_modules/saasufy-components/model-viewer.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/input-provider.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/input-combiner.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/input-transformer.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/log-in-form.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/log-out.js" type="module" defer></script>
 <script src="https://saasufy.com/node_modules/saasufy-components/oauth-link.js" type="module" defer></script>
@@ -607,6 +609,46 @@ The `combineFilters` function produces a combined query string (joined with `%AN
 
 - `consumers`: This allows you to connect this `input-combiner` to other elements on your page. It takes a list of selectors with optional attributes to target. For example `.my-input:value` will find all elements with a `my-input` class and update their `value` attributes with the value of the `input-provider` component in real-time. You can specify multiple selectors separated by commas such as `.my-input,my-div` - In this case, because attribute names are not specified, values will be injected into the `value` attribute (for input elements) or into the `innerHTML` property (for other kinds of elements). The default attribute/property depends on the element type.
 - `provider-template`: A template string within which the `{{value}}` can be injected before passing to consumers. In the case of the `input-combiner`, the value is an object wherein each key represents the unique label associated with different `input-provider` components.
+- `debounce-delay`: The delay in milliseconds to wait before triggering a change event. This is useful to batch multiple updates together. Default is 0ms.
+
+### input-transformer
+
+A component which can be used to transform data from an `input-provider` component and pass the transformed data to other components (or HTML elements) via custom attributes.
+This component can be configured to provide its data to multiple components (consumers) via custom attributes.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/input-transformer.js" type="module" defer></script>
+```
+
+**Example usage**
+
+The following example shows how to bind an `input-provider` component to an `input-transformer`.
+
+```html
+<input-provider
+  class="dollar-input"
+  name="count"
+  type="text"
+  consumers=".cents-transformer"
+  value=""
+  placeholder="Dollars"
+></input-provider>
+
+<input-transformer
+  class="cents-transformer"
+  consumers=".cents-container"
+  provider-template="{{Number(value) * 100}}"
+></input-transformer>
+
+<div class="cents-container"></div>
+```
+
+**Attributes**
+
+- `consumers`: This allows you to connect this `input-transformer` to other elements on your page. It takes a list of selectors with optional attributes to target. For example `.my-input:value` will find all elements with a `my-input` class and update their `value` attributes with the value of the `input-provider` component in real-time. You can specify multiple selectors separated by commas such as `.my-input,my-div` - In this case, because attribute names are not specified, values will be injected into the `value` attribute (for input elements) or into the `innerHTML` property (for other kinds of elements). The default attribute/property depends on the element type.
+- `provider-template`: A template string within which the `{{value}}` can be injected before passing to consumers.
 - `debounce-delay`: The delay in milliseconds to wait before triggering a change event. This is useful to batch multiple updates together. Default is 0ms.
 
 ### log-in-form

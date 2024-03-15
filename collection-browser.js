@@ -139,8 +139,14 @@ class CollectionBrowser extends SocketConsumer {
     let currentPageElements = this.shadowRoot.querySelector('slot[name="page-number"]').assignedElements();
     let pageNumber = Math.floor(this.collection.meta.pageOffset / this.collection.meta.pageSize + 1);
     for (let element of currentPageElements) {
-      if (element.nodeName === 'INPUT') {
+      if (element.nodeName === 'INPUT' || element.nodeName === 'MODEL-INPUT') {
         element.value = pageNumber;
+      } else if (
+        element.nodeName === 'INPUT-PROVIDER' ||
+        element.nodeName === 'INPUT-COMBINER' ||
+        element.nodeName === 'INPUT-TRANSFORMER'
+      ) {
+        element.setAttribute('value', pageNumber);
       } else {
         element.innerHTML = pageNumber;
       }
