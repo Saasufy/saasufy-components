@@ -54,41 +54,14 @@ You can apply custom CSS/styling to elements that are rendered inside a viewport
 
 ### Components
 
-To use components, you just need to include them into your `.html` file inside your `<head>` tag like this:
-
-```html
-<script src="https://saasufy.com/node_modules/saasufy-components/socket.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/app-router.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/collection-browser.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/collection-adder.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/collection-deleter.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/collection-reducer.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/model-input.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/model-text.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/model-viewer.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/input-provider.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/input-combiner.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/input-transformer.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/log-in-form.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/log-out.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/oauth-link.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/oauth-handler.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/render-group.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/if-group.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/switch-group.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/collection-adder-group.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/confirm-modal.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/overlay-modal.js" type="module" defer></script>
-<script src="https://saasufy.com/node_modules/saasufy-components/download-link.js" type="module" defer></script>
-```
+To use a component, you just need to include the relevant `<script>` tag into the `<head>` tag of your `.html` file.
+You can simply copy-paste the script tag provided under the `Import` section of the relevant component's documentation.
 
 You should only add the script tags for the components which your page uses to avoid wasting bandwidth and unnecessarily delaying page load for your users.
-The `.js` file name of the component matches the names of the HTML tags which the script provides.
-The only exception is the `socket-provider` component which is located inside the `socket.js` file - This is because that file exposes multiple components which are used behind the scenes by other components.
-You should always include the `socket.js` script as shown above whenever you use components which depend on data from Saasufy.
+You should always include the `socket.js` script and create a top-level `socket-provider` component if you intend to use components which depend on data from Saasufy.
 
-Linking the scripts directly from `saasufy.com` as shown above is the simplest way to get started as it doesn't require loading anything or hosting the scripts yourself.
-An alternative approach is to download Saasufy components using `npm install saasufy-components` and then link to them from your own hosting provider.
+Linking the scripts directly from `saasufy.com` is the simplest way to get started as it doesn't require loading anything or hosting the scripts yourself.
+An alternative approach is to download Saasufy components using `npm install saasufy-components` and self-host them.
 
 ### Styling
 
@@ -112,6 +85,42 @@ The following utility functions can be used anywhere inside template `{{expressi
 - Specify one or more fallback values in case values are null or undefined: `{{fallback(Product.imageSrc, 'path/to/default-image.png')}}`
 - Format UNIX timestamp as a human-readable date: `{{date(Product.updatedAt)}}`
 - Given an array of objects, extract the values from the specified field and join them together into a single comma-separated string: `{{joinFields(Product, 'name')}}`
+
+### File hosting
+
+Saasufy provides basic HTTP/HTTPS file hosting functionality with support for client-side caching (with `ETag`).
+This is especially useful for hosting images.
+
+To upload files to Saasufy, you first need to create a field of type `string` on a model of your choice.
+You will then need to check/enable the `blob` constraint to tell Saasufy to treat this field as a base64 file.
+
+After you've deployed your schema from the Saasufy dashboard, you will be able to manually add new records into your model via its `data` section.
+Saasufy will show you a file picker next to the relevant field name which you can use to upload a file/image to Saasufy.
+
+After adding a record to Saasufy which holds a file in one of its fields, that file can be accessed over HTTP/HTTPS via your Saasufy service's `/files` HTTP endpoint.
+The format of the URL to link directly to a specific file/image is:
+
+```
+https://saasufy.com/:serviceId/files/:modelName/:modelId/:fieldName
+```
+For example, if the URL for your Saasufy service (which you get after deploying your service) is `wss://saasufy.com/sid7999/socketcluster/`
+and your file is stored inside an `Image` model with ID `58f2051c-14bc-4518-8816-ff387cfdd57e` inside a `data` field, you will be able to link to your image directly using this URL:
+
+```
+https://saasufy.com/sid7999/files/Image/58f2051c-14bc-4518-8816-ff387cfdd57e/data
+```
+
+You can use it to embed images into your application using the `<img>` tag like this:
+
+```html
+<img src="https://saasufy.com/sid7999/files/Image/58f2051c-14bc-4518-8816-ff387cfdd57e/data" alt="My image" />
+```
+
+Saasufy enforces access controls for HTTP in the same way as it does for its WebSocket protocol.
+It's possible to block or restrict access to specific files stored on specific fields via the `Access` page under the relevant model.
+
+If your model field's access is set to `restrict`, only authenticated users with matching permissions will be able to view/download the image/file.
+In this case, you will need to add your user's JWT token to a cookie with the name `socketcluster.saasufyService.authToken` and it will be passed along with the request.
 
 ## Components
 
