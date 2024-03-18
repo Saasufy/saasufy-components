@@ -247,7 +247,7 @@ class CollectionBrowser extends SocketConsumer {
   render() {
     let collectionType = this.getAttribute('collection-type');
     let collectionFields = this.getAttribute('collection-fields') || '';
-    let collectionView = this.getAttribute('collection-view');
+    let collectionView = this.getAttribute('collection-view') || 'defaultView';
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionViewParams = this.getAttribute('collection-view-params') || '';
     let collectionPageOffset = this.getAttribute('collection-page-offset');
