@@ -188,7 +188,7 @@ class ModelInput extends SocketConsumer {
       }
     } else if (elementType === 'input') {
       if (inputList) {
-        this.inputElement.setAttribute('list', inputList)
+        this.inputElement.setAttribute('list', inputList);
       }
       this.inputElement.type = type;
     }
