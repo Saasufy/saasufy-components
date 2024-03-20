@@ -1,7 +1,8 @@
 import {
   debouncer,
   renderTemplate,
-  updateConsumerElements
+  updateConsumerElements,
+  convertStringToFieldParams
 } from './utils.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 800;
@@ -24,7 +25,6 @@ class InputProvider extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      'input-id',
       'list',
       'type',
       'placeholder',
@@ -34,7 +34,9 @@ class InputProvider extends HTMLElement {
       'value',
       'height',
       'autocapitalize',
-      'autocorrect'
+      'autocorrect',
+      'input-id',
+      'input-props'
     ];
   }
 
@@ -99,6 +101,7 @@ class InputProvider extends HTMLElement {
     let options = this.getAttribute('options');
     let height = this.getAttribute('height');
     let value = this.getAttribute('value') || '';
+    let inputProps = this.getAttribute('input-props');
 
     let elementType;
     if (type === 'select') {
@@ -139,6 +142,15 @@ class InputProvider extends HTMLElement {
     }
     if (placeholder) {
       this.inputElement.setAttribute('placeholder', placeholder);
+    }
+    if (inputProps) {
+      let {
+        fieldNames: attrNames,
+        fieldValues: attrValues
+      } = convertStringToFieldParams(inputProps);
+      for (let attr of attrNames) {
+        this.inputElement.setAttribute(attr, attrValues[attr]);
+      }
     }
 
     this.appendChild(this.inputElement);
