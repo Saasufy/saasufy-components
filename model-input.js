@@ -1,5 +1,5 @@
 import { SocketConsumer } from './socket.js';
-import { debouncer, updateConsumerElements } from './utils.js';
+import { debouncer, updateConsumerElements, convertStringToFieldParams } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelInput extends SocketConsumer {
@@ -21,7 +21,6 @@ class ModelInput extends SocketConsumer {
 
   static get observedAttributes() {
     return [
-      'input-id',
       'list',
       'socket-instance-property',
       'type',
@@ -40,7 +39,9 @@ class ModelInput extends SocketConsumer {
       'value',
       'hide-error-logs',
       'autocapitalize',
-      'autocorrect'
+      'autocorrect',
+      'input-id',
+      'input-props'
     ];
   }
 
@@ -112,6 +113,7 @@ class ModelInput extends SocketConsumer {
     let height = this.getAttribute('height');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let enableRebound = this.hasAttribute('enable-rebound');
+    let inputProps = this.getAttribute('input-props');
     let hasConsumers = this.hasAttribute('consumers');
     let writeOnly = type === 'file' && !hasConsumers;
 
@@ -209,6 +211,15 @@ class ModelInput extends SocketConsumer {
     }
     if (accept) {
       this.inputElement.setAttribute('accept', accept);
+    }
+    if (inputProps) {
+      let {
+        fieldNames: attrNames,
+        fieldValues: attrValues
+      } = convertStringToFieldParams(inputProps);
+      for (let attr of attrNames) {
+        this.inputElement.setAttribute(attr, attrValues[attr]);
+      }
     }
     let errorMessageContainer = null;
     if (showErrorMessage) {
