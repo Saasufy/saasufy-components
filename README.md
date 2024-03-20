@@ -443,7 +443,6 @@ Used for displaying and editing a single field of a model instance in real time.
 - `model-id` (required): The id of the model instance/record to bind to.
 - `model-field` (required): The field of the model instance/record to bind to for reading and updating.
 - `debounce-delay`: The delay in milliseconds to wait before sending an update to the server. This is useful to batch multiple updates together (as is common when user is typing). Default is 300ms.
-- `input-id`: Can be used to set an `id` attribute on the inner `input` element.
 - `list`: If specified, this sets the list attribute of the inner `input` element to provide input suggestions (only works with standard input elements).
 - `type`: The type of the input component; can be `text`, `number`, `select`, `textarea`, `checkbox` or `file`.
 - `placeholder`: Can be used to set the placeholder text on the inner input element.
@@ -460,6 +459,8 @@ Used for displaying and editing a single field of a model instance in real time.
 - `autocorrect`: Can be `on` or `off` - It will set the auto-correct attribute on the inner input element. This is useful for mobile devices to enable or disable auto-correct.
 - `enable-rebound`: By default, for efficiency reasons, real-time updates performed via `model-input` components are not sent back to the publishing client; it is usually unnecessary because state changes are shared locally between all components which are bound to the same `socket-provider`. You can add the `enable-rebound` attribute to the `model-input` component to force real-time updates to rebound back to the publisher to support more advanced scenarios. Note that enabling rebound comes with additional performance overheads.
 - `accept`: This attribute should only be used if the `type` is set to `file`; it serves to constrain the types of files which can be selected by the user.
+- `input-id`: Can be used to set an `id` attribute on the inner `input` element.
+- `input-props`: Can be used to set additional attributes on the inner `input` element. Must be in the format `attr1=value1,attr2=value2`.
 
 ### model-text
 
