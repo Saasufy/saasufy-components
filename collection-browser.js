@@ -260,7 +260,9 @@ class CollectionBrowser extends SocketConsumer {
     );
     let { fieldValues: viewParams } = convertStringToFieldParams(collectionViewParams);
     let viewPrimaryFields = collectionViewPrimaryFields ?
-      collectionViewPrimaryFields.split(',').map(fieldName => fieldName.trim()) : null;
+      collectionViewPrimaryFields.split(',').map(fieldName => fieldName.trim()) :
+      collectionViewPrimaryFields == null ?
+      null : [];
 
     if (this.collection) this.collection.destroy();
     this.isStale = true;
