@@ -101,6 +101,7 @@ class CollectionBrowser extends SocketConsumer {
       'collection-fields',
       'collection-view',
       'collection-view-params',
+      'collection-view-primary-fields',
       'collection-page-size',
       'collection-page-offset',
       'collection-get-count',
@@ -250,6 +251,7 @@ class CollectionBrowser extends SocketConsumer {
     let collectionView = this.getAttribute('collection-view') || 'defaultView';
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionViewParams = this.getAttribute('collection-view-params') || '';
+    let collectionViewPrimaryFields = this.getAttribute('collection-view-primary-fields');
     let collectionPageOffset = this.getAttribute('collection-page-offset');
     let collectionGetCount = this.hasAttribute('collection-get-count');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
@@ -257,6 +259,8 @@ class CollectionBrowser extends SocketConsumer {
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
     let { fieldValues: viewParams } = convertStringToFieldParams(collectionViewParams);
+    let viewPrimaryFields = collectionViewPrimaryFields ?
+      collectionViewPrimaryFields.split(',').map(fieldName => fieldName.trim()) : null;
 
     if (this.collection) this.collection.destroy();
     this.isStale = true;
@@ -267,6 +271,7 @@ class CollectionBrowser extends SocketConsumer {
       fields: collectionFields.split(',').map(field => field.trim()).filter(field => field),
       view: collectionView,
       viewParams,
+      viewPrimaryFields,
       pageSize: Number(collectionPageSize || 10),
       pageOffset: Number(collectionPageOffset || 0),
       changeReloadDelay: collectionReloadDelay,
