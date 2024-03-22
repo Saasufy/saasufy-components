@@ -233,6 +233,7 @@ let templateFormatters = {
   computeId
 };
 
+let templateRawTagsRegExp = /{{{.*?}}}/gs;
 let templateTagsRegExp = /{{.*?}}/gs;
 
 function execExpression(expression, options) {
@@ -246,33 +247,49 @@ function execExpression(expression, options) {
   return (new Function(...args))(...keys.map(key => options[key]));
 }
 
-export function renderTemplate(templateString, data, socket) {
-  return templateString.replace(templateTagsRegExp, (match) => {
-    let expString = match.slice(2, -2);
-    let options = {
-      ...templateFormatters,
-      uuid,
-      socket: socket ? {
-        state: socket.state,
-        pendingReconnect: socket.pendingReconnect,
-        connectAttempts: socket.connectAttempts,
-        authState: socket.authState,
-        authToken: socket.authToken
-      } : undefined,
-      ...data
-    };
+function getRenderOptions(data, socket) {
+  return {
+    ...templateFormatters,
+    uuid,
+    socket: socket ? {
+      state: socket.state,
+      pendingReconnect: socket.pendingReconnect,
+      connectAttempts: socket.connectAttempts,
+      authState: socket.authState,
+      authToken: socket.authToken
+    } : undefined,
+    ...data
+  };
+}
 
-    try {
-      return toSafeHTML(
-        execExpression(
+export function renderTemplate(templateString, data, socket) {
+  return templateString
+    .replace(templateRawTagsRegExp, (match) => {
+      let expString = match.slice(3, -3);
+      let options = getRenderOptions(data, socket);
+      try {
+        return execExpression(
           toExpression(expString),
           options
-        )
-      );
-    } catch (error) {
-      return match;
-    }
-  });
+        );
+      } catch (error) {
+        return match;
+      }
+    })
+    .replace(templateTagsRegExp, (match) => {
+      let expString = match.slice(2, -2);
+      let options = getRenderOptions(data, socket);
+      try {
+        return toSafeHTML(
+          execExpression(
+            toExpression(expString),
+            options
+          )
+        );
+      } catch (error) {
+        return match;
+      }
+    });
 }
 
 export function updateConsumerElements(consumers, value, template, sourceElementName) {
