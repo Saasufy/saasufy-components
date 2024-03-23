@@ -26,9 +26,24 @@ export class SocketProvider extends HTMLElement {
   connectedCallback() {
     this.isReady = true;
     this.getSocket();
+    let disableTabSync = this.hasAttribute('disable-tab-sync');
+    if (!disableTabSync) {
+      if (this.storageChangeWatcher) {
+        window.removeEventListener('storage', this.storageChangeWatcher);
+      }
+      this.storageChangeWatcher = (event) => {
+        if (event.storageArea === window.localStorage && event.key === this.saasufySocket.options.authTokenName) {
+          this.saasufySocket.reconnect();
+        }
+      };
+    }
+    window.addEventListener('storage', this.storageChangeWatcher);
   }
 
   disconnectedCallback() {
+    if (this.storageChangeWatcher) {
+      window.removeEventListener('storage', this.storageChangeWatcher);
+    }
     this.destroySocket();
   }
 

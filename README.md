@@ -207,6 +207,7 @@ A Saasufy component which integrates with data from Saasufy is known as a `socke
 
 - `url` (required): Specifies the URL for the Saasufy service to use as the data store for all components which are placed inside it.
 - `auth-token-name`: Allows you to specify a custom key for your token - This will be used as the key in localStorage. You generally do not need to set this attribute. It is intended for situations were an app has multiple `socket-provider` elements connecting different services with different/separate authentication flows.
+- `disable-tab-sync`: By default, the socket provider synchronizes socket auth state across multiple tabs via localStorage. If this attribute is set, then the socket auth state will not sync automatically and a manual page refresh may be necessary to update to the latest auth state.
 
 ### collection-browser
 
