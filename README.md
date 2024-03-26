@@ -87,6 +87,27 @@ The following utility functions can be used anywhere inside template `{{expressi
 - Format UNIX timestamp as a human-readable date: `{{date(Product.updatedAt)}}`
 - Given an array of objects, extract the values from the specified field and join them together into a single comma-separated string: `{{joinFields(Product, 'name')}}`
 
+### Special fields
+
+Saasufy supports a number of special metadata fields which are automatically created and updated on each model record.
+Those fields are hidden by default but may be exposed via the Saasufy control panel and used within your application.
+The fields are:
+
+- `id`: String, UUID v4 format; the ID of the resource.
+- `createdBy`: String, UUID v4 format; if the socket was authenticated, this will hold the ID of the account which created the resource.
+- `updatedBy`: String, UUID v4 format; if the socket was authenticated, this will hold the ID of the account which last modified the resource.
+- `createdByIp`: String, IP address format; the IP address of the client which last modified the resource.
+- `createdAt`: Number, UNIX timestamp format; the timestamp for when the resource was created.
+- `updatedAt`: Number, UNIX timestamp format; the timestamp for when the resource was last modified.
+
+All of the above fields except for the `id` field are hidden by default and must be exposed via the Saasufy control panel in order to be accessible within your front end application.
+To expose a special field on a specific model, you just need to create a field with the same name under the `fields` section of the relevant model.
+You will need to make sure that the type you specify (`String` or `Number`) matches the type of the special field described above.
+You will need to deploy your Saasufy service from the dashboard for the changes to take effect.
+
+The `id` field in Saasufy is extra special; you can optionally specify it when you create a new resource, however, if it is not specified, Saasufy will create one for you.
+Saasufy offers utility functions for creating IDs (random and deterministic). See the previous `Utility functions` section.
+
 ### File hosting
 
 Saasufy provides basic HTTP/HTTPS file hosting functionality with support for client-side caching (with `ETag`).
