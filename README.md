@@ -166,7 +166,27 @@ Note that the `app-router` can contain any number of pages/routes so the `slot="
 </app-router>
 ```
 
-The app router path is based on the `location.hash` so the path section in your browser's address bar needs to start with the `#` character.
+This example shows how to redirect based on the user's authentication status:
+
+```html
+<app-router default-page="/home">
+  <template slot="page" route-path="/log-in" auth-redirect="/home" hard-redirect>
+    <log-in-form
+      hostname="sas.saasufy.com"
+      port="443"
+      network-symbol="sas"
+      chain-module-name="sas_chain"
+      secure="true"
+    ></log-in-form>
+  </template>
+  <template slot="page" route-path="/home" no-auth-redirect="/log-in">
+    <div>This is the home page</div>
+  </template>
+  <div slot="viewport"></div>
+</app-router>
+```
+
+Note that the app router path is based on `location.hash` so the path section in your browser's address bar needs to start with the `#` character.
 So for example, if your `index.html` file is served up from the URL `http://mywebsite.com`, then, to activate the `/products` route as in the example above, you would need to type the URL `http://mywebsite.com#/products`.
 
 **Attributes of app-router**
@@ -180,9 +200,9 @@ So for example, if your `index.html` file is served up from the URL `http://mywe
 - `route-path`: The path of the page. Supports custom URL parameters in the format `/org/:orgId/user/:userId`.
 - `partial-route`: An optional attribute which, if specified, will allow the `route-path` to be matched partially from the start. This can be used to ignore the ending of a path which is not relevant to the page in order to avoid unnecessary re-renders.
 - `redirect`: An optional path/route which this page should redirect to. Note that the content of this page will not be shown so it should always be empty.
-- `auth-redirect`: An optional path/route which this page should redirect to if the user is authenticated. If the user is not authenticated, then the content of the template will be displayed as normal.
-- `no-auth-redirect`: An optional path/route which this page should redirect to if the user is not authenticated. If the user is authenticated, then the content of the template will be displayed as normal.
-- `hard-redirect`: An optional, additional attribute which can be specified alongside a `redirect`, `auth-redirect` or `no-auth-redirect` attribute to ensure that any redirect will change the URL in the address bar. Redirects are `soft` redirects by default; this means that they redirect the user to the target page but keep the current URL path unchanged.
+- `no-auth-redirect`: An optional alternative path/route to redirect to if the user lands on this page but they are not authenticated. If the user is authenticated, then the content of the template will be displayed as normal.
+- `auth-redirect`: An optional alternative path/route to redirect to if the user lands on this page but they are already authenticated. If the user is not authenticated, then the content of the template will be displayed as normal.
+- `hard-redirect`: An optional, additional attribute which can be specified alongside a `redirect`, `no-auth-redirect` or `auth-redirect` attribute to ensure that any redirect will change the URL in the address bar. Redirects are `soft` redirects by default; this means that they redirect the user to the target page but keep the current URL path unchanged.
 
 ### socket-provider
 
