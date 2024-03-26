@@ -56,6 +56,7 @@ You can apply custom CSS/styling to elements that are rendered inside a viewport
 
 To use a component, you just need to include the relevant `<script>` tag into the `<head>` tag of your `.html` file.
 You can simply copy-paste the script tag provided under the `Import` section of the relevant component's documentation.
+Make sure that you read the documentation carefully; especially the list of available attributes and acceptable values for each component.
 
 You should only add the script tags for the components which your page uses to avoid wasting bandwidth and unnecessarily delaying page load for your users.
 You should always include the `socket.js` script and create a top-level `socket-provider` component if you intend to use components which depend on data from Saasufy.
