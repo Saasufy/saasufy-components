@@ -1,5 +1,5 @@
 import { SocketConsumer } from './socket.js';
-import { generateRandomHexString } from './utils.js';
+import { generateRandomHexString, convertStringToFieldParams } from './utils.js';
 
 const DEFAULT_AUTH_TIMEOUT = 10000;
 
@@ -49,9 +49,10 @@ class OAuthHandler extends SocketConsumer {
 
     let codeParamName = this.getAttribute('code-param-name') || 'code';
     let stateParamName = this.getAttribute('state-param-name') || 'state';
+    let extraDataString = this.getAttribute('extra-data') || '';
+    let { fieldValues: extraData } = convertStringToFieldParams(extraDataString);
 
     let authTimeout = Number(this.getAttribute('auth-timeout') || DEFAULT_AUTH_TIMEOUT);
-
     let urlSearchParams = new URLSearchParams(location.search);
     let code = urlSearchParams.get(codeParamName);
 
@@ -63,7 +64,7 @@ class OAuthHandler extends SocketConsumer {
 
       if (state === expectedOAuthState) {
         try {
-          await socket.invoke('log-in-oauth', { provider, data: { code } });
+          await socket.invoke('log-in-oauth', { provider, data: { code, ...extraData } });
         } catch (error) {
           this.innerHTML = `
             <div class="error">OAuth authentication failed. ${error.message}</div>
