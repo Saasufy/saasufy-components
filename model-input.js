@@ -31,6 +31,7 @@ class ModelInput extends SocketConsumer {
       'model-type',
       'model-id',
       'model-field',
+      'slice-to',
       'debounce-delay',
       'enable-rebound',
       'options',
@@ -109,6 +110,7 @@ class ModelInput extends SocketConsumer {
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
+    let sliceTo = this.getAttribute('slice-to');
     let options = this.getAttribute('options');
     let height = this.getAttribute('height');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
@@ -141,11 +143,21 @@ class ModelInput extends SocketConsumer {
 
     let modelFieldList = writeOnly ? [] : [ modelField ];
 
+    let fieldTransformations;
+    if (sliceTo != null) {
+      fieldTransformations = {
+        [modelField]: { sliceTo: Number(sliceTo) }
+      };
+    } else {
+      fieldTransformations = {};
+    }
+
     let model = new AGModel({
       socket: this.socket,
       type: modelType,
       id: modelId,
       fields: modelFieldList,
+      fieldTransformations,
       enableRebound
     });
     if (!hideErrorLogs) {

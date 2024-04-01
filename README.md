@@ -499,6 +499,7 @@ Used for displaying and editing a single field of a model instance in real time.
 - `default-value`: A default value to show the user if the underlying model field's value is null or undefined. Note that setting a default value will not affect the underlying model's value.
 - `value`: Used to set the model's value.
 - `computable-value`: If this attribute is present, it will be possible to execute expressions using the `{{expression}}` syntax inside the `value` attribute.
+- `slice-to`: Optional field which can be set to a number to trim strings down to a maximum number of characters. This is useful when dealing with potentially very long field values. Extra care should be taken when using this attribute on a `model-input` element as it will cause values to be overwritten with shortened values if the user edits the input box. Note also that it may affect caching if the same field is being referenced in multiple parts of the application at the same time within the same `socket-provider`.
 - `hide-error-logs`: By default, this component will log errors to the console. If set, this attribute will suppress such errors from showing up on the console.
 - `autocapitalize`: Can be `on` or `off` - It will set the auto-capitalize attribute on the inner input element. This is useful for mobile devices to enable or disable auto-capitalization of the first character which is typed into the input element.
 - `autocorrect`: Can be `on` or `off` - It will set the auto-correct attribute on the inner input element. This is useful for mobile devices to enable or disable auto-correct.
@@ -533,6 +534,7 @@ Used to displaying a field of a model instance in real time.
 - `model-type` (required): Specifies the type of model to bind to. This should match a `Model` available in your Saasufy service.
 - `model-id` (required): The id of the model instance/record to bind to.
 - `model-field` (required): The field of the model instance/record to bind to for reading.
+- `slice-to`: Optional field which can be set to a number to trim strings down to a maximum number of characters when reading. This is useful when dealing with potentially very long field values. Note that it may affect caching if the same field is being referenced in multiple parts of the application at the same time within the same `socket-provider`.
 - `hide-error-logs`: By default, this component will log errors to the console. If set, this attribute will suppress such errors from showing up on the console.
 
 ### model-viewer

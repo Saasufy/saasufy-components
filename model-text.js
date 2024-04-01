@@ -24,6 +24,7 @@ class ModelText extends SocketConsumer {
       'model-type',
       'model-id',
       'model-field',
+      'slice-to',
       'hide-error-logs'
     ];
   }
@@ -40,6 +41,7 @@ class ModelText extends SocketConsumer {
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
+    let sliceTo = this.getAttribute('slice-to');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
 
     let socket;
@@ -63,11 +65,22 @@ class ModelText extends SocketConsumer {
       socket = this.getSocket();
     }
     this.socket = socket;
+
+    let fieldTransformations;
+    if (sliceTo != null) {
+      fieldTransformations = {
+        [modelField]: { sliceTo: Number(sliceTo) }
+      };
+    } else {
+      fieldTransformations = {};
+    }
+
     let model = new AGModel({
       socket: this.socket,
       type: modelType,
       id: modelId,
-      fields: [ modelField ]
+      fields: [ modelField ],
+      fieldTransformations
     });
     if (!hideErrorLogs) {
       (async () => {
