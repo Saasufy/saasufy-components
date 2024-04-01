@@ -1,6 +1,6 @@
 import { SocketConsumer } from './socket.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
-import { renderTemplate } from './utils.js';
+import { renderTemplate, convertStringToFieldParams } from './utils.js';
 
 class ModelViewer extends SocketConsumer {
   constructor() {
@@ -30,9 +30,11 @@ class ModelViewer extends SocketConsumer {
 
   static get observedAttributes() {
     return [
+      'socket-instance-property',
       'model-type',
       'model-id',
       'model-fields',
+      'fields-slice-to',
       'type-alias',
       'hide-error-logs'
     ];
@@ -85,11 +87,21 @@ class ModelViewer extends SocketConsumer {
   }
 
   render() {
+    let socketInstanceProperty = this.getAttribute('socket-instance-property');
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
     let modelFields = this.getAttribute('model-fields') || '';
-    let socketInstanceProperty = this.getAttribute('socket-instance-property');
+    let fieldsSliceTo = this.getAttribute('fields-slice-to') || '';
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
+
+    let {
+      fieldValues: sliceToMap
+    } = convertStringToFieldParams(fieldsSliceTo);
+
+    let fieldTransformations = {};
+    for (let [ fieldName, sliceTo ] of Object.entries(sliceToMap)) {
+      fieldTransformations[fieldName] = { sliceTo: Number(sliceTo) };
+    }
 
     if (this.model) this.model.destroy();
 
@@ -114,11 +126,13 @@ class ModelViewer extends SocketConsumer {
       socket = this.getSocket();
     }
     this.socket = socket;
+
     this.model = new AGModel({
       socket: this.socket,
       type: modelType,
       id: modelId,
-      fields: modelFields.split(',').map(field => field.trim()).filter(field => field)
+      fields: modelFields.split(',').map(field => field.trim()).filter(field => field),
+      fieldTransformations
     });
 
     this.shadowRoot.innerHTML = `
