@@ -120,9 +120,18 @@ export class SocketProvider extends HTMLElement {
     }
     let disableTabSync = this.hasAttribute('disable-tab-sync');
     if (!disableTabSync) {
-      this.storageChangeWatcher = (event) => {
+      this.storageChangeWatcher = async (event) => {
         if (event.storageArea === window.localStorage && event.key === this.saasufySocket.options.authTokenName) {
-          this.saasufySocket.reconnect();
+          if (event.newValue == null) {
+            await this.saasufySocket.deauthenticate();
+            if (this.hasAttribute('disconnect-on-deauth')) {
+              this.saasufySocket.disconnect(1000, 'log-out');
+            } else {
+              this.saasufySocket.reconnect(1000, 'log-out');
+            }
+          } else {
+            this.saasufySocket.reconnect(1000, 'log-out');
+          }
         }
       };
       window.addEventListener('storage', this.storageChangeWatcher);
