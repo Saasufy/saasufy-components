@@ -240,7 +240,12 @@ class CollectionBrowser extends SocketConsumer {
       }
     }
     if (lastItemTemplate) {
-      items.push(lastItemTemplate.innerHTML);
+      let itemString = renderTemplate(
+        lastItemTemplate.innerHTML,
+        { [`$${type}`]: this.collection.meta },
+        this.socket
+      );
+      items.push(itemString);
     }
     viewportNode.innerHTML = items.join('');
   }
