@@ -1,4 +1,5 @@
 import { create } from '/node_modules/socketcluster-client/socketcluster-client.min.js';
+import { convertStringToFieldParams } from './utils.js';
 
 let globalSocket;
 
@@ -21,23 +22,12 @@ export class SocketProvider extends HTMLElement {
     super();
     this.saasufySocket = null;
     this.isReady = false;
+    this.lastExtraSocketOptionsString = '';
   }
 
   connectedCallback() {
     this.isReady = true;
     this.getSocket();
-    let disableTabSync = this.hasAttribute('disable-tab-sync');
-    if (!disableTabSync) {
-      if (this.storageChangeWatcher) {
-        window.removeEventListener('storage', this.storageChangeWatcher);
-      }
-      this.storageChangeWatcher = (event) => {
-        if (event.storageArea === window.localStorage && event.key === this.saasufySocket.options.authTokenName) {
-          this.saasufySocket.reconnect();
-        }
-      };
-    }
-    window.addEventListener('storage', this.storageChangeWatcher);
   }
 
   disconnectedCallback() {
@@ -50,7 +40,9 @@ export class SocketProvider extends HTMLElement {
   static get observedAttributes() {
     return [
       'url',
-      'auth-token-name'
+      'auth-token-name',
+      'disable-tab-sync',
+      'socket-options'
     ];
   }
 
@@ -72,6 +64,7 @@ export class SocketProvider extends HTMLElement {
 
   getSocketOptions() {
     let authTokenName = this.getAttribute('auth-token-name') || null;
+    let socketOptionsString = this.getAttribute('socket-options') || '';
     let url = this.getSanitizedURL();
     let urlOptions;
     let matchedList = url.match(urlPartsRegExp);
@@ -92,18 +85,24 @@ export class SocketProvider extends HTMLElement {
       }
       urlOptions = {};
     }
+    let {
+      fieldValues: extraSocketOptions
+    } = convertStringToFieldParams(socketOptionsString);
     let socketOptions = {
       authTokenName,
+      autoConnect: !!url,
+      ...extraSocketOptions,
       ...urlOptions
     };
-    socketOptions.autoConnect = !!url;
     return socketOptions;
   }
 
   getSocket() {
+    let socket;
+    let socketOptionsString = this.getAttribute('socket-options') || '';
     if (this.saasufySocket) {
       let sanitizedURL = this.getSanitizedURL();
-      if (this.lastSaasufySocketURL !== sanitizedURL) {
+      if (this.lastSaasufySocketURL !== sanitizedURL || this.lastExtraSocketOptionsString !== socketOptionsString) {
         this.saasufySocket.connect(
           this.getSocketOptions()
         );
@@ -111,15 +110,31 @@ export class SocketProvider extends HTMLElement {
         this.saasufySocket.connect();
       }
       this.lastSaasufySocketURL = sanitizedURL;
-      return this.saasufySocket;
+      this.lastExtraSocketOptionsString = socketOptionsString;
+      socket = this.saasufySocket;
+    } else {
+      socket = this.createSocket();
     }
-    return this.createSocket();
+    if (this.storageChangeWatcher) {
+      window.removeEventListener('storage', this.storageChangeWatcher);
+    }
+    let disableTabSync = this.hasAttribute('disable-tab-sync');
+    if (!disableTabSync) {
+      this.storageChangeWatcher = (event) => {
+        if (event.storageArea === window.localStorage && event.key === this.saasufySocket.options.authTokenName) {
+          this.saasufySocket.reconnect();
+        }
+      };
+      window.addEventListener('storage', this.storageChangeWatcher);
+    }
+    return socket;
   }
 
   createSocket() {
     let socketOptions = this.getSocketOptions();
     this.saasufySocket = create(socketOptions);
     this.lastSaasufySocketURL = this.getSanitizedURL();
+    this.lastExtraSocketOptionsString = this.getAttribute('socket-options') || '';
 
     return this.saasufySocket;
   }
