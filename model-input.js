@@ -338,18 +338,22 @@ class ModelInput extends SocketConsumer {
             return;
           }
           let inputValue;
-          if (inputElement.type === 'file' && inputElement.files && inputElement.files.length) {
-            let reader = new FileReader();
-            let readerLoadPromise = new Promise((resolve, reject) => {
-              reader.addEventListener('load', () => {
-                resolve(reader.result);
+          if (inputElement.type === 'file') {
+            if (inputElement.files && inputElement.files.length) {
+              let reader = new FileReader();
+              let readerLoadPromise = new Promise((resolve, reject) => {
+                reader.addEventListener('load', () => {
+                  resolve(reader.result);
+                });
+                reader.addEventListener('error', () => {
+                  reject(new Error('Failed to read file'));
+                });
               });
-              reader.addEventListener('error', () => {
-                reject(new Error('Failed to read file'));
-              });
-            });
-            reader.readAsDataURL(inputElement.files[0]);
-            inputValue = await readerLoadPromise;
+              reader.readAsDataURL(inputElement.files[0]);
+              inputValue = await readerLoadPromise;
+            } else {
+              throw new Error('No file was selected');
+            }
           } else {
             inputValue = event.target.value;
           }
