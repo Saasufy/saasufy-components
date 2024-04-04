@@ -33,8 +33,9 @@ class OAuthHandler extends SocketConsumer {
       throw new Error('The provider attribute of oauth-handler was not specified');
     }
 
-    let sessionStorageKey = this.getAttribute('state-session-storage-key') || 'oauth.state';
-    let expectedOAuthState = sessionStorage.getItem(sessionStorageKey);
+    let useLocalStorage = this.hasAttribute('use-local-storage');
+    let storageKey = this.getAttribute('state-storage-key') || 'oauth.state';
+    let expectedOAuthState = (useLocalStorage ? localStorage : sessionStorage).getItem(storageKey);
     if (!expectedOAuthState) {
       this.innerHTML = `
         <div class="error">OAuth authentication failed because the state was missing.</div>

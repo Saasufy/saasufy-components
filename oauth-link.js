@@ -16,7 +16,8 @@ class OAuthLink extends HTMLElement {
       'provider',
       'client-id',
       'state-size',
-      'state-session-storage-key'
+      'state-storage-key',
+      'use-local-storage'
     ];
   }
 
@@ -71,10 +72,11 @@ class OAuthLink extends HTMLElement {
     if (!provider) {
       throw new Error('The provider attribute of oauth-link was not specified');
     }
+    let useLocalStorage = this.hasAttribute('use-local-storage');
     let stateSize = Number(this.getAttribute('state-size') || 20);
-    let sessionStorageKey = this.getAttribute('state-session-storage-key') || 'oauth.state';
+    let storageKey = this.getAttribute('state-storage-key') || 'oauth.state';
     this.state = `${provider}-${generateRandomHexString(stateSize)}`;
-    sessionStorage.setItem(sessionStorageKey, this.state);
+    (useLocalStorage ? localStorage : sessionStorage).setItem(storageKey, this.state);
 
     this.shadowRoot.innerHTML = `
       <slot name="item"></slot>

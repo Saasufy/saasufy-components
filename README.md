@@ -222,8 +222,8 @@ So for example, if your `index.html` file is served up from the URL `http://mywe
 - `route-path`: The path of the page. Supports custom URL parameters in the format `/org/:orgId/user/:userId`.
 - `partial-route`: An optional attribute which, if specified, will allow the `route-path` to be matched partially from the start. This can be used to ignore the ending of a path which is not relevant to the page in order to avoid unnecessary re-renders.
 - `redirect`: An optional path/route which this page should redirect to. Note that the content of this page will not be shown so it should always be empty.
-- `no-auth-redirect`: An optional alternative path/route to redirect to if the user lands on this page but they are not authenticated. If the user is authenticated, then the content of the template will be displayed as normal.
-- `auth-redirect`: An optional alternative path/route to redirect to if the user lands on this page but they are already authenticated. If the user is not authenticated, then the content of the template will be displayed as normal.
+- `no-auth-redirect`: An optional alternative path/route to redirect to if the user is on this page but they are not authenticated. If the user is authenticated, then the content of the template will be displayed as normal.
+- `auth-redirect`: An optional alternative path/route to redirect to if the user is on this page but they are already authenticated. If the user is not authenticated, then the content of the template will be displayed as normal.
 - `hard-redirect`: An optional, additional attribute which can be specified alongside a `redirect`, `no-auth-redirect` or `auth-redirect` attribute to ensure that any redirect will change the URL in the address bar. Redirects are `soft` redirects by default; this means that they redirect the user to the target page but keep the current URL path unchanged.
 
 ### socket-provider
@@ -792,7 +792,8 @@ A link to initiate an OAuth flow to authenticate a user as part of log in. Can s
 - `provider` (required): The name of the provider. It must match the provider name specified on the `Authentication` page of your Saasufy control panel and also the value provided to the `oauth-handler` component at the end of the OAuth flow.
 - `client-id` (required): This is the client ID from the third-party OAuth provider.
 - `state-size`: This allows you to control the size (in bytes) of the random state string which is passed to the OAuth provider as part of the OAuth flow. Defaults to 20.
-- `state-session-storage-key`: The state string is stored in the browser's `sessionStorage` under this key. Defaults to `oauth.state`. It must match the value provided to the `oauth-handler` component at the end of the OAuth flow.
+- `state-storage-key`: The state string is stored in the browser's `sessionStorage` under this key. Defaults to `oauth.state`. It must match the value provided to the `oauth-handler` component at the end of the OAuth flow.
+- `use-local-storage`: By default, the state is stored inside sessionStorage. If this property is set, then the state will be stored inside localStorage instead. This is useful for sharing the state across different tabs. If set, this attribute should also be set on the related `oauth-handler` component.
 
 ### oauth-handler
 
@@ -818,10 +819,11 @@ When using an OAuth provider, the callback URL which you register with the provi
 - `success-url`: If authentication is successful, the browser's `location.href` will be set to this value. It can be used to redirect the user to their dashboard, for example.
 - `extra-data`: This attribute can be used to pass additional data to the OAuth `getAccessTokenURL` endpoint. For Google OAuth, for example, an additional `redirect_uri` field is required, so it should be set using `extra-data="redirect_uri=http://localhost.com:8000/"` (substitute the URI with your own).
 - `navigate-event-path`: If authentication is successful and a path is set via this attribute, the component will emit a `navigate` event which will bubble up the component hierarchy and can be used by a parent component to perform the success redirection. This approach can be used as an alternative to `success-location-hash` or `success-url` for doing the final redirect.
-- `state-session-storage-key`: The state string is stored in the browser's `sessionStorage` under this key. Defaults to `oauth.state`. It must match the value provided to the `oauth-link` component at the start of the OAuth flow.
+- `state-storage-key`: The state string is stored in the browser's `sessionStorage` under this key. Defaults to `oauth.state`. It must match the value provided to the `oauth-link` component at the start of the OAuth flow.
 - `code-param-name`: The name of the query parameter which holds the `code` as provided by the OAuth provider within the OAuth callback URL. Defaults to `code`.
 - `state-param-name`: The name of the query parameter which holds the `state` as provided by the OAuth provider within the OAuth callback URL. Defaults to `state`.
 - `auth-timeout`: The number of milliseconds to wait for authentication to complete before timing out. Defaults to 10000 (10 seconds).
+- `use-local-storage`: By default, the state is retrieved from sessionStorage. If this property is set, then the state will be retrieved from localStorage instead. This is useful for sharing the state across different tabs. If set, this attribute should also be set on the related `oauth-link` component.
 
 ### render-group
 
