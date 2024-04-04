@@ -241,7 +241,7 @@ function execExpression(expression, options) {
   let args = [
     ...keys,
     `return (function () {
-      return ${expression};
+      return (${expression});
     })();`
   ];
   return (new Function(...args))(...keys.map(key => options[key]));
