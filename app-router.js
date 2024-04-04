@@ -149,6 +149,7 @@ export class AppRouter extends SocketConsumer {
       let defaultPage = this.getAttribute('default-page');
       if (!defaultPage) {
         routerViewport.innerHTML = '';
+        this.lastPageState = null;
         return;
       }
       routeArgs = this.computeRouteArgs(pagePath, regExp, params);
