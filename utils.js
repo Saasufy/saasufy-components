@@ -233,7 +233,7 @@ let templateFormatters = {
   computeId
 };
 
-let templateRawTagsRegExp = /{{{.*?}}}/gs;
+let templateTripleTagsRegExp = /{{{.*?}}}/gs;
 let templateTagsRegExp = /{{.*?}}/gs;
 
 function execExpression(expression, options) {
@@ -264,7 +264,7 @@ function getRenderOptions(data, socket) {
 
 export function renderTemplate(templateString, data, socket) {
   return templateString
-    .replace(templateRawTagsRegExp, (match) => {
+    .replace(templateTripleTagsRegExp, (match) => {
       let expString = match.slice(3, -3);
       let options = getRenderOptions(data, socket);
       try {
@@ -292,7 +292,7 @@ export function renderTemplate(templateString, data, socket) {
     });
 }
 
-export function updateConsumerElements(consumers, value, template, sourceElementName) {
+export function updateConsumerElements(consumers, value, template, sourceElementName, outputBoolean) {
   if (consumers) {
     let consumerParts = consumers.split(',')
       .filter(part => part)
@@ -303,10 +303,11 @@ export function updateConsumerElements(consumers, value, template, sourceElement
       .filter(([ selector, attributeName ]) => selector);
 
     if (template) {
-      value = renderTemplate(
-        template,
-        { value }
-      );
+      value = renderTemplate(template, { value });
+    }
+
+    if (outputBoolean) {
+      value = value !== 'false' && value !== '';
     }
 
     for (let [ selector, attributeName ] of consumerParts) {

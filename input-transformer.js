@@ -18,6 +18,7 @@ class InputTransformer extends HTMLElement {
       'consumers',
       'debounce-delay',
       'provider-template',
+      'output-type',
       'value'
     ];
   }
@@ -30,6 +31,7 @@ class InputTransformer extends HTMLElement {
     if (!this.hasAttribute('value')) return;
 
     let value = this.getAttribute('value') || '';
+    let outputType = this.getAttribute('output-type');
     let debounceDelay = this.getAttribute('debounce-delay');
     debounceDelay = debounceDelay ? Number(debounceDelay) : DEFAULT_DEBOUNCE_DELAY;
 
@@ -40,7 +42,7 @@ class InputTransformer extends HTMLElement {
 
     this.debounce(async () => {
       let providerTemplate = this.getAttribute('provider-template') || '{{value}}';
-      updateConsumerElements(consumers, value, providerTemplate);
+      updateConsumerElements(consumers, value, providerTemplate, null, outputType === 'boolean');
     }, debounceDelay);
   }
 }
