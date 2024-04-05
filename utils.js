@@ -292,7 +292,7 @@ export function renderTemplate(templateString, data, socket) {
     });
 }
 
-export function updateConsumerElements(consumers, value, template, sourceElementName, outputBoolean) {
+export function updateConsumerElements(consumers, value, template, sourceElementName, outputType) {
   if (consumers) {
     let consumerParts = consumers.split(',')
       .filter(part => part)
@@ -306,8 +306,10 @@ export function updateConsumerElements(consumers, value, template, sourceElement
       value = renderTemplate(template, { value });
     }
 
-    if (outputBoolean) {
+    if (outputType === 'boolean') {
       value = value !== 'false' && value !== '';
+    } else if (outputType === 'number') {
+      value = Number(value);
     }
 
     for (let [ selector, attributeName ] of consumerParts) {
