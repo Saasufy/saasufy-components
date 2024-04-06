@@ -1,6 +1,6 @@
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
-import * as uuid from '/node_modules/uuid/dist/esm-browser/index.js';
+export * as uuid from '/node_modules/uuid/dist/esm-browser/index.js';
 import { sha256 } from './sha256.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 300;
@@ -183,7 +183,7 @@ export function createModel(modelOptions) {
   return model;
 }
 
-function computeId(...parts) {
+export function computeId(...parts) {
   let encoder = new TextEncoder();
   let data = encoder.encode(parts.join('-'));
   let start = Date.now();
