@@ -323,6 +323,7 @@ class ModelInput extends SocketConsumer {
     let debounce = debouncer();
 
     let onInputChange = (event) => {
+      inputElement.classList.remove(successStyleClass);
       debounce(async () => {
         if (event.target.value === String(model.value[fieldName] || '')) return;
 
@@ -381,6 +382,7 @@ class ModelInput extends SocketConsumer {
     let onInputKeyUp;
     if (inputElement.type !== 'checkbox' && inputElement.type !== 'select') {
       onInputKeyUp = async (event) => {
+        inputElement.classList.remove(successStyleClass);
         debounce(async () => {
           if (event.target.value === String(model.value[fieldName] || '')) return;
 
