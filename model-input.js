@@ -42,7 +42,8 @@ class ModelInput extends SocketConsumer {
       'autocapitalize',
       'autocorrect',
       'input-id',
-      'input-props'
+      'input-props',
+      'ignore-invalid-selection'
     ];
   }
 
@@ -266,7 +267,12 @@ class ModelInput extends SocketConsumer {
   }
 
   verifyValue(fieldValue, optionList, inputElement, messageContainerElement) {
-    if (optionList && fieldValue != null && !optionList.includes(fieldValue)) {
+    if (
+      optionList &&
+      fieldValue != null &&
+      !optionList.includes(fieldValue) &&
+      !this.hasAttribute('ignore-invalid-selection')
+    ) {
       inputElement.classList.add('error');
       inputElement.classList.remove('success');
       if (messageContainerElement) {
