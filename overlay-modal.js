@@ -61,18 +61,18 @@ class OverlayModal extends HTMLElement {
           cursor: pointer;
         }
       </style>
-      <div class="overlay-background">
-        <div class="modal-dialog">
-          <div class="modal-title-bar">
+      <div class="overlay-background" part="overlay-background">
+        <div class="modal-dialog" part="dialog">
+          <div class="modal-title-bar" part="title-bar">
             <div>
               <slot name="title"></slot>
             </div>
             <div class="close-button">&#x2715;</div>
           </div>
-          <div class="modal-content">
+          <div class="modal-content" part="content">
             <slot name="content"></slot>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" part="footer">
             <slot name="footer"></slot>
           </div>
         </div>

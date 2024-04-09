@@ -509,6 +509,7 @@ Used for displaying and editing a single field of a model instance in real time.
 - `accept`: This attribute should only be used if the `type` is set to `file`; it serves to constrain the types of files which can be selected by the user.
 - `input-id`: Can be used to set an `id` attribute on the inner `input` element.
 - `input-props`: Can be used to set additional attributes on the inner `input` element. Must be in the format `attr1=value1,attr2=value2`.
+- `ignore-invalid-selection`: Can be used with a `model-input` component of type `select` to prevent the `error` class from being added if the selected value is not among the available options.
 
 ### model-text
 
