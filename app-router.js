@@ -186,24 +186,24 @@ export class AppRouter extends SocketConsumer {
       let hardRedirect = pageTemplate.hasAttribute('hard-redirect');
 
       if (authRedirect != null) {
-        if (hardRedirect) {
-          location.hash = authRedirect;
-          return;
-        }
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(authRedirect, routeArgs);
+        if (hardRedirect) {
+          location.hash = pagePath;
+          return;
+        }
         let result = this.getMatchingPage(pagePath, 'auth-redirect');
         pageTemplate = result.pageTemplate;
         route = result.route;
         regExp = result.regExp;
         params = result.params;
       } else if (noAuthRedirect != null) {
-        if (hardRedirect) {
-          location.hash = noAuthRedirect;
-          return;
-        }
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(noAuthRedirect, routeArgs);
+        if (hardRedirect) {
+          location.hash = pagePath;
+          return;
+        }
         let result = this.getMatchingPage(pagePath, 'no-auth-redirect');
         pageTemplate = result.pageTemplate;
         route = result.route;
