@@ -232,7 +232,8 @@ let templateFormatters = {
   combineFilters: (filterMap, useOr) => {
     return Object.values(filterMap || {}).join(useOr ? ' %OR% ' : ' %AND% ');
   },
-  computeId
+  computeId,
+  safeString: toSafeHTML
 };
 
 let templateTripleTagsRegExp = /{{{.*?}}}/gs;
