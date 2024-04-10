@@ -85,6 +85,7 @@ The following utility functions can be used anywhere inside template `{{expressi
 - Remove leading and trailing spaces from text: `{{trim('   test   ')}}`
 - Specify one or more fallback values in case values are null or undefined: `{{fallback(Product.imageSrc, 'path/to/default-image.png')}}`
 - Format UNIX timestamp as a human-readable date: `{{date(Product.updatedAt)}}`
+- Make a string safe by escaping HTML characters: `{{safeString(Product.name)}}`
 - Given an array of objects, extract the values from the specified field and join them together into a single comma-separated string: `{{joinFields(Product, 'name')}}`
 
 ### Special fields
