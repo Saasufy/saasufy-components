@@ -58,6 +58,7 @@ export class AppRouter extends SocketConsumer {
     return [
       'target-page',
       'default-page',
+      'force-render-paths',
       'debounce-delay',
       'max-redirects'
     ];
@@ -141,9 +142,16 @@ export class AppRouter extends SocketConsumer {
     let routerViewport = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
     if (!routerViewport) return;
 
+    let forceRenderPathsString = this.getAttribute('force-render-paths');
+    let forceRenderPaths = forceRenderPathsString == null ?
+      [] : forceRenderPathsString.split(',').map(path => path.trim());
+
     let routeArgs;
     let pagePath = location.hash.replace(this.hashStartRegex, '');
     let { pageTemplate, route, regExp, params } = this.getMatchingPage(pagePath, 'path', true);
+    if (forceRenderPaths.includes(pagePath)) {
+      this.lastPageState = null;
+    }
 
     if (!pageTemplate) {
       let defaultPage = this.getAttribute('default-page');

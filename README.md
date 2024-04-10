@@ -217,6 +217,7 @@ So for example, if your `index.html` file is served up from the URL `http://mywe
 - `default-page`: The path/route of the default page to send the user to in case no routes are matched. Commonly used to point to a `/page-not-found` page. For the home page, it's typically recommended to create a page template with `route-path=""` instead.
 - `debounce-delay`: The number of milliseconds to wait before changing the route. This can help to avoid multiple renders if the route changes rapidly (e.g. when doing hard redirects). Defaults to 100ms.
 - `target-page`: A convenience attribute which can be used to programmatically change the `location.hash` in the address bar.
+- `force-render-paths`: An optional list of comma-separated paths to force a page render/re-render, regardless of whether or not the page has changed.
 
 **Attributes of slotted page templates**
 
