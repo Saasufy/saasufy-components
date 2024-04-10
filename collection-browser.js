@@ -22,6 +22,15 @@ class CollectionBrowser extends SocketConsumer {
       event.stopPropagation();
       if (this.collection) {
         this.collection.create(event.detail);
+        this.dispatchEvent(
+          new CustomEvent('collectionCreate', {
+            detail: {
+              type: this.collection.type,
+              value: event.detail
+            },
+            bubbles: true
+          })
+        );
       }
     };
 
@@ -29,6 +38,15 @@ class CollectionBrowser extends SocketConsumer {
       event.stopPropagation();
       if (this.collection) {
         this.collection.delete(event.detail);
+        this.dispatchEvent(
+          new CustomEvent('collectionDelete', {
+            detail: {
+              type: this.collection.type,
+              id: event.detail
+            },
+            bubbles: true
+          })
+        );
       }
     };
 
