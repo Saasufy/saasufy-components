@@ -332,7 +332,6 @@ class ModelInput extends SocketConsumer {
       inputElement.classList.remove(successStyleClass);
       debounce(async () => {
         if (event.target.value === String(model.value[fieldName] || '')) return;
-
         let providerTemplate = this.getAttribute('provider-template');
         try {
           if (inputElement.type === 'checkbox') {
@@ -347,6 +346,7 @@ class ModelInput extends SocketConsumer {
           let inputValue;
           if (inputElement.type === 'file') {
             if (inputElement.files && inputElement.files.length) {
+              inputElement.focus();
               let reader = new FileReader();
               let readerLoadPromise = new Promise((resolve, reject) => {
                 reader.addEventListener('load', () => {
@@ -386,19 +386,19 @@ class ModelInput extends SocketConsumer {
     inputElement.addEventListener('change', onInputChange);
 
     let onInputKeyUp;
-    if (inputElement.type !== 'checkbox' && inputElement.type !== 'select') {
+    let inputType = inputElement.type;
+    if (inputType !== 'checkbox' && inputType !== 'select' && inputType !== 'file') {
       onInputKeyUp = async (event) => {
         inputElement.classList.remove(successStyleClass);
         debounce(async () => {
           if (event.target.value === String(model.value[fieldName] || '')) return;
-
           let providerTemplate = this.getAttribute('provider-template');
           try {
             if (event.target.value === '') {
               await model.delete(fieldName);
               updateConsumerElements(consumers, '', providerTemplate, this.getAttribute('name'));
             } else {
-              let targetValue = inputElement.type === 'number' ?
+              let targetValue = inputType === 'number' ?
                 Number(event.target.value) : event.target.value;
               updateConsumerElements(consumers, targetValue, providerTemplate, this.getAttribute('name'));
               await model.update(fieldName, targetValue);

@@ -33,22 +33,24 @@ input[type=file] {
   padding: 10px;
 }
 
-input[type=text]:focus,input[type=password]:focus,input[type=number]:focus,select:focus,textarea:focus {
+input[type=text]:focus,input[type=password]:focus,input[type=number]:focus,input[type=file]:focus,select:focus,textarea:focus {
   border-color: #00a5e5;
   outline-color: #00a5e5;
+  outline-width: 1px;
+  outline-style: solid;
 }
 
-input[type=text].error,input[type=password].error,input[type=number].error,select.error,textarea.error {
+input[type=text].error,input[type=password].error,input[type=number].error,input[type=file].error,select.error,textarea.error {
   border-color: #ff0000;
   outline-color: #ff0000;
 }
 
-input[type=text].warning,input[type=password].warning,input[type=number].warning,select.warning,textarea.warning {
+input[type=text].warning,input[type=password].warning,input[type=number].warning,input[type=file].warning,select.warning,textarea.warning {
   border-color: #ee9900;
   outline-color: #ee9900;
 }
 
-input[type=text].success:focus,input[type=password].success:focus,input[type=number].success:focus,select.success:focus,textarea.success:focus {
+input[type=text].success:focus,input[type=password].success:focus,input[type=number].success:focus,input[type=file].success:focus,select.success:focus,textarea.success:focus {
   border-color: #009900;
   outline-color: #009900;
 }
