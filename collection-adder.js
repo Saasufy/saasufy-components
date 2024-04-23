@@ -53,7 +53,7 @@ class CollectionAdder extends SocketConsumer {
     messageContainer.classList.remove('error');
     messageContainer.textContent = '';
 
-    let radioInputs = [...this.querySelectorAll('.collection-adder-radio')];
+    let radioInputs = [ ...this.querySelectorAll('.collection-adder-radio') ];
     let radioData = {};
     for (let radio of radioInputs) {
       if (radio.checked) {
@@ -69,7 +69,7 @@ class CollectionAdder extends SocketConsumer {
         ...radioData,
         ...Object.fromEntries(
           await Promise.all(
-            [...this.querySelectorAll('.collection-adder-input')].filter(
+            [ ...this.querySelectorAll('.collection-adder-input') ].filter(
               input => input.value !== ''
             )
             .map(
@@ -192,7 +192,7 @@ class CollectionAdder extends SocketConsumer {
     this.collection = new AGCollection({
       socket: this.socket,
       type: collectionType,
-      fields: [...new Set([ ...fieldNames, ...modelFieldNames ])],
+      fields: [ ...new Set([ ...fieldNames, ...modelFieldNames ]) ],
       writeOnly: true
     });
 

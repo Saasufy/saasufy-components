@@ -1,0 +1,209 @@
+import { SocketConsumer } from './socket.js';
+import { convertStringToFieldParams, getTypeCastFunction } from './utils.js';
+import AGCollection from '/node_modules/ag-collection/ag-collection.js';
+
+class CollectionAdderForm extends SocketConsumer {
+  constructor(options) {
+    super();
+    this.attachShadow({
+      mode: 'open'
+    });
+    this.options = options || {};
+    this.isReady = false;
+  }
+
+  connectedCallback() {
+    this.socket = this.getSocket();
+    this.isReady = true;
+    this.render();
+  }
+
+  disconnectedCallback() {
+    if (this.collection) this.collection.destroy();
+  }
+
+  static get observedAttributes() {
+    return [
+      'collection-type',
+      'model-values',
+      'success-message',
+      'trim-spaces'
+    ];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!this.isReady) return;
+    this.render();
+  }
+
+  async submit() {
+    if (!this.isReady) {
+      throw new Error('Collection adder form is not ready to be submitted');
+    }
+    let successMessage = this.getAttribute('success-message');
+    let messageContainer = this.shadowRoot.querySelector('slot[name="message"]').assignedElements()[0];
+
+    if (messageContainer) {
+      messageContainer.classList.remove('success');
+      messageContainer.classList.remove('error');
+      messageContainer.textContent = '';
+    }
+
+    let trimSpaces = this.hasAttribute('trim-spaces');
+
+    let inputElements = this.getAllInputElements();
+
+    try {
+      let newModelData = {
+        ...this.modelFieldValues,
+        ...Object.fromEntries(
+          await Promise.all(
+            [ ...inputElements ].filter(
+              input => input.type === 'radio' ? input.checked : input.value !== ''
+            )
+            .map(
+              async (input) => {
+                let inputType;
+                if (input.nodeName === 'TEXTAREA' || input.nodeName === 'SELECT') {
+                  inputType = input.nodeName.toLowerCase();
+                } else {
+                  inputType = input.type;
+                }
+                let Type = getTypeCastFunction(inputType);
+                let value;
+                if (inputType === 'file' && input.files && input.files.length) {
+                  let reader = new FileReader();
+                  let readerLoadPromise = new Promise((resolve, reject) => {
+                    reader.addEventListener('load', () => {
+                      resolve(reader.result);
+                    });
+                    reader.addEventListener('error', () => {
+                      reject(new Error('Failed to read file'));
+                    });
+                  });
+                  reader.readAsDataURL(input.files[0]);
+                  value = await readerLoadPromise;
+                } else if (inputType === 'checkbox') {
+                  value = input.checked;
+                } else {
+                  value = input.value;
+                }
+                let sanitizedValue = Type(value);
+                if (trimSpaces && typeof sanitizedValue === 'string') {
+                  sanitizedValue = sanitizedValue.trim();
+                }
+                return [ input.name, sanitizedValue ];
+              }
+            )
+          )
+        )
+      };
+
+      await this.collection.create(newModelData);
+      this.dispatchEvent(
+        new CustomEvent('success', {
+          detail: newModelData
+        })
+      );
+      this.reset();
+
+      messageContainer = this.shadowRoot.querySelector('slot[name="message"]').assignedElements()[0];
+      if (messageContainer) {
+        messageContainer.classList.add('success');
+        messageContainer.classList.remove('error');
+        if (successMessage) {
+          messageContainer.textContent = successMessage;
+        } else {
+          messageContainer.textContent = '';
+        }
+      }
+    } catch (error) {
+      messageContainer = this.shadowRoot.querySelector('slot[name="message"]').assignedElements()[0];
+      if (messageContainer) {
+        messageContainer.classList.add('error');
+        messageContainer.classList.remove('success');
+        messageContainer.textContent = error.message;
+      }
+      this.dispatchEvent(
+        new CustomEvent('error', {
+          detail: error
+        })
+      );
+    }
+  }
+
+  getAllInputElements() {
+    return this.shadowRoot.querySelector('.input-slot')
+      .assignedElements()
+      .filter(element => element)
+      .flatMap(element => [ element, ...element.querySelectorAll('input,textarea,select') ])
+      .filter(
+        (element) => {
+          return (element.nodeName === 'INPUT' && element.type !== 'submit' && element.type !== 'button') ||
+            element.nodeName === 'TEXTAREA' || element.nodeName === 'SELECT';
+        }
+      );
+  }
+
+  reset() {
+    let inputElements = this.getAllInputElements();
+    for (let element of inputElements) {
+      if (element.nodeName === 'INPUT') {
+        if (element.type === 'checkbox' || element.type === 'radio') {
+          element.checked = false;
+        } else {
+          element.value = '';
+        }
+      } else if (element.nodeName === 'TEXTAREA') {
+        element.value = '';
+      } else if (element.nodeName === 'SELECT') {
+        element.selectedIndex = 0;
+      }
+    }
+  }
+
+  render() {
+    let collectionType = this.getAttribute('collection-type');
+
+    let {
+      fieldTypes: modelFieldTypes,
+      fieldValues: modelFieldValues
+    } = convertStringToFieldParams(this.getAttribute('model-values'));
+
+    this.modelFieldValues = Object.fromEntries(
+      Object.entries(modelFieldValues).map(([key, value]) => {
+        if (modelFieldTypes[key] === 'boolean') {
+          return [ key, value !== 'false' && value !== '' ];
+        }
+        if (modelFieldTypes[key] === 'number') {
+          return [ key, Number(value) ];
+        }
+        return [ key, value ];
+      })
+    );
+
+    if (this.collection) this.collection.destroy();
+
+    this.collection = new AGCollection({
+      socket: this.socket,
+      type: collectionType,
+      fields: [],
+      writeOnly: true
+    });
+
+    this.shadowRoot.innerHTML = `
+      <slot name="message" class="collection-adder-message-container"></slot>
+      <slot class="input-slot"></slot>
+    `;
+
+    let inputSlot = this.shadowRoot.querySelector('.input-slot');
+    inputSlot.addEventListener('click', async (event) => {
+      let { target } = event;
+      if (target && target.nodeName === 'INPUT' && target.type === 'submit') {
+        await this.submit();
+      }
+    });
+  }
+}
+
+window.customElements.define('collection-adder-form', CollectionAdderForm);

@@ -8,6 +8,7 @@ Components for Saasufy
 ### Collections of resources
 - [collection-browser](#collection-browser)
 - [collection-adder](#collection-adder)
+- [collection-adder-form](#collection-adder-form)
 - [collection-deleter](#collection-deleter)
 - [collection-reducer](#collection-reducer)
 
@@ -314,7 +315,8 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 
 ### collection-adder
 
-A form component for inserting data into collections.
+A basic form component for inserting data into collections.
+This component is a simplified version of the `collection-adder-form` component as it doesn't require input elements to be slotted into it.
 
 **Import**
 
@@ -346,6 +348,44 @@ A form component for inserting data into collections.
 - `autocapitalize`: Can be set to `off` to disable auto-capitalization of the first input character on mobile devices.
 - `autocorrect`: Can be set to `off` to disable auto-correction of input on mobile devices.
 - `trim-spaces`: If this attribute exists on the element, then leading and trailing spaces will be trimmed from each input element's value before submitting the form.
+
+### collection-adder-form
+
+A flexible form component for inserting data into collections.
+This component is similar to the `collection-adder` component except that it requires input elements (and others) to be slotted into it.
+
+**Import**
+
+```html
+<script src="https://saasufy.com/node_modules/saasufy-components/collection-adder-form.js" type="module" defer></script>
+```
+
+**Example usage**
+
+```html
+<collection-adder-form
+  collection-type="Product"
+  model-values="categoryName=electronics,isNew:boolean=true"
+  trim-spaces
+>
+  <div slot="message"></div>
+  <input type="text" name="name" placeholder="Name">
+  <input type="text" name="brand" placeholder="Brand">
+  <input type="number" name="qty" placeholder="Quantity">
+  <input type="submit" value="Add new product">
+</collection-adder-form>
+```
+
+**Attributes of collection-adder-form**
+
+- `collection-type` (required): Specifies the type of collection to add the resource to when the form is submitted. This should match a `Model` available in your Saasufy service.
+- `model-values`: An optional list of key-value pairs in the format `field1=value1,field2=value2` to add to the newly created resource alongside the values collected from the user via the form. For non-string values, the type should be provided in the format `fieldName:type=value`; supported types are `string`, `number` and `boolean`. Unlike `collection-fields` which are rendered as input elements in the form, `model-values` are not shown to the user.
+- `success-message`: A message to show the user if the resource has been successfully added to the collection after submitting the form.
+- `trim-spaces`: If this attribute exists on the element, then leading and trailing spaces will be trimmed from each input element's value before submitting the form.
+
+**Attributes of slotted input, select, textarea... elements**
+
+- `name` (required): This must correspond to a field name on the model specified via the `collection-type` attribute of the `collection-adder-form`.
 
 ### collection-deleter
 
