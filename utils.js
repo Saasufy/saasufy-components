@@ -422,6 +422,10 @@ export function convertStringToFieldParams(string) {
   };
 }
 
+export function formatError(error) {
+  return error.code === 1009 ? 'Resource exceeded the maximum size' : error.message;
+}
+
 export function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }

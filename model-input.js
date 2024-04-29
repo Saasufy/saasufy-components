@@ -1,5 +1,10 @@
 import { SocketConsumer } from './socket.js';
-import { debouncer, updateConsumerElements, convertStringToFieldParams } from './utils.js';
+import {
+  debouncer,
+  updateConsumerElements,
+  convertStringToFieldParams,
+  formatError
+} from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
 class ModelInput extends SocketConsumer {
@@ -379,10 +384,7 @@ class ModelInput extends SocketConsumer {
         } catch (error) {
           inputElement.classList.add(errorStyleClass);
           inputElement.classList.remove(successStyleClass);
-          showErrorMessage(
-            fieldName,
-            error.code === 1009 ? 'Resource exceeded the maximum size' : error.message
-          );
+          showErrorMessage(fieldName, formatError(error));
         }
       }, debounceDelay);
     };

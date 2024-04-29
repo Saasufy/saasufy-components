@@ -1,5 +1,9 @@
 import { SocketConsumer } from './socket.js';
-import { convertStringToFieldParams, getTypeCastFunction } from './utils.js';
+import {
+  convertStringToFieldParams,
+  getTypeCastFunction,
+  formatError
+} from './utils.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 
 class CollectionAdder extends SocketConsumer {
@@ -122,7 +126,7 @@ class CollectionAdder extends SocketConsumer {
     } catch (error) {
       messageContainer.classList.add('error');
       messageContainer.classList.remove('success');
-      messageContainer.textContent = error.message;
+      messageContainer.textContent = formatError(error);
       this.dispatchEvent(
         new CustomEvent('error', {
           detail: error
