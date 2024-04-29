@@ -379,7 +379,10 @@ class ModelInput extends SocketConsumer {
         } catch (error) {
           inputElement.classList.add(errorStyleClass);
           inputElement.classList.remove(successStyleClass);
-          showErrorMessage(fieldName, error.message);
+          showErrorMessage(
+            fieldName,
+            error.code === 1009 ? 'Resource exceeded the maximum size' : error.message
+          );
         }
       }, debounceDelay);
     };
