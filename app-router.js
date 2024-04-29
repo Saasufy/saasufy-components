@@ -244,7 +244,6 @@ export class AppRouter extends SocketConsumer {
       routeArgs = {};
     }
 
-
     let pageState = JSON.stringify({
       route,
       routeArgs
