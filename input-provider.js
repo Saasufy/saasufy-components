@@ -54,11 +54,24 @@ class InputProvider extends HTMLElement {
     this.inputElement && this.inputElement.dispatchEvent(new Event('change'));
   }
 
+  updateInputClassList(newValue) {
+    if (this.inputElement.type === 'checkbox') {
+      this.inputElement.classList.remove('empty-input');
+      return;
+    }
+    if (newValue === '' || newValue == null) {
+      this.inputElement.classList.add('empty-input');
+    } else {
+      this.inputElement.classList.remove('empty-input');
+    }
+  }
+
   set value(newValue) {
     if (this.inputElement) {
       if (newValue && this.hasAttribute('computable-value')) {
         newValue = renderTemplate(newValue);
       }
+      this.updateInputClassList(newValue);
       let oldValue;
       if (this.inputElement.type === 'checkbox') {
         oldValue = this.inputElement.checked;
@@ -117,6 +130,9 @@ class InputProvider extends HTMLElement {
         let optionElements = options
         .split(',')
         .map((option) => {
+          if (option === placeholder) {
+            return `<option value="" selected class="select-default-option">${option}</option>`;
+          }
           return `<option value="${option}">${option}</option>`;
         })
         .join('');
@@ -153,6 +169,7 @@ class InputProvider extends HTMLElement {
       }
     }
 
+    this.updateInputClassList(value);
     this.appendChild(this.inputElement);
 
     let destroyHandlers = this.updateConsumerElementsOnEdit();
@@ -160,6 +177,7 @@ class InputProvider extends HTMLElement {
     if (value) {
       this.value = value;
     }
+
     this.destroy = () => {
       destroyHandlers();
     };
@@ -176,6 +194,7 @@ class InputProvider extends HTMLElement {
     let debounce = debouncer();
 
     let onInputChange = (event) => {
+      this.updateInputClassList(event.target.value);
       debounce(async () => {
         let elementName = this.getAttribute('name');
         let providerTemplate = this.getAttribute('provider-template');
@@ -183,6 +202,7 @@ class InputProvider extends HTMLElement {
         if (inputElement.type === 'checkbox') {
           let checked = !!inputElement.checked;
           this.lastValue = checked;
+
           updateConsumerElements(consumers, checked, providerTemplate, elementName);
           return;
         }
@@ -201,6 +221,7 @@ class InputProvider extends HTMLElement {
     let onInputKeyUp;
     if (inputElement.type !== 'checkbox') {
       onInputKeyUp = async (event) => {
+        this.updateInputClassList(event.target.value);
         debounce(async () => {
           let elementName = this.getAttribute('name');
           let providerTemplate = this.getAttribute('provider-template');
