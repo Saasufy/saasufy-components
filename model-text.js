@@ -25,7 +25,8 @@ class ModelText extends SocketConsumer {
       'model-id',
       'model-field',
       'slice-to',
-      'hide-error-logs'
+      'hide-error-logs',
+      'default-value'
     ];
   }
 
@@ -33,6 +34,14 @@ class ModelText extends SocketConsumer {
     if (!this.isReady) return;
     this.destroy();
     this.render();
+  }
+
+  computeDisplayValue(value) {
+    let safeValue = toSafeHTML(value);
+    if (safeValue != null) {
+      return safeValue;
+    }
+    return this.getAttribute('default-value') || '';
   }
 
   render() {
@@ -107,12 +116,11 @@ class ModelText extends SocketConsumer {
     (async () => {
       for await (let event of changeConsumer) {
         if (event.resourceField !== modelField) continue;
-        let fieldValue = toSafeHTML(model.value[modelField]);
-        this.innerHTML = fieldValue;
+        this.innerHTML = this.computeDisplayValue(model.value[modelField]);
       }
     })();
     if (model.isLoaded) {
-      this.innerHTML = toSafeHTML(model.value[modelField]);
+      this.innerHTML = this.computeDisplayValue(model.value[modelField]);
     }
     this.destroy = () => {
       changeConsumer.kill();
