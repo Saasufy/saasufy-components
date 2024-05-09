@@ -395,6 +395,7 @@ class ModelInput extends SocketConsumer {
     if (inputType !== 'checkbox' && inputType !== 'select' && inputType !== 'file') {
       onInputKeyUp = async (event) => {
         inputElement.classList.remove(successStyleClass);
+        if (this.hasAttribute('disable-instant-flush')) return;
         debounce(async () => {
           if (event.target.value === String(model.value[fieldName] || '')) return;
           let providerTemplate = this.getAttribute('provider-template');

@@ -532,6 +532,7 @@ Used for displaying and editing a single field of a model instance in real time.
 - `model-id` (required): The id of the model instance/record to bind to.
 - `model-field` (required): The field of the model instance/record to bind to for reading and updating.
 - `debounce-delay`: The delay in milliseconds to wait before sending an update to the server. This is useful to batch multiple updates together (as is common when user is typing). Default is 300ms.
+- `disable-instant-flush`: If specified, changes will only be saved once they have settled (E.g. after the element has lost focus or when the enter key is pressed).
 - `list`: If specified, this sets the list attribute of the inner `input` element to provide input suggestions (only works with standard input elements).
 - `type`: The type of the input component; can be `text`, `number`, `select`, `textarea`, `checkbox` or `file`.
 - `placeholder`: Can be used to set the placeholder text on the inner input element.
@@ -650,6 +651,7 @@ This component can be configured to provide its data to multiple components (con
 - `input-id`: Can be used to set an `id` attribute on the inner `input` element.
 - `list`: If specified, this sets the list attribute of the inner `input` element to provide input suggestions (only works with standard input elements).
 - `type`: The type of the input component; can be `text`, `number`, `select`, `textarea` or `checkbox`.
+- `disable-instant-flush`: If specified, changes will only be saved once they have settled (E.g. after the element has lost focus or when the enter key is pressed).
 - `placeholder`: Can be used to set the placeholder text on the inner input element.
 - `consumers`: This allows you to connect this `input-provider` to other elements on your page. It takes a list of selectors with optional attributes to target in the format `element-selector:attribute-name`. For example `.my-input:value` will find all elements with a `my-input` class and update their `value` attributes with the value of the `input-provider` component in real-time. You can specify multiple selectors separated by commas such as `.my-input,my-div`; in this case, because attribute names are not specified, values will be injected into the `value` attribute (for input elements) or into the `innerHTML` property (for other kinds of elements). The default attribute/property depends on the element type.
 - `provider-template`: A template string within which the `{{value}}` can be injected before passing to consumers.

@@ -222,6 +222,7 @@ class InputProvider extends HTMLElement {
     if (inputElement.type !== 'checkbox') {
       onInputKeyUp = async (event) => {
         this.updateInputClassList(event.target.value);
+        if (this.hasAttribute('disable-instant-flush')) return;
         debounce(async () => {
           let elementName = this.getAttribute('name');
           let providerTemplate = this.getAttribute('provider-template');
