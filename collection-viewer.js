@@ -4,7 +4,7 @@ import { renderTemplate, convertStringToFieldParams } from './utils.js';
 
 const DEFAULT_RELOAD_DELAY = 0;
 
-class CollectionBrowser extends SocketConsumer {
+class CollectionViewer extends SocketConsumer {
   constructor() {
     super();
     this.isReady = false;
@@ -351,7 +351,7 @@ class CollectionBrowser extends SocketConsumer {
       (async () => {
         for await (let { error } of this.collection.listener('error')) {
           console.error(
-            `Collection browser encountered an error: ${error.message}`
+            `Collection viewer encountered an error: ${error.message}`
           );
         }
       })();
@@ -359,4 +359,4 @@ class CollectionBrowser extends SocketConsumer {
   }
 }
 
-window.customElements.define('collection-browser', CollectionBrowser);
+window.customElements.define('collection-viewer', CollectionViewer);

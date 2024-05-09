@@ -6,7 +6,7 @@ Components for Saasufy
 - [socket-provider](#socket-provider)
 
 ### Collections of resources
-- [collection-browser](#collection-browser)
+- [collection-viewer](#collection-viewer)
 - [collection-adder](#collection-adder)
 - [collection-adder-form](#collection-adder-form)
 - [collection-deleter](#collection-deleter)
@@ -256,7 +256,7 @@ A Saasufy component which integrates with data from Saasufy is known as a `socke
 - `socket-options`: Can be used to set options on the inner `socket`. Must be in the format `option1:type1=value1,option2:type2=value2`; the type of each option can be string, boolean or number. If not specified, the default type is string.
 - `disconnect-on-deauth`: If this attribute is set, the underlying socket will be disconnected if the socket becomes unauthenticated. This means that components will not receive real-time updates until the user's next interaction (which will cause the socket to reconnect). If this attribute is not set, the socket will attempt to reconnect immediately after losing authentication.
 
-### collection-browser
+### collection-viewer
 
 Used for rendering collections as lists, tables or other sequences based on a specific view using a template.
 Supports pagination by allowing you to specify custom buttons or links to navigate between pages.
@@ -265,13 +265,13 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 **Import**
 
 ```html
-<script src="https://saasufy.com/node_modules/saasufy-components/collection-browser.js" type="module" defer></script>
+<script src="https://saasufy.com/node_modules/saasufy-components/collection-viewer.js" type="module" defer></script>
 ```
 
 **Example usage**
 
 ```html
-<collection-browser
+<collection-viewer
   collection-type="Chat"
   collection-fields="username,message,createdAt"
   collection-view="recentView"
@@ -295,7 +295,7 @@ Can also perform basic CRUD operations such as deleting or creating records by l
   </template>
 
   <div slot="viewport" class="chat-viewport"></div>
-</collection-browser>
+</collection-viewer>
 ```
 
 **Attributes**
@@ -305,11 +305,11 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 - `collection-view` (required): Determines the view of the collection. This should match one of the `Views` defined in your Saasufy service under that specific `Model`.
 - `collection-view-params` (required): Parameters for the view, specified as comma-separated key-value pairs (e.g., key1=value1,key2=value2). These parameters can customize the behavior of the collection view. The keys must match `paramFields` specified in your Saasufy service under the relevant `View`.
 - `collection-page-size`: Sets how many items from the collection are displayed at once. This is useful for pagination, allowing users to navigate through large sets of data in chunks.
-- `collection-page-offset`: Indicates the current page offset in the collection's data. It’s like telling the browser which page of data you want to display initially.
+- `collection-page-offset`: Indicates the current page offset in the collection's data. It’s like telling the viewer which page of data you want to display initially.
 - `collection-get-count`: If this attribute is present, the component will get the record count of the target view. The count can be rendered into the template by prefixing the model name with a dollar sign and accessing the `count` property like this: `{{$MyModelName.count}}`.
 - `collection-view-primary-fields`: An optional list of field names to specify which specific `collection-view-params` to watch for real time updates. Fewer primary fields means that the view will be exposed to a broader range of real time updates but at the cost of performance. It is generally recommended to have just one primary field.
 - `auto-reset-page-offset`: If this attribute is present, the `collection-page-offset` will be reset to zero whenever the view params change.
-- `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `collection-browser` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `SubChat`, then `{{Chat.message}}` would become `{{SubChat.message}}`.
+- `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `collection-viewer` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `SubChat`, then `{{Chat.message}}` would become `{{SubChat.message}}`.
 - `hide-error-logs`: A flag which, when present, suppresses error logs from being printed to the console.
 - `max-show-loader`: If this attribute is present, your slotted `loader` element will be shown as often as possible; this includes situations where the collection is merely refreshing itself. It is disabled by default.
 
@@ -389,8 +389,8 @@ This component is similar to the `collection-adder` component except that it req
 
 ### collection-deleter
 
-A component which can be placed anywhere inside a `collection-browser` component to delete a specific item from a collection as a result of a user action (e.g. on click).
-It supports either immediate deletion or deletion upon confirmation; in the latter case, the parent `collection-browser` must have a `confirm-modal` component slotted into its `modal` slot.
+A component which can be placed anywhere inside a `collection-viewer` component to delete a specific item from a collection as a result of a user action (e.g. on click).
+It supports either immediate deletion or deletion upon confirmation; in the latter case, the parent `collection-viewer` must have a `confirm-modal` component slotted into its `modal` slot.
 
 **Import**
 
@@ -401,14 +401,14 @@ It supports either immediate deletion or deletion upon confirmation; in the latt
 **Example usage**
 
 ```html
-<!-- Must be placed somewhere inside a collection-browser component, typically inside the slotted item template. -->
+<!-- Must be placed somewhere inside a collection-viewer component, typically inside the slotted item template. -->
 <collection-deleter model-id="{{Product.id}}" onclick="deleteItem()">&#x2715;</collection-deleter>
 ```
 
 OR (with confirmation step)
 
 ```html
-<!-- Must be placed somewhere inside a collection-browser component, typically inside the slotted item template. -->
+<!-- Must be placed somewhere inside a collection-viewer component, typically inside the slotted item template. -->
 <collection-deleter model-id="{{Product.id}}" confirm-message="Are you sure you want to delete the {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
 ```
 
@@ -418,10 +418,10 @@ OR (with confirmation step)
 - `onclick` (required): The logic to execute to delete the item. Should be either `deleteItem()` or `confirmDeleteItem()`.
 - `confirm-message`: The confirmation message to show the user when this component's `confirmDeleteItem()` function is invoked.
 
-If `confirmDeleteItem()` is used, then the parent `collection-browser` must have a `confirm-modal` element slotted into it as shown here:
+If `confirmDeleteItem()` is used, then the parent `collection-viewer` must have a `confirm-modal` element slotted into it as shown here:
 
 ```html
-<collection-browser
+<collection-viewer
   collection-type="Product"
   collection-fields="name,qty"
   collection-view="alphabeticalView"
@@ -439,12 +439,12 @@ If `confirmDeleteItem()` is used, then the parent `collection-browser` must have
 
   <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
   <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
-</collection-browser>
+</collection-viewer>
 ```
 
 ### collection-reducer
 
-Similar to the `collection-browser` component but designed to render collections in combined format. For example, to combine values from multiple records into a single item.
+Similar to the `collection-viewer` component but designed to render collections in combined format. For example, to combine values from multiple records into a single item.
 A common use case is to extract and join values to pass to other child components via their attributes.
 
 **Import**
@@ -489,7 +489,7 @@ A common use case is to extract and join values to pass to other child component
 </collection-reducer>
 ```
 
-Unlike with `collection-browser` or `model-viewer`, the template variable references not a single model instance but an array of model instances.
+Unlike with `collection-viewer` or `model-viewer`, the template variable references not a single model instance but an array of model instances.
 In the example above, the name of the first element can be accessed with `{{Category[0].name}}`.
 
 **Attributes**
@@ -499,9 +499,9 @@ In the example above, the name of the first element can be accessed with `{{Cate
 - `collection-view` (required): Determines the view of the collection. This should match one of the `Views` defined in your Saasufy service under that specific `Model`.
 - `collection-view-params` (required): Parameters for the view, specified as comma-separated key-value pairs (e.g., key1=value1,key2=value2). These parameters can customize the behavior of the collection view. The keys must match `paramFields` specified in your Saasufy service under the relevant `View`.
 - `collection-page-size`: Sets how many items from the collection are displayed at once. This is useful for pagination, allowing users to navigate through large sets of data in chunks.
-- `collection-page-offset`: Indicates the current page offset in the collection's data. It’s like telling the browser which page of data you want to display initially.
+- `collection-page-offset`: Indicates the current page offset in the collection's data. It’s like telling the viewer which page of data you want to display initially.
 - `collection-get-count`: If this attribute is present, the component will get the record count of the target view. The count can be rendered into the template by prefixing the model name with a dollar sign and accessing the `count` property like this: `{{$MyModelName.count}}`.
-- `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `collection-browser` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `SubChat`, then `{{Chat.message}}` would become `{{SubChat.message}}`.
+- `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `collection-viewer` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `SubChat`, then `{{Chat.message}}` would become `{{SubChat.message}}`.
 - `hide-error-logs`: A flag which, when present, suppresses error logs from being printed to the console.
 
 ### model-input
@@ -586,7 +586,7 @@ Used to displaying a field of a model instance in real time.
 
 ### model-viewer
 
-Used for rendering a single model resource using a template. This is the single-model alternative to the `collection-browser` which works with collections of models.
+Used for rendering a single model resource using a template. This is the single-model alternative to the `collection-viewer` which works with collections of models.
 
 **Import**
 
@@ -619,14 +619,14 @@ Used for rendering a single model resource using a template. This is the single-
 - `model-type` (required): Specifies the type of model to bind to. This should match a `Model` available in your Saasufy service.
 - `model-id` (required): The id of the model instance/record to bind to.
 - `model-fields` (required): A comma-separated list of fields to bind to. Note that unlike with `model-input` and `model-text`, the attribute name is plural and can bind to multiple fields.
-- `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `model-browser` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `MyProduct`, then `{{Product.name}}` would become `{{MyProduct.name}}`.
+- `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `model-viewer` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `MyProduct`, then `{{Product.name}}` would become `{{MyProduct.name}}`.
 - `fields-slice-to`: Optional attribute which can be used to trim strings down to a maximum number of characters when reading. The format is `fieldName1=number1,fieldName2=number2`. This is useful when dealing with potentially very long field values. Note that it may affect caching if the same field is being referenced in multiple parts of the application at the same time within the same `socket-provider`.
 - `hide-error-logs`: A flag which, when present, suppresses error logs from being printed to the console.
 
 ### input-provider
 
 An input component which can pass data to other components (or HTML elements) via custom attributes.
-A common use case for it is to pass user input to `collection-browser` or `model-viewer` components to then fetch data from Saasufy.
+A common use case for it is to pass user input to `collection-viewer` or `model-viewer` components to then fetch data from Saasufy.
 This component can be configured to provide its data to multiple components (consumers) via custom attributes.
 
 **Import**
@@ -667,7 +667,7 @@ This component can be configured to provide its data to multiple components (con
 ### input-combiner
 
 A component which can be used to combine data from multiple `input-provider` components and pass the combined data to other components (or HTML elements) via custom attributes.
-A common use case for it is to pass user input to `collection-browser` or `model-viewer` components to then fetch data from Saasufy.
+A common use case for it is to pass user input to `collection-viewer` or `model-viewer` components to then fetch data from Saasufy.
 This component can be configured to provide its data to multiple components (consumers) via custom attributes.
 
 **Import**
@@ -679,7 +679,7 @@ This component can be configured to provide its data to multiple components (con
 **Example usage**
 
 The following example shows how to bind multiple `input-provider` components to an `input-combiner`.
-In this example, the `input-combiner` component forwards the combined, formatted values to the `collection-view-params` attribute of a `company-browser` component.
+In this example, the `input-combiner` component forwards the combined, formatted values to the `collection-view-params` attribute of a `company-viewer` component.
 
 Note that the `value` inside the `provider-template` attribute of the `input-combiner` is an object with keys that represent the `name` attribute of the different source `input-provider` components.
 The `combineFilters` function produces a combined query string (joined with `%AND%`) by iterating over the `value` object which holds different parts of the query as provided by different `input-provider` components.
@@ -707,7 +707,7 @@ The `combineFilters` function produces a combined query string (joined with `%AN
 
 <input-combiner
   class="search-combiner"
-  consumers=".company-browser:collection-view-params"
+  consumers=".company-viewer:collection-view-params"
   provider-template="query='{{combineFilters(value)}}'"
 ></input-combiner>
 ```
@@ -918,7 +918,7 @@ The `render-group` will only render its content once all the components specifie
 ### if-group
 
 A component which exposes a `show-content` property which can be set to true or false to show or hide its content.
-It's intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. This component requires a template and a viewport to be slotted in. The content of the template will not be processed unless the `show-content` condition is met.
+It's intended to be placed inside a `model-viewer`, `collection-viewer` or `collection-reducer` component such that the true/false value of the `show-content` attribute can be computed using a template `{{expression}}` placeholder. This component requires a template and a viewport to be slotted in. The content of the template will not be processed unless the `show-content` condition is met.
 
 **Import**
 
@@ -942,7 +942,7 @@ It's intended to be placed inside a `model-viewer`, `collection-browser` or `col
 ### switch-group
 
 A component which exposes a `show-cases` property which can be set to key-value pairs in the format `key1=true,key2=false`. It can be used to conditionally display multiple slotted elements based on multiple conditions. It helps to keep HTML clean when the conditions are complex.
-This element is intended to be placed inside a `model-viewer`, `collection-browser` or `collection-reducer` component such that the true/false values of the `show-cases` attribute can be computed using template `{{expression}}` placeholders. This component requires one or more templates and a viewport to be slotted in. The content of the templates will not be processed unless the `show-cases` condition is met. All templates must have a `slot="content"` attribute and a name attribute in the format `name="key1"` where the value `key1` corresponds to the key specified inside the `show-cases` attribute of the `switch-group`.
+This element is intended to be placed inside a `model-viewer`, `collection-viewer` or `collection-reducer` component such that the true/false values of the `show-cases` attribute can be computed using template `{{expression}}` placeholders. This component requires one or more templates and a viewport to be slotted in. The content of the templates will not be processed unless the `show-cases` condition is met. All templates must have a `slot="content"` attribute and a name attribute in the format `name="key1"` where the value `key1` corresponds to the key specified inside the `show-cases` attribute of the `switch-group`.
 
 **Import**
 
@@ -1008,7 +1008,7 @@ A component which can be used to group together multiple `collection-adder` comp
 
 ### confirm-modal
 
-A modal component to prompt the user for confirmation before performing sensitive operations. Can be slotted into a `collection-browser` component.
+A modal component to prompt the user for confirmation before performing sensitive operations. Can be slotted into a `collection-viewer` component.
 
 **Import**
 
@@ -1019,7 +1019,7 @@ A modal component to prompt the user for confirmation before performing sensitiv
 **Example usage**
 
 ```html
-<collection-browser
+<collection-viewer
   collection-type="Product"
   collection-fields="name,qty"
   collection-view="alphabeticalView"
@@ -1037,7 +1037,7 @@ A modal component to prompt the user for confirmation before performing sensitiv
 
   <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
   <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
-</collection-browser>
+</collection-viewer>
 ```
 
 **Attributes**

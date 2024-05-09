@@ -167,14 +167,14 @@ collection-adder .collection-adder-form-content > label {
   align-self: flex-start;
 }
 
-collection-browser {
+collection-viewer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
 }
 
-collection-browser > [slot=viewport] {
+collection-viewer > [slot=viewport] {
   display: flex;
   flex-direction: column;
 }
@@ -183,20 +183,20 @@ collection-browser > [slot=viewport] {
   cursor: pointer;
 }
 
-collection-browser > [slot=previous-page] {
+collection-viewer > [slot=previous-page] {
   cursor: pointer;
   flex-shrink: 1;
   width: auto;
 }
 
-collection-browser > [slot=page-number] {
+collection-viewer > [slot=page-number] {
   display: flex;
   justify-content: center;
   align-items: center;
   min-width: 30px;
 }
 
-collection-browser > [slot=next-page] {
+collection-viewer > [slot=next-page] {
   cursor: pointer;
   flex-shrink: 1;
   width: auto;
