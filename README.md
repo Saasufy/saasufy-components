@@ -428,7 +428,7 @@ If `confirmDeleteItem()` is used, then the parent `collection-viewer` must have 
 >
   <template slot="item">
     <div>
-      <div class="chat-message">{{Product.name}}</div>
+      <div>{{Product.name}}</div>
       <collection-deleter model-id="{{Product.id}}" confirm-message="Are you sure you want to delete the {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
     </div>
   </template>
@@ -1026,12 +1026,12 @@ A modal component to prompt the user for confirmation before performing sensitiv
 >
   <template slot="item">
     <div>
-      <div class="chat-message">{{Product.name}}</div>
+      <div>{{Product.name}}</div>
       <collection-deleter model-id="{{Product.id}}" confirm-message="Are you sure you want to delete the {{Product.name}} product?" onclick="confirmDeleteItem()">&#x2715;</collection-deleter>
     </div>
   </template>
 
-  <div slot="viewport" class="chat-viewport"></div>
+  <div slot="viewport"></div>
 
   <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
   <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
