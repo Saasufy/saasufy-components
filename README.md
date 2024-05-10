@@ -280,11 +280,9 @@ Can also perform basic CRUD operations such as deleting or creating records by l
 >
   <template slot="item">
     <div>
-      <div class="chat-username">
-        <b>{{Chat.username}}</b>
-      </div>
-      <div class="chat-message">{{Chat.message}}</div>
-      <div class="chat-created-at">{{date(Chat.createdAt)}}</div>
+      <div>{{Chat.username}}</div>
+      <div>{{Chat.message}}</div>
+      <div>{{date(Chat.createdAt)}}</div>
     </div>
   </template>
 
