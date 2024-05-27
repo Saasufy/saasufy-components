@@ -289,6 +289,16 @@ class CollectionAdder extends SocketConsumer {
             field
           }"${extraAttributesString} />`
         );
+      } else if (inputType === 'number') {
+        items.push(
+          `<input class="collection-adder-input" type="${
+            inputType
+          }" name="${
+            field
+          }" placeholder="${
+            inputLabel
+          }" step="any"${extraAttributesString} />`
+        );
       } else {
         items.push(
           `<input class="collection-adder-input" type="${
