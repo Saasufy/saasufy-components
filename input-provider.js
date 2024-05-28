@@ -118,13 +118,6 @@ class InputProvider extends HTMLElement {
     let inputProps = this.getAttribute('input-props');
     let name = this.getAttribute('name');
 
-    if (name) {
-      inputProps = {
-        name,
-        ...inputProps
-      };
-    }
-
     let elementType;
     if (type === 'select') {
       elementType = 'select';
@@ -167,6 +160,9 @@ class InputProvider extends HTMLElement {
     }
     if (placeholder) {
       this.inputElement.setAttribute('placeholder', placeholder);
+    }
+    if (name) {
+      this.inputElement.setAttribute('name', name);
     }
     if (inputProps) {
       let {
