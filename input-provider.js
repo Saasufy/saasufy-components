@@ -116,6 +116,14 @@ class InputProvider extends HTMLElement {
     let height = this.getAttribute('height');
     let value = this.getAttribute('value') || '';
     let inputProps = this.getAttribute('input-props');
+    let name = this.getAttribute('name');
+
+    if (name) {
+      inputProps = {
+        name,
+        ...inputProps
+      };
+    }
 
     let elementType;
     if (type === 'select') {

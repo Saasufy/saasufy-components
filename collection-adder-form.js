@@ -155,7 +155,7 @@ class CollectionAdderForm extends SocketConsumer {
       if (element.nodeName === 'INPUT') {
         if (element.type === 'checkbox' || element.type === 'radio') {
           element.checked = false;
-        } else {
+        } else if (element.type !== 'hidden' || this.hasAttribute('auto-reset-hidden-inputs')) {
           element.value = '';
         }
       } else if (element.nodeName === 'TEXTAREA') {

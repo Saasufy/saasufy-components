@@ -286,6 +286,10 @@ Can also perform basic CRUD operations such as deleting or creating records by l
     </div>
   </template>
 
+  <template slot="no-item">
+    <div>There are no messages.</div>
+  </template>
+
   <template slot="loader">
     <div class="loading-spinner-container">
       <div class="spinning">&#8635;</div>
@@ -295,6 +299,13 @@ Can also perform basic CRUD operations such as deleting or creating records by l
   <div slot="viewport" class="chat-viewport"></div>
 </collection-viewer>
 ```
+
+In addition to the slots shown above, the `collection-viewer` also supports the following optional slots:
+- `previous-page`: This is typically an `input` element of type `button` for pagination.
+- `next-page`: This is typically an `input` element of type `button` for pagination.
+- `page-number`: This is typically a `div` element to display the current page number. Alternatively, it can be an `input-provider` element to allow the user to manually type in the page number.
+- `first-item`: This should be a `template` element. It can be used to inject an element just above the first record. This can be useful to render the `collection-viewer` as a table with a heading above table rows.
+- `last-item`: This should be a `template` element. It can be used to inject an element just after the last record.
 
 **Attributes**
 
@@ -380,6 +391,7 @@ This component is similar to the `collection-adder` component except that it req
 - `model-values`: An optional list of key-value pairs in the format `field1=value1,field2=value2` to add to the newly created resource alongside the values collected from the user via the form. For non-string values, the type should be provided in the format `fieldName:type=value`; supported types are `string`, `number` and `boolean`. Unlike `collection-fields` which are rendered as input elements in the form, `model-values` are not shown to the user.
 - `success-message`: A message to show the user if the resource has been successfully added to the collection after submitting the form.
 - `trim-spaces`: If this attribute exists on the element, then leading and trailing spaces will be trimmed from each input element's value before submitting the form.
+- `auto-reset-hidden-inputs`: If this attribute exists, then `hidden` input elements which are inside the `collection-adder-form` will be cleared along with other input fields. By default, `hidden` input elements are not cleared when the form is reset.
 
 **Attributes of slotted input, select, textarea... elements**
 
