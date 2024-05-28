@@ -87,7 +87,8 @@ class InputProvider extends HTMLElement {
       }
       oldValue = this.inputElement.value;
       this.inputElement.value = newValue;
-      if (oldValue !== newValue) {
+      if (oldValue !== newValue || this.forceTriggerChange) {
+        delete this.forceTriggerChange;
         this.triggerChange();
       }
     }
@@ -167,6 +168,11 @@ class InputProvider extends HTMLElement {
       for (let attr of attrNames) {
         this.inputElement.setAttribute(attr, attrValues[attr]);
       }
+    }
+
+    if (type === 'select') {
+      this.forceTriggerChange = true;
+      value = this.inputElement.value;
     }
 
     this.updateInputClassList(value);
