@@ -24,6 +24,8 @@ class InputTransformer extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
+    let greedyRefresh = this.hasAttribute('greedy-refresh');
+    if (!greedyRefresh && oldValue === newValue) return;
     this.render();
   }
 

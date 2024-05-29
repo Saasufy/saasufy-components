@@ -132,6 +132,8 @@ class CollectionViewer extends SocketConsumer {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
+    let greedyRefresh = this.hasAttribute('greedy-refresh');
+    if (!greedyRefresh && oldValue === newValue) return;
     if (name === 'collection-page-offset') {
       if (this.collection) {
         let newOffset = Number(newValue);

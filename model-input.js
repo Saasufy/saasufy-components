@@ -54,6 +54,8 @@ class ModelInput extends SocketConsumer {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
+    let greedyRefresh = this.hasAttribute('greedy-refresh');
+    if (!greedyRefresh && oldValue === newValue) return;
     if (name === 'value') {
       this.value = newValue;
     } else {

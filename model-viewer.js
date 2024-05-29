@@ -42,6 +42,8 @@ class ModelViewer extends SocketConsumer {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
+    let greedyRefresh = this.hasAttribute('greedy-refresh');
+    if (!greedyRefresh && oldValue === newValue) return;
     this.render();
   }
 

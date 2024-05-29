@@ -48,6 +48,8 @@ export class SocketProvider extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.isReady) return;
+    let greedyRefresh = this.hasAttribute('greedy-refresh');
+    if (!greedyRefresh && oldValue === newValue) return;
     this.getSocket();
   }
 

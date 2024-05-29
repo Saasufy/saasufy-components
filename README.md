@@ -219,6 +219,7 @@ So for example, if your `index.html` file is served up from the URL `http://mywe
 - `debounce-delay`: The number of milliseconds to wait before changing the route. This can help to avoid multiple renders if the route changes rapidly (e.g. when doing hard redirects). Defaults to 100ms.
 - `target-page`: A convenience attribute which can be used to programmatically change the `location.hash` in the address bar.
 - `force-render-paths`: An optional list of comma-separated paths to force a page render/re-render, regardless of whether or not the page has changed.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 **Attributes of slotted page templates**
 
@@ -255,6 +256,7 @@ A Saasufy component which integrates with data from Saasufy is known as a `socke
 - `disable-tab-sync`: By default, the socket provider synchronizes socket auth state across multiple tabs via localStorage. If this attribute is set, then the socket auth state will not sync automatically and a manual page refresh may be necessary to update to the latest auth state.
 - `socket-options`: Can be used to set options on the inner `socket`. Must be in the format `option1:type1=value1,option2:type2=value2`; the type of each option can be string, boolean or number. If not specified, the default type is string.
 - `disconnect-on-deauth`: If this attribute is set, the underlying socket will be disconnected if the socket becomes unauthenticated. This means that components will not receive real-time updates until the user's next interaction (which will cause the socket to reconnect). If this attribute is not set, the socket will attempt to reconnect immediately after losing authentication.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 ### collection-viewer
 
@@ -321,6 +323,7 @@ In addition to the slots shown above, the `collection-viewer` also supports the 
 - `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `collection-viewer` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `SubChat`, then `{{Chat.message}}` would become `{{SubChat.message}}`.
 - `hide-error-logs`: A flag which, when present, suppresses error logs from being printed to the console.
 - `max-show-loader`: If this attribute is present, your slotted `loader` element will be shown as often as possible; this includes situations where the collection is merely refreshing itself. It is disabled by default.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 ### collection-adder
 
@@ -392,6 +395,7 @@ This component is similar to the `collection-adder` component except that it req
 - `success-message`: A message to show the user if the resource has been successfully added to the collection after submitting the form.
 - `trim-spaces`: If this attribute exists on the element, then leading and trailing spaces will be trimmed from each input element's value before submitting the form.
 - `auto-reset-hidden-inputs`: If this attribute exists, then `hidden` input elements which are inside the `collection-adder-form` will be cleared along with other input fields. By default, `hidden` input elements are not cleared when the form is reset.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 **Attributes of slotted input, select, textarea... elements**
 
@@ -513,6 +517,7 @@ In the example above, the name of the first element can be accessed with `{{Cate
 - `collection-get-count`: If this attribute is present, the component will get the record count of the target view. The count can be rendered into the template by prefixing the model name with a dollar sign and accessing the `count` property like this: `{{$MyModelName.count}}`.
 - `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `collection-viewer` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `SubChat`, then `{{Chat.message}}` would become `{{SubChat.message}}`.
 - `hide-error-logs`: A flag which, when present, suppresses error logs from being printed to the console.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 ### model-input
 
@@ -563,6 +568,7 @@ Used for displaying and editing a single field of a model instance in real time.
 - `input-id`: Can be used to set an `id` attribute on the inner `input` element.
 - `input-props`: Can be used to set additional attributes on the inner `input` element. Must be in the format `attr1=value1,attr2=value2`.
 - `ignore-invalid-selection`: Can be used with a `model-input` component of type `select` to prevent the `error` class from being added if the selected value is not among the available options.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 ### model-text
 
@@ -593,6 +599,7 @@ Used to displaying a field of a model instance in real time.
 - `slice-to`: Optional attribute which can be set to a number to trim strings down to a maximum number of characters when reading. This is useful when dealing with potentially very long field values. Note that it may affect caching if the same field is being referenced in multiple parts of the application at the same time within the same `socket-provider`.
 - `default-value`: A default value to show the user if the underlying model field's value is null or undefined.
 - `hide-error-logs`: By default, this component will log errors to the console. If set, this attribute will suppress such errors from showing up on the console.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 ### model-viewer
 
@@ -632,6 +639,7 @@ Used for rendering a single model resource using a template. This is the single-
 - `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `model-viewer` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `MyProduct`, then `{{Product.name}}` would become `{{MyProduct.name}}`.
 - `fields-slice-to`: Optional attribute which can be used to trim strings down to a maximum number of characters when reading. The format is `fieldName1=number1,fieldName2=number2`. This is useful when dealing with potentially very long field values. Note that it may affect caching if the same field is being referenced in multiple parts of the application at the same time within the same `socket-provider`.
 - `hide-error-logs`: A flag which, when present, suppresses error logs from being printed to the console.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 ### input-provider
 
@@ -804,6 +812,7 @@ The change in the location hash can then be detected by an `app-router` to switc
 - `secure` (required): Should be `true` or `false` depending on whether or not the node is exposed over HTTP/WS or HTTPS/WSS.
 - `auth-timeout`: The maximum number of milliseconds to wait for authentication to complete. Defaults to 10000 (10 seconds).
 - `success-location-hash`: If authentication is successful, the browser's `location.hash` will be set to this value. It can be used to redirect the user to their dashboard, for example.
+- `greedy-refresh`: If this attribute exists, the component will refresh itself whenever an attribute is set, even if that attribute's value did not change.
 
 ### log-out
 
