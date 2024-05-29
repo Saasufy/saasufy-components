@@ -1,6 +1,6 @@
 import { debouncer, updateConsumerElements } from './utils.js';
 
-const DEFAULT_DEBOUNCE_DELAY = 0;
+const DEFAULT_DEBOUNCE_DELAY = 500;
 
 class InputCombiner extends HTMLElement {
   constructor() {
