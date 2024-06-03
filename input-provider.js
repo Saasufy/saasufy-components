@@ -197,7 +197,7 @@ class InputProvider extends HTMLElement {
 
   updateConsumerElementsOnEdit() {
     let consumers = this.getAttribute('consumers');
-    if (!consumers) return;
+    if (!consumers) return () => {};
 
     let inputElement = this.inputElement;
 
