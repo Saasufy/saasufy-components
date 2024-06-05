@@ -213,6 +213,9 @@ This example shows how to redirect based on the user's authentication status:
 Note that the app router path is based on `location.hash` so the path section in your browser's address bar needs to start with the `#` character.
 So for example, if your `index.html` file is served up from the URL `http://mywebsite.com`, then, to activate the `/products` route as in the example above, you would need to type the URL `http://mywebsite.com#/products`.
 
+Also note that the app router will only render once its `viewport` has been added and slotted into it.
+If you want to make sure that some data (e.g. a config file) has been fully loaded before rendering the app, you could set the `slot="viewport"` attribute on your viewport element at a later time using JavaScript.
+
 **Attributes of app-router**
 
 - `default-page`: The path/route of the default page to send the user to in case no routes are matched. Commonly used to point to a `/page-not-found` page. For the home page, it's typically recommended to create a page template with `route-path=""` instead.
