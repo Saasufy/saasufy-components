@@ -152,6 +152,14 @@ class CollectionAdderForm extends SocketConsumer {
       };
     }
     let consumers = this.getAttribute('consumers');
+    let outcomeConsumers = this.getAttribute(outputValue.error ? 'error-consumers' : 'success-consumers');
+    if (consumers) {
+      if (outcomeConsumers) {
+        consumers = `${consumers},${outcomeConsumers}`;
+      }
+    } else if (outcomeConsumers) {
+      consumers = outcomeConsumers;
+    }
     let providerTemplate = this.getAttribute('provider-template');
     updateConsumerElements(consumers, outputValue, providerTemplate, this.getAttribute('name'));
   }
