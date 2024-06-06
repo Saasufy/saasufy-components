@@ -1,5 +1,6 @@
 import { SocketConsumer } from './socket.js';
 import {
+  updateConsumerElements,
   convertStringToFieldParams,
   getTypeCastFunction,
   formatError
@@ -66,6 +67,7 @@ class CollectionAdder extends SocketConsumer {
     }
 
     let trimSpaces = this.hasAttribute('trim-spaces');
+    let outputValue;
 
     try {
       let newModelData = {
@@ -108,16 +110,26 @@ class CollectionAdder extends SocketConsumer {
           )
         )
       };
-      await this.collection.create(newModelData);
-      messageContainer.classList.add('success');
-      messageContainer.classList.remove('error');
+      let resourceId = await this.collection.create(newModelData);
+      let insertedModelData = {
+        ...newModelData,
+        id: resourceId
+      };
       this.dispatchEvent(
         new CustomEvent('success', {
-          detail: newModelData
+          detail: insertedModelData
         })
       );
       let form = this.querySelector('.collection-adder-form');
       form.reset();
+
+      outputValue = {
+        resource: insertedModelData
+      };
+
+      messageContainer.classList.add('success');
+      messageContainer.classList.remove('error');
+
       if (successMessage) {
         messageContainer.textContent = successMessage;
       } else {
@@ -132,7 +144,13 @@ class CollectionAdder extends SocketConsumer {
           detail: error
         })
       );
+      outputValue = {
+        error
+      };
     }
+    let consumers = this.getAttribute('consumers');
+    let providerTemplate = this.getAttribute('provider-template');
+    updateConsumerElements(consumers, outputValue, providerTemplate, this.getAttribute('name'));
   }
 
   reset() {
