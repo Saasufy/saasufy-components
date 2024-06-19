@@ -374,14 +374,20 @@ export function generateRandomHexString(byteLength) {
 export const fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
 export const quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
 
+export function toBoolean(value) {
+  return !!value && value !== 'false' && value !== 'null' && value !== 'undefined';
+}
+
 export const typeCastFunctions = {
   text: String,
   textarea: String,
-  checkbox: Boolean,
-  number: Number,
+  checkbox: toBoolean,
   radio: String,
   select: String,
-  'text-select': String
+  'text-select': String,
+  number: Number,
+  string: String,
+  boolean: toBoolean
 };
 
 export function getTypeCastFunction(type) {
