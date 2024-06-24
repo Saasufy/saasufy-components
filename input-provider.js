@@ -178,7 +178,9 @@ class InputProvider extends HTMLElement {
 
     if (type === 'select') {
       this.forceTriggerChange = true;
-      value = this.inputElement.value;
+      if (!value) {
+        value = this.inputElement.value;
+      }
     }
 
     this.updateInputClassList(value);
