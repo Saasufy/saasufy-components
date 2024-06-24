@@ -70,6 +70,10 @@ class InputProvider extends HTMLElement {
 
   set value(newValue) {
     if (this.inputElement) {
+      let forceInitChange = this.forceTriggerChange;
+      if (forceInitChange) {
+        delete this.forceTriggerChange;
+      }
       if (newValue && this.hasAttribute('computable-value')) {
         newValue = renderTemplate(newValue);
       }
@@ -82,15 +86,14 @@ class InputProvider extends HTMLElement {
         } else {
           this.inputElement.checked = newValue;
         }
-        if (oldValue !== newValue) {
+        if (oldValue !== newValue || forceInitChange) {
           this.triggerChange();
         }
         return;
       }
       oldValue = this.inputElement.value;
       this.inputElement.value = newValue;
-      if (oldValue !== newValue || this.forceTriggerChange) {
-        delete this.forceTriggerChange;
+      if (oldValue !== newValue || forceInitChange) {
         this.triggerChange();
       }
     }
@@ -176,11 +179,8 @@ class InputProvider extends HTMLElement {
       }
     }
 
-    if (type === 'select') {
-      this.forceTriggerChange = true;
-      if (!value) {
-        value = this.inputElement.value;
-      }
+    if (type === 'select' && !value) {
+      value = this.inputElement.value;
     }
 
     this.updateInputClassList(value);
@@ -189,6 +189,9 @@ class InputProvider extends HTMLElement {
     let destroyHandlers = this.updateConsumerElementsOnEdit();
 
     if (value) {
+      if (this.hasAttribute('force-init-change')) {
+        this.forceTriggerChange = true;
+      }
       this.value = value;
     }
 
