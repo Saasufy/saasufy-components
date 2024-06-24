@@ -134,13 +134,18 @@ class InputProvider extends HTMLElement {
     this.inputElement = document.createElement(elementType);
     if (type === 'select') {
       if (options) {
-        let optionElements = options
-        .split(',')
-        .map((option) => {
-          if (option === placeholder) {
-            return `<option value="" selected class="select-default-option">${option}</option>`;
+        let {
+          fieldNames: optionNames,
+          fieldValues: optionValues
+        } = convertStringToFieldParams(options);
+
+        let optionElements = optionNames
+        .map((optionName) => {
+          let optionValue = optionValues[optionName] || optionName;
+          if (optionName === placeholder) {
+            return `<option value="" selected class="select-default-option">${optionName}</option>`;
           }
-          return `<option value="${option}">${option}</option>`;
+          return `<option value="${optionValue}">${optionName}</option>`;
         })
         .join('');
         this.inputElement.innerHTML = optionElements;
