@@ -194,7 +194,7 @@ class InputProvider extends HTMLElement {
     let destroyHandlers = this.updateConsumerElementsOnEdit();
 
     if (value) {
-      if (this.hasAttribute('force-init-change')) {
+      if (type === 'select' && !this.hasAttribute('skip-init-change')) {
         this.forceTriggerChange = true;
       }
       this.value = value;

@@ -692,7 +692,7 @@ This component can be configured to provide its data to multiple components (con
 - `autocapitalize`: Can be `on` or `off` - It will set the auto-capitalize attribute on the inner input element. This is useful for mobile devices to enable or disable auto-capitalization of the first character which is typed into the input element.
 - `autocorrect`: Can be `on` or `off` - It will set the auto-correct attribute on the inner input element. This is useful for mobile devices to enable or disable auto-correct.
 - `input-props`: Can be used to set additional attributes on the inner `input` element. Must be in the format `attr1=value1,attr2=value2`.
-- `force-init-change`: This attribute can be used to ensure that an `input-provider` of type `select` will trigger a change when initialized with a default (non-empty option). By default, the `input-provider` does not trigger a change when initialized with a default value.
+- `skip-init-change`: This attribute can be used to prevent an `input-provider` of type `select` from triggering a change when initialized with a default option. By default, the `input-provider` will trigger a change when initialized with a default value.
 
 ### input-combiner
 
