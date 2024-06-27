@@ -201,6 +201,7 @@ class CollectionViewer extends SocketConsumer {
 
   renderList() {
     let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
+    if (!viewportSlot) return;
 
     let viewportNode = viewportSlot.assignedNodes()[0];
     if (!viewportNode) return;
@@ -271,12 +272,20 @@ class CollectionViewer extends SocketConsumer {
   }
 
   render() {
+    if (
+      !this.hasAttribute('collection-type') ||
+      !this.hasAttribute('collection-fields') ||
+      !this.hasAttribute('collection-view') ||
+      !this.getAttribute('collection-view-params')
+    ) {
+      return;
+    };
     let collectionType = this.getAttribute('collection-type');
     let collectionFields = this.getAttribute('collection-fields') || '';
     let collectionView = this.getAttribute('collection-view') || 'defaultView';
-    let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionViewParams = this.getAttribute('collection-view-params') || '';
     let collectionViewPrimaryFields = this.getAttribute('collection-view-primary-fields');
+    let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionPageOffset = this.getAttribute('collection-page-offset');
     let collectionGetCount = this.hasAttribute('collection-get-count');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');

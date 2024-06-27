@@ -105,6 +105,13 @@ class ModelInput extends SocketConsumer {
   }
 
   render() {
+    if (
+      !this.hasAttribute('model-type') ||
+      !this.hasAttribute('model-id') ||
+      !this.hasAttribute('model-field')
+    ) {
+      return;
+    };
     this.innerHTML = '';
     let socketInstanceProperty = this.getAttribute('socket-instance-property');
     let showErrorMessage = this.hasAttribute('show-error-message');

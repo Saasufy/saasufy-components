@@ -54,6 +54,7 @@ class ModelViewer extends SocketConsumer {
 
   renderItem() {
     let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
+    if (!viewportSlot) return;
 
     let viewportNode = viewportSlot.assignedNodes()[0];
     if (!viewportNode) return;
@@ -89,6 +90,13 @@ class ModelViewer extends SocketConsumer {
   }
 
   render() {
+    if (
+      !this.hasAttribute('model-type') ||
+      !this.hasAttribute('model-id') ||
+      !this.hasAttribute('model-fields')
+    ) {
+      return;
+    };
     let socketInstanceProperty = this.getAttribute('socket-instance-property');
     let modelType = this.getAttribute('model-type');
     let modelId = this.getAttribute('model-id');
