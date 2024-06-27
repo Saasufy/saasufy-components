@@ -141,6 +141,7 @@ class CollectionViewer extends SocketConsumer {
           this.isStale = true;
           this.collection.fetchPage(newOffset);
         }
+        this.renderList();
         this.updatePageNumberElements();
         this.updatePageButtons();
       }
