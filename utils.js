@@ -232,7 +232,7 @@ let templateFormatters = {
     return list.map(item => item[field]).join(sep);
   },
   combineFilters: (filterMap, useOr) => {
-    return Object.values(filterMap || {}).join(useOr ? ' %OR% ' : ' %AND% ');
+    return Object.values(filterMap || {}).join(useOr ? ' ~OR~ ' : ' ~AND~ ');
   },
   computeId,
   safeString: toSafeHTML
@@ -373,7 +373,7 @@ export function generateRandomHexString(byteLength) {
   }).join('');
 }
 
-export const fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
+export const fieldPartsRegExp = /((^|(?<=,))((?=,)|$)|"[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g
 export const quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
 
 export function toBoolean(value) {
