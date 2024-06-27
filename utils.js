@@ -205,6 +205,16 @@ export function computeId(...parts) {
   return `${idHex.slice(0, 8)}-${idHex.slice(8, 12)}-${third}-${fourth}-${idHex.slice(20, 32)}`;
 }
 
+export function toDate(timestamp) {
+  let date = new Date(timestamp);
+  let year = date.getFullYear();
+  let month = date.toLocaleString('default', { month: 'long' });
+  let day = date.getDate();
+  let hour = date.getHours();
+  let minutes = date.getMinutes();
+  return `${month} ${day}, ${year} at ${hour}:${minutes.toString().padStart(2, '0')}`;
+}
+
 let templateFormatters = {
   url: (value) => String(value).toLowerCase().replace(/ /g, '-'),
   lowerCase: (value) => String(value).toLowerCase(),
@@ -217,15 +227,7 @@ let templateFormatters = {
   fallback: (...args) => {
     return args.filter(arg => arg)[0];
   },
-  date: (timestamp) => {
-    let date = new Date(timestamp);
-    let year = date.getFullYear();
-    let month = date.toLocaleString('default', { month: 'long' });
-    let day = date.getDate();
-    let hour = date.getHours();
-    let minutes = date.getMinutes();
-    return `${month} ${day}, ${year} at ${hour}:${minutes.toString().padStart(2, '0')}`;
-  },
+  date: (timestamp) => toDate(timestamp),
   joinFields: (list, field, sep) => {
     return list.map(item => item[field]).join(sep);
   },
