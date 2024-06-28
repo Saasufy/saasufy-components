@@ -181,7 +181,7 @@ class CollectionReducer extends SocketConsumer {
       !this.hasAttribute('collection-type') ||
       !this.hasAttribute('collection-fields') ||
       !this.hasAttribute('collection-view') ||
-      !this.getAttribute('collection-view-params')
+      !this.hasAttribute('collection-view-params')
     ) {
       return;
     };
