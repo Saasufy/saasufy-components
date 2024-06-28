@@ -373,7 +373,9 @@ export function generateRandomHexString(byteLength) {
   }).join('');
 }
 
-export const fieldPartsRegExp = /((^|(?<=,))((?=,)|$)|"[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g
+export const fieldPartsRegExp = /("[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g;
+export const fieldPartsRegExpWithEmpty = /((^|(?<=,))((?=,)|$)|"[^"]*"|'[^']*'|\([^)]*\)|[^,()"']+)+/g
+
 export const quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
 
 export function toBoolean(value) {
@@ -396,8 +398,9 @@ export function getTypeCastFunction(type) {
   return typeCastFunctions[type] || ((value) => value);
 }
 
-export function convertStringToFieldParams(string) {
-  let parts = ((string || '').match(fieldPartsRegExp) || []).map(field => field.trim());
+export function convertStringToFieldParams(string, allowEmpty) {
+  let partsRegExp = allowEmpty ? fieldPartsRegExpWithEmpty : fieldPartsRegExp;
+  let parts = ((string || '').match(partsRegExp) || []).map(field => field.trim());
   let fieldTypeValues = parts.map((part) => {
     let subParts = part.split('=');
     let nameType = (subParts[0] || '').split(':');

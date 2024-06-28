@@ -137,7 +137,7 @@ class InputProvider extends HTMLElement {
         let {
           fieldNames: optionNames,
           fieldValues: optionValues
-        } = convertStringToFieldParams(options);
+        } = convertStringToFieldParams(options, true);
 
         let optionElements = optionNames
         .map((optionName) => {
