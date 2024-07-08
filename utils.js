@@ -188,7 +188,6 @@ export { uuid };
 export function computeId(...parts) {
   let encoder = new TextEncoder();
   let data = encoder.encode(parts.join('-'));
-  let start = Date.now();
   let hashBuffer = sha256(data);
   let hashArray = Array.from(new Uint8Array(hashBuffer));
   let hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
