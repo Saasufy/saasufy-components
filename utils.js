@@ -8,11 +8,12 @@ const DEFAULT_RELOAD_DELAY = 0;
 
 export function toSafeHTML(text) {
   if (typeof text === 'string') {
-    return text.replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
+    return text.replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;')
+      .replace(/\{/g, '&#123;')
+      .replace(/\}/g, '&#125;')
       .replace(/\n/g, '<br />');
   } else if (text != null && typeof text.toString !== 'function') {
     return '[invalid]';
@@ -266,34 +267,72 @@ function getRenderOptions(data, socket) {
   };
 }
 
+function* selectExpressions(string) {
+  let charList = string.split('');
+  let isCapturing = false;
+  let isTripleBracket = false;
+  let captureList = [];
+  for (let i = 1; i < charList.length; i++) {
+    if (charList[i - 1] === '{' && charList[i] === '{') {
+      captureList = [];
+      captureList.push('{');
+      isCapturing = true;
+      isTripleBracket = charList[i - 2] === '{';
+      if (isTripleBracket) {
+        captureList.push('{');
+      }
+    }
+    if (isCapturing) {
+      captureList.push(charList[i]);
+    } else if (captureList.length) {
+      captureList.push('}');
+      captureList.push('}');
+      if (isTripleBracket) {
+        captureList.push('}');
+      }
+      yield captureList.join('');
+      captureList = [];
+    }
+    if (
+      charList[i + 1] === '}' && charList[i + 2] === '}' &&
+      (!isTripleBracket || charList[i + 3] === '}')
+    ) {
+      isCapturing = false;
+    }
+  }
+}
+
 export function renderTemplate(templateString, data, socket) {
-  return templateString
-    .replace(templateTripleTagsRegExp, (match) => {
-      let expString = match.slice(3, -3);
-      let options = getRenderOptions(data, socket);
+  let expressionIterator = selectExpressions(templateString);
+  let options = getRenderOptions(data, socket);
+  for (let expression of expressionIterator) {
+    let computedValue;
+    if (expression.match(templateTripleTagsRegExp)) {
+      let expString = expression.slice(3, -3);
       try {
-        return execExpression(
+        computedValue = execExpression(
           toExpression(expString),
           options
         );
       } catch (error) {
-        return match;
+        computedValue = expression;
       }
-    })
-    .replace(templateTagsRegExp, (match) => {
-      let expString = match.slice(2, -2);
-      let options = getRenderOptions(data, socket);
+    } else {
+      let expString = expression.slice(2, -2);
       try {
-        return toSafeHTML(
+        computedValue = toSafeHTML(
           execExpression(
             toExpression(expString),
             options
           )
         );
       } catch (error) {
-        return match;
+        computedValue = expression;
       }
-    });
+    }
+    templateString = templateString.replace(expression, computedValue);
+  }
+  return templateString;
 }
 
 export function updateConsumerElements(consumers, value, template, sourceElementName, outputType) {
@@ -344,7 +383,10 @@ export function updateConsumerElements(consumers, value, template, sourceElement
             }
           } else if (element.nodeName === 'MODEL-INPUT') {
             element.value = value;
-          } else if (element.nodeName === 'INPUT-TRANSFORMER') {
+          } else if (
+            element.nodeName === 'INPUT-TRANSFORMER' ||
+            element.nodeName === 'INPUT-PROVIDER'
+          ) {
             element.setAttribute('value', value);
           } else if (element.nodeName === 'INPUT-COMBINER') {
             element.setAttribute(
