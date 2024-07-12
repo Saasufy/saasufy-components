@@ -8,14 +8,14 @@ const DEFAULT_RELOAD_DELAY = 0;
 
 export function toSafeHTML(text) {
   if (typeof text === 'string') {
-    return text.replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
+    return text.replace(/&(?!(amp|lt|gt|quot|#039|#123|#125);)/g, '&amp;')
+      .replace(/<(?!br ?\/?>)/g, '&lt;')
+      .replace(/(?<!br ?\/?)>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;')
       .replace(/\{/g, '&#123;')
       .replace(/\}/g, '&#125;')
-      .replace(/\n/g, '<br />');
+      .replace(/\n/g, '<br>');
   } else if (text != null && typeof text.toString !== 'function') {
     return '[invalid]';
   }
