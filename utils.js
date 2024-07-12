@@ -8,7 +8,8 @@ const DEFAULT_RELOAD_DELAY = 0;
 
 export function toSafeHTML(text) {
   if (typeof text === 'string') {
-    return text.replace(/</g, '&lt;')
+    return text.replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;')
