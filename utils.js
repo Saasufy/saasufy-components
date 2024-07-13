@@ -273,14 +273,17 @@ function* selectExpressions(string) {
   let isCapturing = false;
   let isTripleBracket = false;
   let captureList = [];
+  let captureStartIndex = 0;
   for (let i = 1; i < charList.length; i++) {
     if (charList[i - 1] === '{' && charList[i] === '{') {
       captureList = [];
       captureList.push('{');
       isCapturing = true;
+      captureStartIndex = i - 1;
       isTripleBracket = charList[i - 2] === '{';
       if (isTripleBracket) {
         captureList.push('{');
+        captureStartIndex--;
       }
     }
     if (isCapturing) {
@@ -288,10 +291,16 @@ function* selectExpressions(string) {
     } else if (captureList.length) {
       captureList.push('}');
       captureList.push('}');
+      let closeBrackets = 2;
       if (isTripleBracket) {
         captureList.push('}');
+        closeBrackets++;
       }
-      yield captureList.join('');
+      yield {
+        startIndex: captureStartIndex,
+        length: (i + closeBrackets) - captureStartIndex,
+        value: captureList.join('')
+      };
       captureList = [];
     }
     if (
@@ -303,37 +312,44 @@ function* selectExpressions(string) {
   }
 }
 
+function replaceExpressions(string, replaceFn) {
+  let charList = string.split('');
+  let matches = [ ...selectExpressions(string) ];
+  let charSubs = matches.map(item => String(replaceFn(item.value) ?? '').split(''));
+  for (let i = matches.length - 1; i >= 0; i--) {
+    let match = matches[i];
+    charList.splice(match.startIndex, match.length, ...charSubs[i]);
+  }
+  return charList.join('');
+}
+
 export function renderTemplate(templateString, data, socket) {
-  let expressionIterator = selectExpressions(templateString);
   let options = getRenderOptions(data, socket);
-  for (let expression of expressionIterator) {
-    let computedValue;
-    if (expression.match(templateTripleTagsRegExp)) {
-      let expString = expression.slice(3, -3);
+  return replaceExpressions(templateString, (expression) => {
+    let expString;
+    if (expression.startsWith('{{{') && expression.endsWith('}}}')) {
+      expString = expression.slice(3, -3);
       try {
-        computedValue = execExpression(
+        return execExpression(
           toExpression(expString),
           options
         );
       } catch (error) {
-        computedValue = expression;
-      }
-    } else {
-      let expString = expression.slice(2, -2);
-      try {
-        computedValue = toSafeHTML(
-          execExpression(
-            toExpression(expString),
-            options
-          )
-        );
-      } catch (error) {
-        computedValue = expression;
+        return expression;
       }
     }
-    templateString = templateString.replace(expression, computedValue);
-  }
-  return templateString;
+    expString = expression.slice(2, -2);
+    try {
+      return toSafeHTML(
+        execExpression(
+          toExpression(expString),
+          options
+        )
+      );
+    } catch (error) {
+      return expression;
+    }
+  });
 }
 
 export function updateConsumerElements(consumers, value, template, sourceElementName, outputType) {
