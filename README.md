@@ -321,7 +321,8 @@ In addition to the slots shown above, the `collection-viewer` also supports the 
 - `collection-page-size`: Sets how many items from the collection are displayed at once. This is useful for pagination, allowing users to navigate through large sets of data in chunks.
 - `collection-page-offset`: Indicates the current page offset in the collection's data. It’s like telling the viewer which page of data you want to display initially.
 - `collection-get-count`: If this attribute is present, the component will get the record count of the target view. The count can be rendered into the template by prefixing the model name with a dollar sign and accessing the `count` property like this: `{{$MyModelName.count}}`.
-- `collection-view-primary-fields`: An optional list of field names to specify which specific `collection-view-params` to watch for real time updates. Fewer primary fields means that the view will be exposed to a broader range of real time updates but at the cost of performance. It is generally recommended to have just one primary field.
+- `collection-view-primary-fields`: An optional list of field names to specify which specific `collection-view-params` to watch for realtime updates. Fewer primary fields means that the view will be exposed to a broader range of realtime updates but at the cost of performance. It is generally recommended to have just one primary field.
+- `collection-disable-realtime`: If this attribute is present, the underlying collection will not listen for changes nor update in realtime. Fields of records that are in view may still update in realtime.
 - `auto-reset-page-offset`: If this attribute is present, the `collection-page-offset` will be reset to zero whenever the view params change.
 - `type-alias`: Allows you to provide an alternative name for your `Model` to use when injecting values inside the template. This is useful for situations where you may have multiple `collection-viewer` elements and/or `model-viewer` elements of the same type nested inside each other and want to avoid `Model` name clashes in the nested template definitions. For example, if the `type-alias` in the snippet above was set to `SubChat`, then `{{Chat.message}}` would become `{{SubChat.message}}`.
 - `hide-error-logs`: A flag which, when present, suppresses error logs from being printed to the console.
@@ -532,7 +533,7 @@ In the example above, the name of the first element can be accessed with `{{Cate
 
 ### model-input
 
-Used for displaying and editing a single field of a model instance in real time.
+Used for displaying and editing a single field of a model instance in realtime.
 
 **Import**
 
@@ -583,7 +584,7 @@ Used for displaying and editing a single field of a model instance in real time.
 
 ### model-text
 
-Used to displaying a field of a model instance in real time.
+Used to displaying a field of a model instance in realtime.
 
 **Import**
 

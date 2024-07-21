@@ -18,10 +18,10 @@ class CollectionViewer extends SocketConsumer {
       modal.show(event.detail.message, event.detail.callback);
     };
 
-    this.handleCRUDCreateEvent = (event) => {
+    this.handleCRUDCreateEvent = async (event) => {
       event.stopPropagation();
       if (this.collection) {
-        this.collection.create(event.detail);
+        await this.collection.create(event.detail);
         this.dispatchEvent(
           new CustomEvent('collectionCreate', {
             detail: {
@@ -31,13 +31,16 @@ class CollectionViewer extends SocketConsumer {
             bubbles: true
           })
         );
+        if (this.hasAttribute('collection-disable-realtime') && this.collection) {
+          this.collection.reloadCurrentPage();
+        }
       }
     };
 
-    this.handleCRUDDeleteEvent = (event) => {
+    this.handleCRUDDeleteEvent = async (event) => {
       event.stopPropagation();
       if (this.collection) {
-        this.collection.delete(event.detail);
+        await this.collection.delete(event.detail);
         this.dispatchEvent(
           new CustomEvent('collectionDelete', {
             detail: {
@@ -47,6 +50,9 @@ class CollectionViewer extends SocketConsumer {
             bubbles: true
           })
         );
+        if (this.hasAttribute('collection-disable-realtime') && this.collection) {
+          this.collection.reloadCurrentPage();
+        }
       }
     };
 
@@ -123,6 +129,7 @@ class CollectionViewer extends SocketConsumer {
       'collection-page-size',
       'collection-page-offset',
       'collection-get-count',
+      'collection-disable-realtime',
       'auto-reset-page-offset',
       'max-show-loader',
       'type-alias',
@@ -289,6 +296,7 @@ class CollectionViewer extends SocketConsumer {
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionPageOffset = this.getAttribute('collection-page-offset');
     let collectionGetCount = this.hasAttribute('collection-get-count');
+    let collectionDisableRealtime = this.hasAttribute('collection-disable-realtime');
     let hideErrorLogs = this.hasAttribute('hide-error-logs');
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
@@ -312,7 +320,8 @@ class CollectionViewer extends SocketConsumer {
       pageSize: Number(collectionPageSize || 10),
       pageOffset: Number(collectionPageOffset || 0),
       changeReloadDelay: collectionReloadDelay,
-      getCount: collectionGetCount
+      getCount: collectionGetCount,
+      realtimeCollection: !collectionDisableRealtime
     });
 
     this.shadowRoot.innerHTML = `
