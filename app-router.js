@@ -255,6 +255,10 @@ export class AppRouter extends SocketConsumer {
 
     this.lastPageState = pageState;
 
+    if (this.hasAttribute('auto-reset-window-scroll')) {
+      window.scrollTo(0, 0);
+    }
+
     routerViewport.innerHTML = renderTemplate(
       pageTemplate.innerHTML,
       routeArgs,

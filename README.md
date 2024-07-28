@@ -232,6 +232,7 @@ If you want to make sure that some data (e.g. a config file) has been fully load
 - `no-auth-redirect`: An optional alternative path/route to redirect to if the user is on this page but they are not authenticated. If the user is authenticated, then the content of the template will be displayed as normal.
 - `auth-redirect`: An optional alternative path/route to redirect to if the user is on this page but they are already authenticated. If the user is not authenticated, then the content of the template will be displayed as normal.
 - `hard-redirect`: An optional, additional attribute which can be specified alongside a `redirect`, `no-auth-redirect` or `auth-redirect` attribute to ensure that any redirect will change the URL in the address bar. Redirects are `soft` redirects by default; this means that they redirect the user to the target page but keep the current URL path unchanged.
+- `auto-reset-window-scroll`: If this attribute is present, the page scroll will be reset to the top when each new page is rendered.
 
 ### socket-provider
 
