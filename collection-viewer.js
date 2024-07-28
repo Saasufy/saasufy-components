@@ -361,8 +361,6 @@ class CollectionViewer extends SocketConsumer {
 
     (async () => {
       for await (let event of this.collection.listener('change')) {
-        // Ignore change events which originate from this collection instance.
-        if (!event.isRemote) continue;
         this.renderList();
         this.updatePageButtons();
       }

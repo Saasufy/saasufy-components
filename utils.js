@@ -63,32 +63,17 @@ export function createReactiveCollection(collectionOptions, callback) {
   collection.safeValue = [];
 
   (async () => {
-    let changes = {};
     for await (let event of collection.listener('change')) {
-      // Ignore change events which originate from this collection instance.
-      if (!event.isRemote) continue;
-
-      if (event.resourceId != null && changes[event.resourceId] !== false) {
-        changes[event.resourceId] = event.isRemote;
-      }
-
       if (!collection.isLoaded) continue;
-
       collection.safeValue = collection.value.map(toSafeModelValue);
-
-      callback({
-        changes
-      });
-      changes = {};
+      callback();
     }
   })();
 
   (async () => {
     for await (let event of collection.listener('load')) {
       if (collection.isLoaded && !collection.value.length) {
-        callback({
-          changes: {}
-        });
+        callback();
       }
     }
   })();
@@ -114,17 +99,9 @@ export function createReactiveModel(modelOptions, callback) {
   })();
 
   (async () => {
-    let changes = {};
     for await (let event of model.listener('change')) {
-      if (changes[event.resourceField] !== false) {
-        changes[event.resourceField] = event.isRemote;
-      }
-
       model.safeValue = toSafeModelValue(model.value);
-      callback({
-        changes
-      });
-      changes = {};
+      callback();
     }
   })();
 
