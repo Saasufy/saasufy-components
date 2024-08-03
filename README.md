@@ -413,6 +413,7 @@ This component is similar to the `collection-adder` component except that it req
 **Attributes of slotted input, select, textarea... elements**
 
 - `name` (required): This must correspond to a field name on the model specified via the `collection-type` attribute of the `collection-adder-form`.
+- `output-type`: An optional type to cast the value of the input element into when the form is submitted.
 
 ### collection-deleter
 
