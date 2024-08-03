@@ -77,7 +77,10 @@ class CollectionAdderForm extends SocketConsumer {
                 } else {
                   inputType = input.type;
                 }
-                let Type = getTypeCastFunction(inputType);
+                let Type = getTypeCastFunction(
+                  inputType === 'hidden' ?
+                    input.getAttribute('output-type') : inputType
+                );
                 let value;
                 if (inputType === 'file' && input.files && input.files.length) {
                   let reader = new FileReader();
@@ -198,21 +201,10 @@ class CollectionAdderForm extends SocketConsumer {
     let collectionType = this.getAttribute('collection-type');
 
     let {
-      fieldTypes: modelFieldTypes,
       fieldValues: modelFieldValues
     } = convertStringToFieldParams(this.getAttribute('model-values'));
 
-    this.modelFieldValues = Object.fromEntries(
-      Object.entries(modelFieldValues).map(([key, value]) => {
-        if (modelFieldTypes[key] === 'boolean') {
-          return [ key, value !== 'false' && value !== '' ];
-        }
-        if (modelFieldTypes[key] === 'number') {
-          return [ key, Number(value) ];
-        }
-        return [ key, value ];
-      })
-    );
+    this.modelFieldValues = modelFieldValues;
 
     if (this.collection) this.collection.destroy();
 
