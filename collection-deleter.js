@@ -38,6 +38,29 @@ class CollectionDeleter extends HTMLElement {
       })
     )
   }
+
+  deleteItemField() {
+    let modelId = this.getAttribute('model-id');
+    let modelField = this.getAttribute('model-field');
+    this.dispatchEvent(
+      new CustomEvent('crudDelete', { detail: { id: modelId, field: modelField }, bubbles: true })
+    );
+  }
+
+  confirmDeleteItemField() {
+    let confirmMessage = this.getAttribute('confirm-message');
+    this.dispatchEvent(
+      new CustomEvent('showModal', {
+        detail: {
+          message: confirmMessage,
+          callback: () => {
+            this.deleteItemField();
+          }
+        },
+        bubbles: true
+      })
+    )
+  }
 }
 
 window.customElements.define('collection-deleter', CollectionDeleter);
