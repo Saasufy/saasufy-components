@@ -37,10 +37,40 @@ class CollectionViewer extends SocketConsumer {
       }
     };
 
+    this.handleCRUDUpdateEvent = async (event) => {
+      event.stopPropagation();
+      if (this.collection) {
+        let detail = event.detail || {};
+        let modelId = detail.id;
+        let modelValue = detail.value;
+        await this.collection.update(modelId, modelValue);
+        this.dispatchEvent(
+          new CustomEvent('collectionUpdate', {
+            detail: {
+              type: this.collection.type,
+              id: modelId,
+              value: modelValue
+            },
+            bubbles: true
+          })
+        );
+        if (this.hasAttribute('collection-disable-realtime') && this.collection) {
+          this.collection.reloadCurrentPage();
+        }
+      }
+    };
+
     this.handleCRUDDeleteEvent = async (event) => {
       event.stopPropagation();
       if (this.collection) {
-        await this.collection.delete(event.detail);
+        let detail = event.detail || {};
+        let modelId = detail.id;
+        let modelField = detail.field;
+        if (modelId != null) {
+          await this.collection.delete(modelId, modelField);
+        } else {
+          await this.collection.delete(event.detail);
+        }
         this.dispatchEvent(
           new CustomEvent('collectionDelete', {
             detail: {
@@ -83,6 +113,7 @@ class CollectionViewer extends SocketConsumer {
     this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
     this.addEventListener('showModal', this.handleShowModalEvent);
     this.addEventListener('crudCreate', this.handleCRUDCreateEvent);
+    this.addEventListener('crudUpdate', this.handleCRUDUpdateEvent);
     this.addEventListener('crudDelete', this.handleCRUDDeleteEvent);
     this.addEventListener('goToPreviousPage', this.handleGoToPreviousPageEvent);
     this.addEventListener('goToNextPage', this.handleGoToNextPageEvent);
@@ -95,6 +126,7 @@ class CollectionViewer extends SocketConsumer {
     this.shadowRoot.removeEventListener('slotchange', this.handleSlotChangeEvent);
     this.removeEventListener('showModal', this.handleShowModalEvent);
     this.removeEventListener('crudCreate', this.handleCRUDCreateEvent);
+    this.removeEventListener('crudUpdate', this.handleCRUDUpdateEvent);
     this.removeEventListener('crudDelete', this.handleCRUDDeleteEvent);
     this.removeEventListener('goToPreviousPage', this.handleGoToPreviousPageEvent);
     this.removeEventListener('goToNextPage', this.handleGoToNextPageEvent);
