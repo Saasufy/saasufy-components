@@ -4,13 +4,6 @@ class CollectionDeleter extends HTMLElement {
     this.attachShadow({ mode: 'open' });
   }
 
-  static get observedAttributes() {
-    return [
-      'model-id',
-      'confirm-message'
-    ];
-  }
-
   connectedCallback() {
     this.shadowRoot.innerHTML = `
       <slot></slot>
@@ -24,21 +17,6 @@ class CollectionDeleter extends HTMLElement {
     );
   }
 
-  confirmDeleteItem() {
-    let confirmMessage = this.getAttribute('confirm-message');
-    this.dispatchEvent(
-      new CustomEvent('showModal', {
-        detail: {
-          message: confirmMessage,
-          callback: () => {
-            this.deleteItem();
-          }
-        },
-        bubbles: true
-      })
-    )
-  }
-
   deleteItemField() {
     let modelId = this.getAttribute('model-id');
     let modelField = this.getAttribute('model-field');
@@ -47,19 +25,37 @@ class CollectionDeleter extends HTMLElement {
     );
   }
 
-  confirmDeleteItemField() {
-    let confirmMessage = this.getAttribute('confirm-message');
+  showConfirmModal(deleteField) {
+    let message = this.getAttribute('confirm-message');
+    let title = this.getAttribute('confirm-title');
+    let confirmButtonLabel = this.getAttribute('confirm-button-label');
+    let cancelButtonLabel = this.getAttribute('cancel-button-label');
     this.dispatchEvent(
       new CustomEvent('showModal', {
         detail: {
-          message: confirmMessage,
+          message,
+          title,
+          confirmButtonLabel,
+          cancelButtonLabel,
           callback: () => {
-            this.deleteItemField();
+            if (deleteField) {
+              this.deleteItemField();
+            } else {
+              this.deleteItem();
+            }
           }
         },
         bubbles: true
       })
-    )
+    );
+  }
+
+  confirmDeleteItem() {
+    this.showConfirmModal();
+  }
+
+  confirmDeleteItemField() {
+    this.showConfirmModal(true);
   }
 }
 

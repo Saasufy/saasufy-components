@@ -21,14 +21,29 @@ class ConfirmModal extends HTMLElement {
     this.render();
   }
 
-  show(message, confirmCallback) {
+  show(options, confirmCallback) {
     let overlayModal = this.querySelector('overlay-modal');
     if (overlayModal) {
       overlayModal.removeAttribute('style');
     }
     this.confirmCallback = confirmCallback;
     this.hidden = false;
-    this.setAttribute('message', message);
+    if (typeof options === 'string') {
+      this.setAttribute('message', options);
+    } else {
+      if (options.title != null) {
+        this.setAttribute('title', options.title);
+      }
+      if (options.confirmButtonLabel != null) {
+        this.setAttribute('confirm-button-label', options.confirmButtonLabel);
+      }
+      if (options.cancelButtonLabel != null) {
+        this.setAttribute('cancel-button-label', options.cancelButtonLabel);
+      }
+      if (options.message != null) {
+        this.setAttribute('message', options.message);
+      }
+    }
   }
 
   render() {

@@ -15,7 +15,8 @@ class CollectionViewer extends SocketConsumer {
     this.handleShowModalEvent = (event) => {
       event.stopPropagation();
       let modal = this.shadowRoot.querySelector('slot[name="modal"]').assignedNodes()[0];
-      modal.show(event.detail.message, event.detail.callback);
+      let { callback, ...confirmOptions } = event.detail;
+      modal.show(confirmOptions, callback);
     };
 
     this.handleCRUDCreateEvent = async (event) => {
