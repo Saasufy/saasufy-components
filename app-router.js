@@ -1,7 +1,7 @@
 import { toSafeHTML, renderTemplate, debouncer } from './utils.js';
 import { SocketConsumer } from './socket.js';
 
-const DEFAULT_DEBOUNCE_DELAY = 100;
+const DEFAULT_DEBOUNCE_DELAY = 200;
 const DEFAULT_MAX_REDIRECTS = 5;
 
 export class AppRouter extends SocketConsumer {

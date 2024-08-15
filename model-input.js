@@ -207,13 +207,21 @@ class ModelInput extends SocketConsumer {
     let optionList = null;
     if (type === 'select') {
       if (options != null) {
-        optionList = options.split(',');
-        let optionElements = optionList
-          .map((option) => {
-            return `<option value="${option}">${option}</option>`;
+        let {
+          fieldNames: optionNames,
+          fieldValues: optionValues
+        } = convertStringToFieldParams(options, true);
+
+        let optionElements = optionNames
+          .map((optionName) => {
+            let optionValue = optionValues[optionName] || optionName;
+            if (optionName === placeholder) {
+              return `<option value="" selected class="select-default-option">${optionName}</option>`;
+            }
+            return `<option value="${optionValue}">${optionName}</option>`;
           })
           .join('');
-          this.inputElement.innerHTML = optionElements;
+        this.inputElement.innerHTML = optionElements;
       }
     } else if (elementType === 'input') {
       if (inputList) {
