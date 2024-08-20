@@ -353,7 +353,7 @@ class ModelInput extends SocketConsumer {
     let onInputChange = (event) => {
       inputElement.classList.remove(successStyleClass);
       debounce(async () => {
-        if (event.target.value === String(model.value[fieldName] || '')) return;
+        if (event.target.value === String(model.value[fieldName] ?? '')) return;
         let providerTemplate = this.getAttribute('provider-template');
         try {
           if (inputElement.type === 'checkbox') {
@@ -414,7 +414,7 @@ class ModelInput extends SocketConsumer {
         inputElement.classList.remove(successStyleClass);
         if (this.hasAttribute('disable-instant-flush')) return;
         debounce(async () => {
-          if (event.target.value === String(model.value[fieldName] || '')) return;
+          if (event.target.value === String(model.value[fieldName] ?? '')) return;
           let providerTemplate = this.getAttribute('provider-template');
           try {
             if (event.target.value === '') {
