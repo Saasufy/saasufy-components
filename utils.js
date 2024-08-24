@@ -413,6 +413,13 @@ export const fieldPartsRegExpWithEmpty = /((^|(?<=,))((?=,)|$)|"[^"]*"|'[^']*'|\
 
 export const quotedContentRegExp = /^\s*["']?(.*?)["']?\s*$/;
 
+export const unescapedEqualRegExp = /(?<!\\)=/;
+export const escapedEqualRegExp = /\\=/g;
+
+export function unescapeEqualSigns(value) {
+  return value.replace(escapedEqualRegExp, '=');
+}
+
 export function toBoolean(value) {
   return !!value && value !== 'false' && value !== 'null' && value !== 'undefined';
 }
@@ -433,11 +440,16 @@ export function getTypeCastFunction(type) {
   return typeCastFunctions[type] || ((value) => value);
 }
 
-export function convertStringToFieldParams(string, allowEmpty) {
+export function convertStringToFieldParams(string, allowEmpty, unescapeEqual) {
   let partsRegExp = allowEmpty ? fieldPartsRegExpWithEmpty : fieldPartsRegExp;
   let parts = ((string || '').match(partsRegExp) || []).map(field => field.trim());
   let fieldTypeValues = parts.map((part) => {
-    let subParts = part.split('=');
+    let subParts;
+    if (unescapeEqual) {
+      subParts = part.split(unescapedEqualRegExp).map(unescapeEqualSigns);
+    } else {
+      subParts = part.split(unescapedEqualRegExp);
+    }
     let nameType = (subParts[0] || '').split(':');
     let name = nameType[0];
     let type = nameType[1] || 'text';

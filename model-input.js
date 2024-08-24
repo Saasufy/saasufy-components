@@ -210,7 +210,7 @@ class ModelInput extends SocketConsumer {
         let {
           fieldNames: optionNames,
           fieldValues: optionValues
-        } = convertStringToFieldParams(options, true);
+        } = convertStringToFieldParams(options, true, true);
 
         let optionElements = optionNames
           .map((optionName) => {
