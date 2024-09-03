@@ -214,7 +214,7 @@ class ModelInput extends SocketConsumer {
 
         let optionElements = optionNames
           .map((optionName) => {
-            let optionValue = optionValues[optionName] ?? optionName;
+            let optionValue = optionValues[optionName] || optionName;
             if (optionName === placeholder) {
               return `<option value="" selected class="select-default-option">${optionName}</option>`;
             }
