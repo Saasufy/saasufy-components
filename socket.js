@@ -131,8 +131,8 @@ export class SocketProvider extends HTMLElement {
             } else {
               this.saasufySocket.reconnect(1000, 'log-out');
             }
-          } else {
-            this.saasufySocket.reconnect(1000, 'log-out');
+          } else if (this.saasufySocket.authState === 'unauthenticated') {
+            this.saasufySocket.reconnect(1000, 'log-in');
           }
         }
       };
