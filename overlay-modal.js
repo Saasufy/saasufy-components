@@ -30,6 +30,7 @@ class OverlayModal extends HTMLElement {
           justify-content: space-between;
           width: var(--modal-width, 800px);
           height: var(--modal-height, auto);
+          max-width: 100%;
           min-height: var(--modal-min-height, auto);
           background-color: #ffffff;
         }
