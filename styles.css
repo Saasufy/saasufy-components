@@ -65,7 +65,7 @@ input[type=button][disabled],input[type=submit][disabled],button[disabled] {
   opacity: .6;
 }
 
-input[type=text],input[type=password],input[type=button],input[type=submit],input[type=number],select,textarea {
+input[type=text],input[type=password],input[type=button],input[type=submit],input[type=number],select,textarea,button {
   padding: 10px;
   font-size: 18px;
   width: 100%;
