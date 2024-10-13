@@ -484,6 +484,38 @@ export function formatError(error) {
   return error.code === 1009 ? 'Resource exceeded the maximum size' : error.message;
 }
 
+export function logAttributeChanges(...elementSelectors) {
+  let domObserverCallback = (mutationList) => {
+    for (let mutation of mutationList) {
+      let matchingSelector = (elementSelectors || []).find(elementSelector => mutation.target?.matches(elementSelector));
+      let isWatchingElement = !elementSelectors.length || !!matchingSelector;
+      if (mutation.type === 'attributes' && isWatchingElement) {
+        let identifier = mutation.target.id || matchingSelector || mutation.target.nodeName?.toLowerCase();
+        console.log(
+          `[${identifier}] Attribute ${
+            mutation.attributeName
+          } changed to: ${
+            mutation.target.getAttribute(mutation.attributeName)
+          }`
+        );
+      }
+    }
+  };
+
+  let observer = new MutationObserver(domObserverCallback);
+
+  let config = {
+    attributes: true,
+    subtree: true,
+    attributeOldValue: true
+  };
+
+  observer.observe(document, config);
+  return () => {
+    observer.disconnect();
+  };
+}
+
 export function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }
