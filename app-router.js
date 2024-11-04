@@ -140,6 +140,15 @@ export class AppRouter extends SocketConsumer {
     return route;
   }
 
+  replaceLocationHash(pagePath) {
+    let cleanPagePath = pagePath || '';
+    let firstChar = cleanPagePath.charAt(0);
+    if (firstChar !== '#') {
+      cleanPagePath = `#${cleanPagePath}`;
+    }
+    location.replace(cleanPagePath);
+  }
+
   renderCurrentPage() {
     let routerViewport = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
     if (!routerViewport) return;
@@ -199,7 +208,7 @@ export class AppRouter extends SocketConsumer {
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(authRedirect, routeArgs);
         if (hardRedirect) {
-          location.hash = pagePath;
+          this.replaceLocationHash(pagePath);
           return;
         }
         let result = this.getMatchingPage(pagePath, 'auth-redirect');
@@ -211,7 +220,7 @@ export class AppRouter extends SocketConsumer {
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(noAuthRedirect, routeArgs);
         if (hardRedirect) {
-          location.hash = pagePath;
+          this.replaceLocationHash(pagePath);
           return;
         }
         let result = this.getMatchingPage(pagePath, 'no-auth-redirect');
@@ -220,12 +229,12 @@ export class AppRouter extends SocketConsumer {
         regExp = result.regExp;
         params = result.params;
       } else {
-        if (hardRedirect) {
-          location.hash = redirect;
-          return;
-        }
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(redirect, routeArgs);
+        if (hardRedirect) {
+          this.replaceLocationHash(pagePath);
+          return;
+        }
         let result = this.getMatchingPage(pagePath, 'redirect');
         pageTemplate = result.pageTemplate;
         route = result.route;
