@@ -71,7 +71,7 @@ class ModelInput extends SocketConsumer {
   set value(newValue) {
     if (this.inputElement) {
       if (newValue && this.hasAttribute('computable-value')) {
-        newValue = renderTemplate(newValue);
+        newValue = renderTemplate(newValue, null, null, true);
       }
       let oldValue;
       if (this.inputElement.type === 'checkbox') {

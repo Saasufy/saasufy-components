@@ -75,7 +75,7 @@ class InputProvider extends HTMLElement {
         delete this.forceTriggerChange;
       }
       if (newValue && this.hasAttribute('computable-value')) {
-        newValue = renderTemplate(newValue);
+        newValue = renderTemplate(newValue, null, null, true);
       }
       this.updateInputClassList(newValue);
       let oldValue;
