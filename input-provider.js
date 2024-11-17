@@ -74,6 +74,8 @@ class InputProvider extends HTMLElement {
       if (forceInitChange) {
         delete this.forceTriggerChange;
       }
+      let skipInitChange = this.skipInitChange && !forceInitChange;
+      delete this.skipInitChange;
       if (newValue && this.hasAttribute('computable-value')) {
         newValue = renderTemplate(newValue, null, null, true);
       }
@@ -86,14 +88,14 @@ class InputProvider extends HTMLElement {
         } else {
           this.inputElement.checked = newValue;
         }
-        if (oldValue !== newValue || forceInitChange) {
+        if ((oldValue !== newValue || forceInitChange) && !skipInitChange) {
           this.triggerChange();
         }
         return;
       }
       oldValue = this.inputElement.value;
       this.inputElement.value = newValue;
-      if (oldValue !== newValue || forceInitChange) {
+      if ((oldValue !== newValue || forceInitChange) && !skipInitChange) {
         this.triggerChange();
       }
     }
@@ -197,7 +199,9 @@ class InputProvider extends HTMLElement {
       this.forceTriggerChange = true;
       this.value = value;
     } else if (value) {
-      if (type === 'select' && !this.hasAttribute('skip-init-change')) {
+      if (this.hasAttribute('skip-init-change')) {
+        this.skipInitChange = true;
+      } else if (type === 'select') {
         this.forceTriggerChange = true;
       }
       this.value = value;
