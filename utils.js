@@ -5,9 +5,23 @@ import { sha256 } from './sha256.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 300;
 const DEFAULT_RELOAD_DELAY = 0;
+
+let expressionCharsRegExp = /\$\{(.*?)\}/g;
+let backtickRegExp = /`/g;
+let templateMultiStartBracesRegExp = /{{{*/g
+let templateMultiEndBracesRegExp = /}}}*/g
+
+export function toSafeString(value) {
+  return value.replace(expressionCharsRegExp, '$!{$1}')
+    .replace(backtickRegExp, `'`)
+    .replace(templateMultiStartBracesRegExp, '[[')
+    .replace(templateMultiEndBracesRegExp, ']]');
+}
+
 export function toSafeHTML(value) {
   if (typeof value === 'string') {
-    return value.replace(/&(?!(amp|lt|gt|quot|#039|#123|#125);)/g, '&amp;')
+    return toSafeString(value)
+      .replace(/&(?!(amp|lt|gt|quot|#039|#123|#125);)/g, '&amp;')
       .replace(/<(?!br ?\/?>)/g, '&lt;')
       .replace(/(?<!br ?\/?)>/g, '&gt;')
       .replace(/"/g, '&quot;')
@@ -296,9 +310,6 @@ function replaceExpressions(string, replaceFn) {
   return charList.join('');
 }
 
-let templateMultiStartBracesRegExp = /{{{*/g
-let templateMultiEndBracesRegExp = /}}}*/g
-
 export function renderTemplate(templateString, data, socket, autoExecFunction) {
   let options = getRenderOptions(data, socket);
   return replaceExpressions(templateString, (expression) => {
@@ -332,15 +343,6 @@ export function renderTemplate(templateString, data, socket, autoExecFunction) {
           return expression;
         }
         result = result();
-      }
-      if (typeof result === 'string') {
-        // Double braces cannot contain sub-expressions as it
-        // would present an XSS vulnerability.
-        // Replace them with square braces so that any code inside
-        // will not be executed if output is re-processed later.
-        result = result
-          .replace(templateMultiStartBracesRegExp, '[[')
-          .replace(templateMultiEndBracesRegExp, ']]');
       }
       return toSafeHTML(result);
     } catch (error) {
