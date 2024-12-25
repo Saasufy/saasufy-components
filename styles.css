@@ -215,6 +215,18 @@ collection-viewer > [slot=next-page] {
   gap: 5px;
 }
 
+.container-column {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.container-row {
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+}
+
 .container-vertical {
   display: flex;
   flex-direction: column;
