@@ -76,8 +76,7 @@ class CollectionReducer extends SocketConsumer {
       'collection-page-offset',
       'collection-get-count',
       'max-show-loader',
-      'type-alias',
-      'hide-error-logs'
+      'type-alias'
     ];
   }
 
@@ -133,6 +132,27 @@ class CollectionReducer extends SocketConsumer {
           element.removeAttribute('disabled');
         }
       }
+    }
+  }
+
+  renderError(error) {
+    let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
+    if (!viewportSlot) return;
+
+    let viewportNode = viewportSlot.assignedNodes()[0];
+    if (!viewportNode) return;
+
+    this.activeLoader = null;
+
+    let errorTemplate = this.shadowRoot.querySelector('slot[name="error"]').assignedNodes()[0];
+    if (errorTemplate) {
+      let type = this.getAttribute('type-alias') || this.getAttribute('collection-type');
+      let errorItemString = renderTemplate(
+        errorTemplate.innerHTML,
+        { [`$${type}`]: { error } },
+        this.socket
+      );
+      viewportNode.innerHTML = errorItemString;
     }
   }
 
@@ -192,7 +212,7 @@ class CollectionReducer extends SocketConsumer {
     let collectionPageSize = this.getAttribute('collection-page-size');
     let collectionPageOffset = this.getAttribute('collection-page-offset');
     let collectionGetCount = this.hasAttribute('collection-get-count');
-    let hideErrorLogs = this.hasAttribute('hide-error-logs');
+
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
@@ -217,6 +237,7 @@ class CollectionReducer extends SocketConsumer {
       <slot name="loader"></slot>
       <slot name="item"></slot>
       <slot name="no-item"></slot>
+      <slot name="error"></slot>
       <slot name="viewport"></slot>
       <slot name="previous-page"></slot>
       <slot name="page-number"></slot>
@@ -252,15 +273,17 @@ class CollectionReducer extends SocketConsumer {
       }
     })();
 
-    if (!hideErrorLogs) {
-      (async () => {
-        for await (let { error } of this.collection.listener('error')) {
+    (async () => {
+      for await (let { error } of this.collection.listener('error')) {
+        let hideErrorLogs = this.hasAttribute('hide-error-logs');
+        if (!hideErrorLogs) {
           console.error(
             `Collection reducer encountered an error: ${error.message}`
           );
         }
-      })();
-    }
+        this.renderError(error);
+      }
+    })();
   }
 }
 

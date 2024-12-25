@@ -35,8 +35,7 @@ class ModelViewer extends SocketConsumer {
       'model-id',
       'model-fields',
       'fields-slice-to',
-      'type-alias',
-      'hide-error-logs'
+      'type-alias'
     ];
   }
 
@@ -50,6 +49,27 @@ class ModelViewer extends SocketConsumer {
   modelValueExists(modelValue) {
     let { id, ...otherProps } = modelValue;
     return !!Object.values(otherProps).filter(value => value != null).length;
+  }
+
+  renderError(error) {
+    let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
+    if (!viewportSlot) return;
+
+    let viewportNode = viewportSlot.assignedNodes()[0];
+    if (!viewportNode) return;
+
+    this.activeLoader = null;
+
+    let errorTemplate = this.shadowRoot.querySelector('slot[name="error"]').assignedNodes()[0];
+    if (errorTemplate) {
+      let type = this.getAttribute('type-alias') || this.getAttribute('model-type');
+      let errorItemString = renderTemplate(
+        errorTemplate.innerHTML,
+        { [`$${type}`]: { error } },
+        this.socket
+      );
+      viewportNode.innerHTML = errorItemString;
+    }
   }
 
   renderItem() {
@@ -102,7 +122,6 @@ class ModelViewer extends SocketConsumer {
     let modelId = this.getAttribute('model-id');
     let modelFields = this.getAttribute('model-fields') || '';
     let fieldsSliceTo = this.getAttribute('fields-slice-to') || '';
-    let hideErrorLogs = this.hasAttribute('hide-error-logs');
 
     let {
       fieldValues: sliceToMap
@@ -149,6 +168,7 @@ class ModelViewer extends SocketConsumer {
       <slot name="loader"></slot>
       <slot name="item"></slot>
       <slot name="no-item"></slot>
+      <slot name="error"></slot>
       <slot name="viewport"></slot>
     `;
 
@@ -176,16 +196,18 @@ class ModelViewer extends SocketConsumer {
       }
     })();
 
-    if (!hideErrorLogs) {
-      (async () => {
-        this.modelErrorConsumer = this.model.listener('error').createConsumer();
-        for await (let { error } of this.modelErrorConsumer) {
+    (async () => {
+      this.modelErrorConsumer = this.model.listener('error').createConsumer();
+      for await (let { error } of this.modelErrorConsumer) {
+        let hideErrorLogs = this.hasAttribute('hide-error-logs');
+        if (!hideErrorLogs) {
           console.error(
             `Model viewer encountered an error: ${error.message}`
           );
         }
-      })();
-    }
+        this.renderError(error);
+      }
+    })();
   }
 }
 
