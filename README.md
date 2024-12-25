@@ -312,6 +312,7 @@ In addition to the slots shown above, the `collection-viewer` also supports the 
 - `page-number`: This is typically a `div` element to display the current page number. Alternatively, it can be an `input-provider` element to allow the user to manually type in the page number.
 - `first-item`: This should be a `template` element. It can be used to inject an element just above the first record. This can be useful to render the `collection-viewer` as a table with a heading above table rows.
 - `last-item`: This should be a `template` element. It can be used to inject an element just after the last record.
+- `error`: This can be used to display an error message if the required data cannot be loaded. The `Error` object can be accessed inside the template via the syntax: `$CollectionName.error` (substitute `CollectionName` with your `collection-type` or, if set, your `type-alias` preceded by a dollar sign). For example, the error message for a `Chat` collection will be `$Chat.error.message`.
 
 **Attributes**
 
