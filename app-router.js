@@ -149,7 +149,11 @@ export class AppRouter extends SocketConsumer {
     location.replace(cleanPagePath);
   }
 
-  renderCurrentPage() {
+  refreshCurrentPage() {
+    this.renderCurrentPage(true);
+  }
+
+  renderCurrentPage(force) {
     let routerViewport = this.shadowRoot.querySelector('slot[name="viewport"]').assignedNodes()[0];
     if (!routerViewport) return;
 
@@ -260,7 +264,7 @@ export class AppRouter extends SocketConsumer {
       routeArgs
     });
 
-    if (pageState === this.lastPageState) return;
+    if (pageState === this.lastPageState && !force) return;
 
     this.lastPageState = pageState;
 
