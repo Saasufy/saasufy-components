@@ -65,6 +65,16 @@ You should always include the `socket.js` script and create a top-level `socket-
 Linking the scripts directly from `saasufy.com` is the simplest way to get started as it doesn't require loading anything or hosting the scripts yourself.
 An alternative approach is to download Saasufy components using `npm install saasufy-components` and self-host them.
 
+### Templating
+
+Many components allow you to substitute dynamic values or JavaScript expressions inside them using double brackets such as `{{someValue}}`. Using double brackets is the safest way to inject values into your components as it escapes all HTML characters to mitigate XSS attacks.
+
+In order to render HTML which was generated dynamically, you need to use triple brackets such as `{{{someValue}}}` but you should not inject untrusted user-generated values directly in this way.
+
+Saasufy components also support nested expressions. This can be useful if you're rendering a component within another component and want to use some variables from both the current component as well as its parent. For example (assume `projectId` comes from the parent component): `{{ 'Project {{projectId}}: ' + Project.name }}`. When nesting expressions like this, it's important to pay attention to the rendering order (the parent component renders first) in order to ensure that both the nested expression and the outer expression remain valid after each layer of rendering. For example, it may be necessary to add quotation marks around the nested expression to ensure that it will be incorporated as a string literal into the outer expression. Note that using a single expression like `{{ 'Project ' + projectId + ':' + Project.name }}` will not work because the expression would fail to evaluate during both the rendering of the parent component as well as during the rendering of the child component since `projectId` and `Project.name` are provided as part of the rendering of different components and never actually exist at the same time, in the same rendering. The child component doesn't have access to state from the parent unless that state was itself explicitly rendered into the child's template.
+
+When an expression fails to render (I.e. throws an error), it will remain unchanged in its original expression format within the component/template. If an expression is nested inside a child component, the parent will attempt to evaluate it first. If it fails, then it will remain as-is and the child may later also attempt to evaluate it as part of its own rendering (e.g. once the child provides the missing state).
+
 ### Styling
 
 This project does not impose any specific approach to styling components, however, it comes with an optional `styles.css` stylesheet which can be added inside your `<head>` tag like this:
