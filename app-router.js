@@ -272,9 +272,10 @@ export class AppRouter extends SocketConsumer {
       window.scrollTo(0, 0);
     }
 
+    this.setCurrentState(routeArgs);
     routerViewport.innerHTML = renderTemplate(
       pageTemplate.innerHTML,
-      routeArgs,
+      this.getStateContext(),
       this.socket
     );
   }

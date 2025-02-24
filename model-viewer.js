@@ -63,9 +63,10 @@ class ModelViewer extends SocketConsumer {
     let errorTemplate = this.shadowRoot.querySelector('slot[name="error"]').assignedNodes()[0];
     if (errorTemplate) {
       let type = this.getAttribute('type-alias') || this.getAttribute('model-type');
+      this.setCurrentState({ [`$${type}`]: { error } });
       let errorItemString = renderTemplate(
         errorTemplate.innerHTML,
-        { [`$${type}`]: { error } },
+        this.getStateContext(),
         this.socket
       );
       viewportNode.innerHTML = errorItemString;
@@ -100,9 +101,10 @@ class ModelViewer extends SocketConsumer {
       viewportNode.innerHTML = noItemTemplate.innerHTML;
     } else if (itemTemplate) {
       let type = this.getAttribute('type-alias') || this.model.type;
+      this.setCurrentState({ [type]: modelValue });
       let itemString = renderTemplate(
         itemTemplate.innerHTML,
-        { [type]: modelValue },
+        this.getStateContext(),
         this.socket
       );
       viewportNode.innerHTML = itemString;

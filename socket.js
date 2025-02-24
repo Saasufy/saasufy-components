@@ -151,7 +151,33 @@ export class SocketProvider extends HTMLElement {
   }
 }
 
+export function setElementState(element, currentState) {
+  element.saasufyState = currentState;
+}
+
 export class SocketConsumer extends HTMLElement {
+  setCurrentState(currentState) {
+    this.saasufyState = currentState;
+  }
+  getStateContext(currentState) {
+    let currentNode = this.parentNode;
+    let statefulParentNodes = [];
+    while (currentNode) {
+      if (currentNode.saasufyState) {
+        statefulParentNodes.push(currentNode);
+      }
+      currentNode = currentNode.getRootNode().host || currentNode.parentNode;
+    }
+    statefulParentNodes.reverse();
+    let stateContext = {};
+    for (let parentNode of statefulParentNodes) {
+      Object.assign(stateContext, parentNode.saasufyState);
+    }
+    return {
+      ...stateContext,
+      ...(currentState || this.saasufyState)
+    };
+  }
   getSocket() {
     let socket = null;
     let currentNode = this.parentNode;

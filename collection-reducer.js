@@ -147,9 +147,10 @@ class CollectionReducer extends SocketConsumer {
     let errorTemplate = this.shadowRoot.querySelector('slot[name="error"]').assignedNodes()[0];
     if (errorTemplate) {
       let type = this.getAttribute('type-alias') || this.getAttribute('collection-type');
+      this.setCurrentState({ [`$${type}`]: { error } });
       let errorItemString = renderTemplate(
         errorTemplate.innerHTML,
-        { [`$${type}`]: { error } },
+        this.getStateContext(),
         this.socket
       );
       viewportNode.innerHTML = errorItemString;
@@ -187,9 +188,10 @@ class CollectionReducer extends SocketConsumer {
       viewportNode.innerHTML = noItemTemplate.innerHTML;
     } else if (itemTemplate) {
       let type = this.getAttribute('type-alias') || this.collection.type;
+      this.setCurrentState({ [type]: this.collection.value, [`$${type}`]: this.collection.meta });
       let itemString = renderTemplate(
         itemTemplate.innerHTML,
-        { [type]: this.collection.value, [`$${type}`]: this.collection.meta },
+        this.getStateContext(),
         this.socket
       );
       viewportNode.innerHTML = itemString;
