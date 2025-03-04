@@ -1,4 +1,4 @@
-import { SocketConsumer } from './socket.js';
+import { SocketConsumer, setElementState } from './socket.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 import { renderTemplate, convertStringToFieldParams } from './utils.js';
 
@@ -251,13 +251,28 @@ class CollectionViewer extends SocketConsumer {
     let errorTemplate = this.shadowRoot.querySelector('slot[name="error"]').assignedNodes()[0];
     if (errorTemplate) {
       let type = this.getAttribute('type-alias') || this.getAttribute('collection-type');
+      this.setCurrentState({ [`$${type}`]: { error } });
       let errorItemString = renderTemplate(
         errorTemplate.innerHTML,
-        { [`$${type}`]: { error } },
+        this.getStateContext(),
         this.socket
       );
       viewportNode.innerHTML = errorItemString;
     }
+  }
+
+  getNodesWithState(htmlString, state) {
+    let items = [];
+    let template = document.createElement('template');
+    template.innerHTML = htmlString;
+    let content = template.content;
+    for (let child of content.children) {
+      setElementState(child, state);
+    }
+    for (let node of content.childNodes) {
+      items.push(node);
+    }
+    return items;
   }
 
   renderList() {
@@ -289,47 +304,56 @@ class CollectionViewer extends SocketConsumer {
     let firstItemTemplate = this.shadowRoot.querySelector('slot[name="first-item"]').assignedNodes()[0];
     let lastItemTemplate = this.shadowRoot.querySelector('slot[name="last-item"]').assignedNodes()[0];
 
+    viewportNode.innerHTML = '';
+    this.setCurrentState(null);
+    let stateContext = this.getStateContext();
     let items = [];
 
     let type = this.getAttribute('type-alias') || this.collection.type;
 
     if (firstItemTemplate) {
+      let state = { [`$${type}`]: this.collection.meta };
       let itemString = renderTemplate(
         firstItemTemplate.innerHTML,
-        { [`$${type}`]: this.collection.meta },
+        {...stateContext, ...state},
         this.socket
       );
-      items.push(itemString);
+      items.push(...this.getNodesWithState(itemString, state));
     }
     if (noItemTemplate && !this.collection.value.length) {
+      let state = { [`$${type}`]: this.collection.meta };
       let itemString = renderTemplate(
         noItemTemplate.innerHTML,
-        { [`$${type}`]: this.collection.meta },
+        {...stateContext, ...state},
         this.socket
       );
-      items.push(itemString);
+      items.push(...this.getNodesWithState(itemString, state));
     } else if (itemTemplate) {
       for (let modelItem of this.collection.value) {
+        let state = {
+          [type]: modelItem,
+          [`$${type}`]: this.collection.meta
+        };
         let itemString = renderTemplate(
           itemTemplate.innerHTML,
-          {
-            [type]: modelItem,
-            [`$${type}`]: this.collection.meta
-          },
+          {...stateContext, ...state},
           this.socket
         );
-        items.push(itemString);
+        items.push(...this.getNodesWithState(itemString, state));
       }
     }
     if (lastItemTemplate) {
+      let state = { [`$${type}`]: this.collection.meta };
       let itemString = renderTemplate(
         lastItemTemplate.innerHTML,
-        { [`$${type}`]: this.collection.meta },
+        {...stateContext, ...state},
         this.socket
       );
-      items.push(itemString);
+      items.push(...this.getNodesWithState(itemString, state));
     }
-    viewportNode.innerHTML = items.join('');
+    for (let item of items) {
+      viewportNode.appendChild(item);
+    }
   }
 
   render() {
