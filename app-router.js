@@ -15,6 +15,7 @@ export class AppRouter extends SocketConsumer {
     this.debounce = debouncer();
     this.debounceDelay = DEFAULT_DEBOUNCE_DELAY;
     this.lastPageState = null;
+    this.lastOriginPageState = null;
 
     this.hashStartRegex = /^#/;
 
@@ -166,13 +167,16 @@ export class AppRouter extends SocketConsumer {
     let { pageTemplate, route, regExp, params } = this.getMatchingPage(pagePath, 'path', true);
     if (forceRenderPaths.includes(pagePath)) {
       this.lastPageState = null;
+      this.lastOriginPageState = null;
     }
+    let originRoute = route;
 
     if (!pageTemplate) {
       let defaultPage = this.getAttribute('default-page');
       if (!defaultPage) {
         routerViewport.innerHTML = '';
         this.lastPageState = null;
+        this.lastOriginPageState = null;
         return;
       }
       routeArgs = this.computeRouteArgs(pagePath, regExp, params);
@@ -185,8 +189,9 @@ export class AppRouter extends SocketConsumer {
     };
 
     let maxRedirects = Number(this.getAttribute('max-redirects') || DEFAULT_MAX_REDIRECTS);
-
+    let hasOriginPageChanged = false;
     let redirectCount;
+
     for (redirectCount = 0; redirectCount <= maxRedirects; redirectCount++) {
       let authRedirect = this.socket && this.socket.authState === 'authenticated' ?
         pageTemplate.getAttribute('auth-redirect') : null;
@@ -212,6 +217,7 @@ export class AppRouter extends SocketConsumer {
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(authRedirect, routeArgs);
         if (hardRedirect) {
+          this.lastOriginPageState = JSON.stringify({ route: originRoute, routeArgs });
           this.replaceLocationHash(pagePath);
           return;
         }
@@ -224,6 +230,7 @@ export class AppRouter extends SocketConsumer {
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(noAuthRedirect, routeArgs);
         if (hardRedirect) {
+          this.lastOriginPageState = JSON.stringify({ route: originRoute, routeArgs });
           this.replaceLocationHash(pagePath);
           return;
         }
@@ -236,6 +243,7 @@ export class AppRouter extends SocketConsumer {
         routeArgs = this.computeRouteArgs(pagePath, regExp, params);
         pagePath = this.substituteRouteAgs(redirect, routeArgs);
         if (hardRedirect) {
+          this.lastOriginPageState = JSON.stringify({ route: originRoute, routeArgs });
           this.replaceLocationHash(pagePath);
           return;
         }
@@ -244,6 +252,13 @@ export class AppRouter extends SocketConsumer {
         route = result.route;
         regExp = result.regExp;
         params = result.params;
+      }
+      if (redirectCount === 0) {
+        let lastOriginPageState = JSON.stringify({ route: originRoute, routeArgs });
+        if (lastOriginPageState !== this.lastOriginPageState) {
+          hasOriginPageChanged = true;
+        }
+        this.lastOriginPageState = lastOriginPageState;
       }
     }
 
@@ -264,7 +279,10 @@ export class AppRouter extends SocketConsumer {
       routeArgs
     });
 
-    if (pageState === this.lastPageState && !force) return;
+    let watchOriginRoute = this.hasAttribute('watch-origin-route');
+    let originRouteChanged = watchOriginRoute && hasOriginPageChanged;
+
+    if (pageState === this.lastPageState && !originRouteChanged && !force) return;
 
     this.lastPageState = pageState;
 
