@@ -75,8 +75,23 @@ class OAuthLink extends HTMLElement {
     let useLocalStorage = this.hasAttribute('use-local-storage');
     let stateSize = Number(this.getAttribute('state-size') || 20);
     let storageKey = this.getAttribute('state-storage-key') || 'oauth.state';
+    
+    let storage = useLocalStorage ? localStorage : sessionStorage;
+    let existingState = storage.getItem(storageKey);
+    let stateList;
+    if (existingState) {
+      stateList = existingState.split(',').filter(Boolean);
+      let maxStateCount = Number(this.getAttribute('max-state-count') ?? 20);
+      if (stateList.length >= maxStateCount) {
+        stateList.pop();
+      }
+    } else {
+      stateList = []
+    }
     this.state = `${provider}-${generateRandomHexString(stateSize)}`;
-    (useLocalStorage ? localStorage : sessionStorage).setItem(storageKey, this.state);
+    stateList.unshift(this.state);
+
+    storage.setItem(storageKey, stateList.join(','));
 
     this.shadowRoot.innerHTML = `
       <slot name="item"></slot>

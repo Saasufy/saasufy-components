@@ -43,10 +43,13 @@ class OAuthHandler extends SocketConsumer {
       return;
     };
 
-    let stateParts = expectedOAuthState.split('-');
+    let relevantStates = expectedOAuthState
+      .split(',')
+      .filter(expectedState => expectedState && expectedState.split('-')[0] === provider);
+    
     // Do not process. The state may have been set for a different provider
     // which is handled on the same page.
-    if (stateParts[0] !== provider) return;
+    if (!relevantStates.length) return;
 
     let codeParamName = this.getAttribute('code-param-name') || 'code';
     let stateParamName = this.getAttribute('state-param-name') || 'state';
@@ -62,8 +65,8 @@ class OAuthHandler extends SocketConsumer {
       let socket = this.getSocket();
 
       history.replaceState({}, document.title, location.pathname);
-
-      if (state === expectedOAuthState) {
+      
+      if (relevantStates.some(expectedState => expectedState === state)) {
         try {
           await socket.invoke('log-in-oauth', { provider, data: { code, ...extraData } });
         } catch (error) {
