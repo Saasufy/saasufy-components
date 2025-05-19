@@ -462,10 +462,10 @@ export function getTypeCastFunction(type) {
   return typeCastFunctions[type] || ((value) => value);
 }
 
-export function convertStringToFieldParams(string, allowEmpty, unescapeEqual) {
+export function convertStringToFieldTypeValues(string, allowEmpty, unescapeEqual) {
   let partsRegExp = allowEmpty ? fieldPartsRegExpWithEmpty : fieldPartsRegExp;
   let parts = ((string || '').match(partsRegExp) || []).map(field => field.trim());
-  let fieldTypeValues = parts.map((part) => {
+  return parts.map((part) => {
     let subParts;
     if (unescapeEqual) {
       subParts = part.split(unescapedEqualRegExp).map(unescapeEqualSigns);
@@ -473,25 +473,29 @@ export function convertStringToFieldParams(string, allowEmpty, unescapeEqual) {
       subParts = part.split(unescapedEqualRegExp);
     }
     let nameType = (subParts[0] || '').split(':');
-    let name = nameType[0];
+    let field = nameType[0];
     let type = nameType[1] || 'text';
     let value = subParts.slice(1).join('=').replace(quotedContentRegExp, '$1');
     return {
-      name,
+      field,
       type,
       value
     }
   });
-  let fieldNames = fieldTypeValues.map(item => item.name);
+}
+
+export function convertStringToFieldParams(string, allowEmpty, unescapeEqual) {
+  let fieldTypeValues = convertStringToFieldTypeValues(string, allowEmpty, unescapeEqual);
+  let fieldNames = fieldTypeValues.map(item => item.field);
   let fieldTypes = Object.fromEntries(
-    fieldTypeValues.map(item => [ item.name, item.type ])
+    fieldTypeValues.map(item => [ item.field, item.type ])
   );
   let fieldValues = Object.fromEntries(
     fieldTypeValues.map(
       (item) => {
-        let type = fieldTypes[item.name];
+        let type = fieldTypes[item.field];
         let Type = getTypeCastFunction(type);
-        return [ item.name, Type(item.value) ];
+        return [ item.field, Type(item.value) ];
       }
     )
   );
