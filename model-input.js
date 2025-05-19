@@ -214,7 +214,7 @@ class ModelInput extends SocketConsumer {
             if (option.field === placeholder) {
               return `<option value="" selected class="select-default-option">${option.field}</option>`;
             }
-            return `<option value="${option.value}">${option.field}</option>`;
+            return `<option value="${option.value || option.field}">${option.field}</option>`;
           })
           .join('');
         this.inputElement.innerHTML = optionElements;
