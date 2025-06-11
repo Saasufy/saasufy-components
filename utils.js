@@ -475,7 +475,7 @@ export function convertStringToFieldTypeValues(string, allowEmpty, unescapeEqual
     let nameType = (subParts[0] || '').split(':');
     let field = nameType[0];
     let type = nameType[1] || 'text';
-    let value = subParts.slice(1).join('=').replace(quotedContentRegExp, '$1');
+    let value = subParts.length > 1 ? subParts.slice(1).join('=').replace(quotedContentRegExp, '$1') : undefined;
     return {
       field,
       type,
