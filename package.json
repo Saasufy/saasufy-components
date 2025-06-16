@@ -1,6 +1,6 @@
 {
   "name": "saasufy-components",
-  "version": "8.2.6",
+  "version": "8.2.7",
   "description": "Components for Saasufy.",
   "main": "index.js",
   "scripts": {
@@ -19,8 +19,8 @@
   "dependencies": {
     "ag-collection": "^5.4.0",
     "ag-model": "^3.2.0",
-    "capitalisk-auth-client": "^1.5.2",
-    "socketcluster-client": "^19.2.3",
+    "capitalisk-auth-client": "^1.5.3",
+    "socketcluster-client": "^19.2.6",
     "uuid": "^8.3.2"
   },
   "bugs": {
