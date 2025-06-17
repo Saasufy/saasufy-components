@@ -77,6 +77,16 @@ class OverlayModal extends HTMLElement {
         </div>
       </div>
     `;
+
+    this.shadowRoot.querySelector('.overlay-background').addEventListener('click', (event) => {
+      let closeOnBackgroundClick = this.hasAttribute('close-on-bg-click');
+      if (closeOnBackgroundClick && event.target?.classList?.contains('overlay-background')) {
+        this.dispatchEvent(
+          new CustomEvent('close', { bubbles: true })
+        );
+      }
+    });
+
     this.shadowRoot.querySelector('.close-button').addEventListener('click', () => {
       this.dispatchEvent(
         new CustomEvent('close', { bubbles: true })
