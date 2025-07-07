@@ -120,6 +120,17 @@ You will need to deploy your Saasufy service from the dashboard for the changes 
 The `id` field in Saasufy is extra special; you can optionally specify it when you create a new resource, however, if it is not specified, Saasufy will create one for you.
 Saasufy offers utility functions for creating IDs (random and deterministic). See the previous `Utility functions` section.
 
+### Events
+
+The Saasufy `collection-viewer` component dispatches the following events when records are created, updated or removed from an active collection as a result of user interactions with that component:
+
+- `collectionCreate`
+- `collectionUpdate`
+- `collectionDelete`
+
+These events are set to bubble so you can listen to them on any parent element in the DOM.
+The event object passed to the listener function has a `detail` property which is an object with a `type` and `id` property to indicate the type and id of the affected resource within the collection.
+
 ### File hosting
 
 Saasufy provides basic HTTP/HTTPS file hosting functionality with support for client-side caching (with `ETag`).
