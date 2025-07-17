@@ -83,7 +83,7 @@ This project does not impose any specific approach to styling components, howeve
 <link href="https://saasufy.com/node_modules/saasufy-components/styles.css" rel="stylesheet" />
 ```
 
-### Utility functions
+### Template utility functions
 
 The following utility functions can be used anywhere inside template `{{expression}}` placeholders:
 
@@ -98,6 +98,65 @@ The following utility functions can be used anywhere inside template `{{expressi
 - Format UNIX timestamp as a human-readable date: `{{date(Product.updatedAt)}}`
 - Make a string safe by escaping HTML characters: `{{safeString(Product.name)}}`
 - Given an array of objects, extract the values from the specified field and join them together into a single comma-separated string: `{{joinFields(Product, 'name')}}`
+
+### General utility functions
+
+The following utility functions are available for advanced use cases and can be imported from the `saasufy-components` module:
+
+**Import from CDN:**
+```javascript
+import {
+  getRecordIds,
+  getRecord,
+  getRecordCount,
+  generateRecords,
+  getRecords,
+  logAttributeChanges,
+  wait
+} from 'https://saasufy.com/node_modules/saasufy-components/utils.js';
+```
+
+**Import from npm:**
+```javascript
+import {
+  getRecordIds,
+  getRecord,
+  getRecordCount,
+  generateRecords,
+  getRecords,
+  logAttributeChanges,
+  wait
+} from 'saasufy-components/utils.js';
+```
+
+**Available functions:**
+
+- `getRecordIds({ socket, type, viewName, viewParams, startPage, maxPages, pageSize })`: Retrieves record IDs from a collection view across multiple pages. Returns an array of IDs.
+- `getRecord({ socket, type, id, fields })`: Fetches a single record by ID. If fields are specified, only those fields are retrieved; otherwise the entire record is returned.
+- `getRecordCount({ socket, type, viewName, viewParams, offset })`: Gets the total count of records in a view. Returns a number representing the count.
+- `generateRecords({ socket, type, viewName, viewParams, fields, startPage, pageSize, maxAttempts })`: An async generator function that yields records one by one from a collection view. Useful for processing large datasets efficiently.
+
+**Example usage:**
+```javascript
+// Process all products one by one without loading them all into memory at once
+const productGenerator = generateRecords({
+  socket: mySocket,
+  type: 'Product',
+  viewName: 'alphabeticalView',
+  viewParams: { category: 'electronics' },
+  fields: [ 'name', 'price', 'qty' ],
+  pageSize: 50
+});
+
+for await (let product of productGenerator) {
+  console.log(`Processing product: ${product.name}`);
+  // Process each product individually
+}
+```
+- `getRecords({ socket, type, viewName, viewParams, fields, startPage, maxPages, pageSize })`: Retrieves multiple records from a collection view. Returns an array of record objects.
+- `logAttributeChanges(...elementSelectors)`: Logs attribute changes for DOM elements to the console. Useful for debugging. Returns a function to stop observing.
+- `wait(duration)`: Creates a promise that resolves after the specified duration in milliseconds. Useful for adding delays in async operations.
+
 
 ### Special fields
 
