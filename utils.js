@@ -510,6 +510,134 @@ export function formatError(error) {
   return error.code === 1009 ? 'Resource exceeded the maximum size' : error.message;
 }
 
+export function getBatches(list, batchSize) {
+  let batches = [];
+  let currentBatch = [];
+  for (let item of list) {
+    if (currentBatch.length >= batchSize) {
+      batches.push(currentBatch);
+      currentBatch = [];
+    }
+    currentBatch.push(item);
+  }
+  if (currentBatch.length) {
+    batches.push(currentBatch);
+  }
+  return batches;
+}
+
+export async function getRecordIds({ socket, type, viewName, viewParams, startPage, maxPages, pageSize }) {
+  if (startPage == null) startPage = 0;
+  if (maxPages == null) maxPages = 10;
+  if (pageSize == null) pageSize = 100;
+  let currentPage = startPage;
+  let lastPage = currentPage + maxPages;
+  let isLastPage = false;
+  let modelIds = [];
+  while (!isLastPage && currentPage < lastPage) {
+    let result = await socket.invoke('crud', {
+      action: 'read',
+      type,
+      offset: currentPage * pageSize,
+      view: viewName,
+      viewParams,
+      pageSize
+    });
+    isLastPage = result.isLastPage;
+    modelIds.push(...result.data);
+    currentPage++;
+  }
+  return modelIds;
+}
+
+export async function getRecord({ socket, type, id, fields }) {
+  if (!fields) {
+    return socket.invoke('crud', {
+      action: 'read',
+      type,
+      id
+    });
+  }
+  let data = await Promise.all(
+    fields.map(async (field) => {
+      return socket.invoke('crud', {
+        action: 'read',
+        type,
+        id,
+        field
+      });
+    })
+  );
+  let fieldCount = fields.length;
+  let record = {};
+  for (let i = 0; i < fieldCount; i++) {
+    record[fields[i]] = data[i];
+  }
+  return record;
+}
+
+export async function getRecordCount({ socket, type, viewName, viewParams, offset }) {
+  let result = await socket.invoke('crud', {
+    action: 'read',
+    type,
+    offset: offset || 0,
+    view: viewName,
+    viewParams,
+    pageSize: 0,
+    getCount: true
+  });
+  return Math.max(result.count - offset, 0);
+}
+
+export async function* generateRecords({ socket, type, viewName, viewParams, fields, startPage, pageSize, maxAttempts }) {
+  if (startPage == null) startPage = 0;
+  if (pageSize == null) pageSize = 100;
+  if (maxAttempts == null) maxAttempts = 10;
+  
+  let currentPage = startPage;
+  let isLastPage = false;
+  let failureCount = 0;
+
+  while (!isLastPage) {
+    try {
+      let result = await socket.invoke('crud', {
+        action: 'read',
+        type,
+        offset: currentPage * pageSize,
+        view: viewName,
+        viewParams,
+        pageSize
+      });
+      let idList = result.data || [];
+      for (let id of idList) {
+        yield await getRecord({ socket, type, id, fields });
+      }
+      isLastPage = result.isLastPage;
+      currentPage++;
+      failureCount = 0;
+    } catch (error) {
+      if (++failureCount > maxAttempts) {
+        throw new Error(`Record generation failed after max consecutive attempts because of error: ${error.message}`);
+      }
+    }
+  }
+}
+
+export async function getRecords({ socket, type, viewName, viewParams, fields, startPage, maxPages, pageSize }) {
+  let recordIds = await getRecordIds({ socket, type, viewName, viewParams, startPage, maxPages, pageSize });
+  let recordIdBatches = getBatches(recordIds, pageSize);
+  let records = [];
+  for (let idBatch of recordIdBatches) {
+    let recordBatch = await Promise.all(
+      idBatch.map(async (id) => {
+        return getRecord({ socket, type, id, fields });
+      })
+    );
+    records.push(...recordBatch);
+  }
+  return records;
+}
+
 export function logAttributeChanges(...elementSelectors) {
   let domObserverCallback = (mutationList) => {
     for (let mutation of mutationList) {
