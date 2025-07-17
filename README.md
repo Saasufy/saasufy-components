@@ -129,6 +129,12 @@ import {
 } from 'saasufy-components/utils.js';
 ```
 
+A reference to a socket can be obtained from a `socket-provider` element like this:
+
+```javascript
+let socket = document.querySelector('socket-provider').getSocket();
+```
+
 **Available functions:**
 
 - `getRecordIds({ socket, type, viewName, viewParams, startPage, maxPages, pageSize })`: Retrieves record IDs from a collection view across multiple pages. Returns an array of IDs.
@@ -139,8 +145,8 @@ import {
 **Example usage:**
 ```javascript
 // Process all products one by one without loading them all into memory at once
-const productGenerator = generateRecords({
-  socket: mySocket,
+let productGenerator = generateRecords({
+  socket,
   type: 'Product',
   viewName: 'alphabeticalView',
   viewParams: { category: 'electronics' },
