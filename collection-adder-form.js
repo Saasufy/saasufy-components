@@ -156,6 +156,7 @@ class CollectionAdderForm extends SocketConsumer {
     }
     let consumers = this.getAttribute('consumers');
     let outcomeConsumers = this.getAttribute(outputValue.error ? 'error-consumers' : 'success-consumers');
+    let oppositeOutcomeConsumers = this.getAttribute(outputValue.error ? 'success-consumers' : 'error-consumers');
     if (consumers) {
       if (outcomeConsumers) {
         consumers = `${consumers},${outcomeConsumers}`;
@@ -164,7 +165,9 @@ class CollectionAdderForm extends SocketConsumer {
       consumers = outcomeConsumers;
     }
     let providerTemplate = this.getAttribute('provider-template');
-    updateConsumerElements(consumers, outputValue, providerTemplate, this.getAttribute('name'));
+    let selfName = this.getAttribute('name');
+    updateConsumerElements(consumers, outputValue, providerTemplate, selfName);
+    updateConsumerElements(oppositeOutcomeConsumers, '', null, selfName);
   }
 
   getAllInputElements() {
