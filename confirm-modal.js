@@ -66,7 +66,8 @@ class ConfirmModal extends HTMLElement {
     `;
 
     let overlayModal = this.querySelector('overlay-modal');
-    overlayModal.addEventListener('close', () => {
+    overlayModal.addEventListener('close', (event) => {
+      event.stopPropagation();
       overlayModal.style.display = 'none';
     });
     let cancelButton = this.querySelector('.modal-cancel-button');
