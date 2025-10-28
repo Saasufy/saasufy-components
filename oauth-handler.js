@@ -1,7 +1,7 @@
 import { SocketConsumer } from './socket.js';
 import { generateRandomHexString, convertStringToFieldParams } from './utils.js';
 
-const DEFAULT_AUTH_TIMEOUT = 10000;
+const DEFAULT_AUTH_TIMEOUT = 20000;
 
 class OAuthHandler extends SocketConsumer {
   successRedirect() {
