@@ -90,6 +90,38 @@ export class SocketProvider extends HTMLElement {
     let {
       fieldValues: extraSocketOptions
     } = convertStringToFieldParams(socketOptionsString);
+
+    function addAutoReconnectOption(optionName, optionValue) {
+      if (!extraSocketOptions.autoReconnectOptions) {
+        extraSocketOptions.autoReconnectOptions = {};
+      }
+      extraSocketOptions.autoReconnectOptions[optionName] = optionValue;
+    }
+
+    let acInitialDelay = extraSocketOptions['autoReconnectOptions.initialDelay'];
+    if (acInitialDelay) {
+      addAutoReconnectOption('initialDelay', acInitialDelay);
+      delete extraSocketOptions['autoReconnectOptions.initialDelay'];
+    }
+
+    let acRandomness = extraSocketOptions['autoReconnectOptions.randomness'];
+    if (acRandomness) {
+      addAutoReconnectOption('randomness', acRandomness);
+      delete extraSocketOptions['autoReconnectOptions.randomness'];
+    }
+
+    let acMultiplier = extraSocketOptions['autoReconnectOptions.multiplier'];
+    if (acMultiplier) {
+      addAutoReconnectOption('multiplier', acMultiplier);
+      delete extraSocketOptions['autoReconnectOptions.multiplier'];
+    }
+
+    let acMaxDelay = extraSocketOptions['autoReconnectOptions.maxDelay'];
+    if (acMaxDelay) {
+      addAutoReconnectOption('maxDelay', acMaxDelay);
+      delete extraSocketOptions['autoReconnectOptions.maxDelay'];
+    }
+
     let socketOptions = {
       authTokenName,
       autoConnect: !!url,
