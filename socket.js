@@ -99,27 +99,43 @@ export class SocketProvider extends HTMLElement {
     }
 
     let acInitialDelay = extraSocketOptions['autoReconnectOptions.initialDelay'];
-    if (acInitialDelay) {
+    if (acInitialDelay != null) {
       addAutoReconnectOption('initialDelay', Number(acInitialDelay));
       delete extraSocketOptions['autoReconnectOptions.initialDelay'];
     }
 
     let acRandomness = extraSocketOptions['autoReconnectOptions.randomness'];
-    if (acRandomness) {
+    if (acRandomness != null) {
       addAutoReconnectOption('randomness', Number(acRandomness));
       delete extraSocketOptions['autoReconnectOptions.randomness'];
     }
 
     let acMultiplier = extraSocketOptions['autoReconnectOptions.multiplier'];
-    if (acMultiplier) {
+    if (acMultiplier != null) {
       addAutoReconnectOption('multiplier', Number(acMultiplier));
       delete extraSocketOptions['autoReconnectOptions.multiplier'];
     }
 
     let acMaxDelay = extraSocketOptions['autoReconnectOptions.maxDelay'];
-    if (acMaxDelay) {
+    if (acMaxDelay != null) {
       addAutoReconnectOption('maxDelay', Number(acMaxDelay));
       delete extraSocketOptions['autoReconnectOptions.maxDelay'];
+    }
+
+    if (extraSocketOptions.connectTimeout != null) {
+      extraSocketOptions.connectTimeout = Number(extraSocketOptions.connectTimeout);
+    }
+
+    if (extraSocketOptions.ackTimeout != null) {
+      extraSocketOptions.ackTimeout = Number(extraSocketOptions.ackTimeout);
+    }
+
+    if (extraSocketOptions.batchOnHandshakeDuration != null) {
+      extraSocketOptions.batchOnHandshakeDuration = Number(extraSocketOptions.batchOnHandshakeDuration);
+    }
+
+    if (extraSocketOptions.batchInterval != null) {
+      extraSocketOptions.batchInterval = Number(extraSocketOptions.batchInterval);
     }
 
     let socketOptions = {
