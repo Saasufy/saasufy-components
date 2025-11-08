@@ -100,25 +100,25 @@ export class SocketProvider extends HTMLElement {
 
     let acInitialDelay = extraSocketOptions['autoReconnectOptions.initialDelay'];
     if (acInitialDelay) {
-      addAutoReconnectOption('initialDelay', acInitialDelay);
+      addAutoReconnectOption('initialDelay', Number(acInitialDelay));
       delete extraSocketOptions['autoReconnectOptions.initialDelay'];
     }
 
     let acRandomness = extraSocketOptions['autoReconnectOptions.randomness'];
     if (acRandomness) {
-      addAutoReconnectOption('randomness', acRandomness);
+      addAutoReconnectOption('randomness', Number(acRandomness));
       delete extraSocketOptions['autoReconnectOptions.randomness'];
     }
 
     let acMultiplier = extraSocketOptions['autoReconnectOptions.multiplier'];
     if (acMultiplier) {
-      addAutoReconnectOption('multiplier', acMultiplier);
+      addAutoReconnectOption('multiplier', Number(acMultiplier));
       delete extraSocketOptions['autoReconnectOptions.multiplier'];
     }
 
     let acMaxDelay = extraSocketOptions['autoReconnectOptions.maxDelay'];
     if (acMaxDelay) {
-      addAutoReconnectOption('maxDelay', acMaxDelay);
+      addAutoReconnectOption('maxDelay', Number(acMaxDelay));
       delete extraSocketOptions['autoReconnectOptions.maxDelay'];
     }
 
