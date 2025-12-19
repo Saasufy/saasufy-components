@@ -121,7 +121,9 @@ class CollectionAdderForm extends SocketConsumer {
         })
       );
 
-      this.reset();
+      if (!this.hasAttribute('no-auto-reset')) {
+        this.reset();
+      }
 
       outputValue = {
         resource: insertedModelData
@@ -188,12 +190,17 @@ class CollectionAdderForm extends SocketConsumer {
     for (let element of inputElements) {
       if (element.nodeName === 'INPUT') {
         if (element.type === 'checkbox' || element.type === 'radio') {
-          element.checked = false;
-        } else if (element.type !== 'hidden' || this.hasAttribute('auto-reset-hidden-inputs')) {
+          let isChecked = element.hasAttribute('checked');
+          element.checked = isChecked || false;
+        } else if (element.type !== 'hidden') {
+          let currentValue = element.getAttribute('value');
+          element.value = currentValue || '';
+        } else if (element.type === 'hidden' && this.hasAttribute('auto-reset-hidden-inputs')) {
           element.value = '';
         }
       } else if (element.nodeName === 'TEXTAREA') {
-        element.value = '';
+        let currentValue = element.getAttribute('value');
+        element.value = currentValue || '';
       } else if (element.nodeName === 'SELECT') {
         element.selectedIndex = 0;
       }
