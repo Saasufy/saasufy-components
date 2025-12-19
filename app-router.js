@@ -291,7 +291,8 @@ export class AppRouter extends SocketConsumer {
     }
 
     this.setCurrentState(routeArgs);
-    routerViewport.innerHTML = renderTemplate(
+    routerViewport.innerHTML = renderTemplate.call(
+      this,
       pageTemplate.innerHTML,
       this.getStateContext(),
       this.socket

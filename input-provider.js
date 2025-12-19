@@ -78,7 +78,7 @@ class InputProvider extends HTMLElement {
       let skipInitChange = this.skipInitChange && !forceInitChange;
       delete this.skipInitChange;
       if (newValue && this.hasAttribute('computable-value')) {
-        newValue = renderTemplate(newValue, null, null, true);
+        newValue = renderTemplate.call(this, newValue, null, null, true);
       }
       this.updateInputClassList(newValue);
       let oldValue;
@@ -228,16 +228,16 @@ class InputProvider extends HTMLElement {
           let checked = !!inputElement.checked;
           this.lastValue = checked;
 
-          updateConsumerElements(consumers, checked, providerTemplate, elementName);
+          updateConsumerElements.call(this, consumers, checked, providerTemplate, elementName);
           return;
         }
         this.lastValue = event.target.value;
         if (event.target.value === '') {
-          updateConsumerElements(consumers, '', providerTemplate, elementName);
+          updateConsumerElements.call(this, consumers, '', providerTemplate, elementName);
         } else {
           let targetValue = inputElement.type === 'number' ?
             Number(event.target.value) : event.target.value;
-          updateConsumerElements(consumers, targetValue, providerTemplate, elementName);
+          updateConsumerElements.call(this, consumers, targetValue, providerTemplate, elementName);
         }
       }, debounceDelay);
     };
@@ -254,11 +254,11 @@ class InputProvider extends HTMLElement {
           if (event.target.value === this.lastValue) return;
           this.lastValue = event.target.value;
           if (event.target.value === '') {
-            updateConsumerElements(consumers, '', providerTemplate, elementName);
+            updateConsumerElements.call(this, consumers, '', providerTemplate, elementName);
           } else {
             let targetValue = inputElement.type === 'number' ?
               Number(event.target.value) : event.target.value;
-            updateConsumerElements(consumers, targetValue, providerTemplate, elementName);
+            updateConsumerElements.call(this, consumers, targetValue, providerTemplate, elementName);
           }
         }, debounceDelay);
       };

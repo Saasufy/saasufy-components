@@ -148,7 +148,8 @@ class CollectionReducer extends SocketConsumer {
     if (errorTemplate) {
       let type = this.getAttribute('type-alias') || this.getAttribute('collection-type');
       this.setCurrentState({ [`$${type}`]: { error } });
-      let errorItemString = renderTemplate(
+      let errorItemString = renderTemplate.call(
+        this,
         errorTemplate.innerHTML,
         this.getStateContext(),
         this.socket
@@ -189,7 +190,8 @@ class CollectionReducer extends SocketConsumer {
     } else if (itemTemplate) {
       let type = this.getAttribute('type-alias') || this.collection.type;
       this.setCurrentState({ [type]: this.collection.value, [`$${type}`]: this.collection.meta });
-      let itemString = renderTemplate(
+      let itemString = renderTemplate.call(
+        this,
         itemTemplate.innerHTML,
         this.getStateContext(),
         this.socket

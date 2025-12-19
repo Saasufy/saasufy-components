@@ -44,7 +44,7 @@ class InputTransformer extends HTMLElement {
 
     this.debounce(async () => {
       let providerTemplate = this.getAttribute('provider-template') || '{{value}}';
-      updateConsumerElements(consumers, value, providerTemplate, null, outputType);
+      updateConsumerElements.call(this, consumers, value, providerTemplate, null, outputType);
     }, debounceDelay);
   }
 }

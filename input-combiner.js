@@ -48,7 +48,7 @@ class InputCombiner extends HTMLElement {
 
     this.debounce(async () => {
       let providerTemplate = this.getAttribute('provider-template') || '{{value._root}}';
-      updateConsumerElements(consumers, { ...this.inputValues }, providerTemplate);
+      updateConsumerElements.call(this, consumers, { ...this.inputValues }, providerTemplate);
     }, debounceDelay);
   }
 }

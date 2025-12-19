@@ -235,9 +235,9 @@ function execExpression(expression, options) {
     ...keys,
     `return (function () {
       return (${expression});
-    })();`
+    }).call(this);`
   ];
-  return (new Function(...args))(...keys.map(key => options[key]));
+  return (new Function(...args)).call(this, ...keys.map(key => options[key]));
 }
 
 function getRenderOptions(data, socket) {
@@ -317,7 +317,8 @@ export function renderTemplate(templateString, data, socket, autoExecFunction) {
     if (expression.startsWith('{{{') && expression.endsWith('}}}')) {
       expString = expression.slice(3, -3);
       try {
-        let result = execExpression(
+        let result = execExpression.call(
+          this,
           toExpression(expString),
           options
         );
@@ -334,7 +335,8 @@ export function renderTemplate(templateString, data, socket, autoExecFunction) {
     }
     expString = expression.slice(2, -2);
     try {
-      let result = execExpression(
+      let result = execExpression.call(
+        this,
         toExpression(expString),
         options
       );
@@ -362,7 +364,7 @@ export function updateConsumerElements(consumers, value, template, sourceElement
       .filter(([ selector, attributeName ]) => selector);
 
     if (template) {
-      value = renderTemplate(template, { value }, null, true);
+      value = renderTemplate.call(this, template, { value }, null, true);
     }
 
     if (outputType === 'boolean') {

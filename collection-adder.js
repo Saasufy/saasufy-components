@@ -3,7 +3,8 @@ import {
   updateConsumerElements,
   convertStringToFieldParams,
   getTypeCastFunction,
-  formatError
+  formatError,
+  renderTemplate
 } from './utils.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 
@@ -68,6 +69,17 @@ class CollectionAdder extends SocketConsumer {
 
     let trimSpaces = this.hasAttribute('trim-spaces');
     let outputValue;
+
+    let modelValues = this.getAttribute('model-values');
+    if (modelValues && this.hasAttribute('computable-model-values')) {
+      modelValues = renderTemplate.call(this, modelValues, null, null, true);
+    }
+
+    let {
+      fieldValues: modelFieldValues
+    } = convertStringToFieldParams(modelValues);
+
+    this.modelFieldValues = modelFieldValues;
 
     try {
       let newModelData = {
@@ -160,8 +172,8 @@ class CollectionAdder extends SocketConsumer {
     }
     let providerTemplate = this.getAttribute('provider-template');
     let selfName = this.getAttribute('name');
-    updateConsumerElements(consumers, outputValue, providerTemplate, selfName);
-    updateConsumerElements(oppositeOutcomeConsumers, '', null, selfName);
+    updateConsumerElements.call(this, consumers, outputValue, providerTemplate, selfName);
+    updateConsumerElements.call(this, oppositeOutcomeConsumers, '', null, selfName);
   }
 
   reset() {
@@ -186,17 +198,17 @@ class CollectionAdder extends SocketConsumer {
     this.fieldTypes = fieldTypes;
 
     let {
-      fieldNames: modelFieldNames,
-      fieldValues: modelFieldValues
-    } = convertStringToFieldParams(this.getAttribute('model-values'));
-
-    let {
       fieldValues: modelFieldLabels
     } = convertStringToFieldParams(this.getAttribute('field-labels'));
 
     let {
       fieldValues: optionLabels
     } = convertStringToFieldParams(this.getAttribute('option-labels'));
+
+    let modelValues = this.getAttribute('model-values');
+    let {
+      fieldNames: modelFieldNames
+    } = convertStringToFieldParams(modelValues);
 
     let autocapitalize = this.getAttribute('autocapitalize');
     let autocorrect = this.getAttribute('autocorrect');
@@ -206,8 +218,6 @@ class CollectionAdder extends SocketConsumer {
     }${
       autocorrect ? ` autocorrect="${autocorrect}"` : ''
     }`;
-
-    this.modelFieldValues = modelFieldValues;
 
     if (this.collection) this.collection.destroy();
 

@@ -64,7 +64,8 @@ class ModelViewer extends SocketConsumer {
     if (errorTemplate) {
       let type = this.getAttribute('type-alias') || this.getAttribute('model-type');
       this.setCurrentState({ [`$${type}`]: { error } });
-      let errorItemString = renderTemplate(
+      let errorItemString = renderTemplate.call(
+        this,
         errorTemplate.innerHTML,
         this.getStateContext(),
         this.socket
@@ -102,7 +103,8 @@ class ModelViewer extends SocketConsumer {
     } else if (itemTemplate) {
       let type = this.getAttribute('type-alias') || this.model.type;
       this.setCurrentState({ [type]: modelValue });
-      let itemString = renderTemplate(
+      let itemString = renderTemplate.call(
+        this,
         itemTemplate.innerHTML,
         this.getStateContext(),
         this.socket

@@ -252,7 +252,8 @@ class CollectionViewer extends SocketConsumer {
     if (errorTemplate) {
       let type = this.getAttribute('type-alias') || this.getAttribute('collection-type');
       this.setCurrentState({ [`$${type}`]: { error } });
-      let errorItemString = renderTemplate(
+      let errorItemString = renderTemplate.call(
+        this,
         errorTemplate.innerHTML,
         this.getStateContext(),
         this.socket
@@ -313,7 +314,8 @@ class CollectionViewer extends SocketConsumer {
 
     if (firstItemTemplate) {
       let state = { [`$${type}`]: this.collection.meta };
-      let itemString = renderTemplate(
+      let itemString = renderTemplate.call(
+        this,
         firstItemTemplate.innerHTML,
         {...stateContext, ...state},
         this.socket
@@ -322,7 +324,8 @@ class CollectionViewer extends SocketConsumer {
     }
     if (noItemTemplate && !this.collection.value.length) {
       let state = { [`$${type}`]: this.collection.meta };
-      let itemString = renderTemplate(
+      let itemString = renderTemplate.call(
+        this,
         noItemTemplate.innerHTML,
         {...stateContext, ...state},
         this.socket
@@ -334,7 +337,8 @@ class CollectionViewer extends SocketConsumer {
           [type]: modelItem,
           [`$${type}`]: this.collection.meta
         };
-        let itemString = renderTemplate(
+        let itemString = renderTemplate.call(
+          this,
           itemTemplate.innerHTML,
           {...stateContext, ...state},
           this.socket
@@ -344,7 +348,8 @@ class CollectionViewer extends SocketConsumer {
     }
     if (lastItemTemplate) {
       let state = { [`$${type}`]: this.collection.meta };
-      let itemString = renderTemplate(
+      let itemString = renderTemplate.call(
+        this,
         lastItemTemplate.innerHTML,
         {...stateContext, ...state},
         this.socket

@@ -50,7 +50,8 @@ class OAuthLink extends HTMLElement {
 
     let clientId = this.getAttribute('client-id');
 
-    let itemString = renderTemplate(
+    let itemString = renderTemplate.call(
+      this,
       itemTemplate.innerHTML,
       {
         oauth: {

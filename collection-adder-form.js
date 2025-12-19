@@ -3,7 +3,8 @@ import {
   updateConsumerElements,
   convertStringToFieldParams,
   getTypeCastFunction,
-  formatError
+  formatError,
+  renderTemplate
 } from './utils.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 
@@ -60,6 +61,18 @@ class CollectionAdderForm extends SocketConsumer {
 
     let inputElements = this.getAllInputElements();
     let outputValue;
+
+    let modelValues = this.getAttribute('model-values');
+
+    if (modelValues && this.hasAttribute('computable-model-values')) {
+      modelValues = renderTemplate.call(this, modelValues, null, null, true);
+    }
+
+    let {
+      fieldValues: modelFieldValues
+    } = convertStringToFieldParams(modelValues);
+
+    this.modelFieldValues = modelFieldValues;
 
     try {
       let newModelData = {
@@ -168,8 +181,8 @@ class CollectionAdderForm extends SocketConsumer {
     }
     let providerTemplate = this.getAttribute('provider-template');
     let selfName = this.getAttribute('name');
-    updateConsumerElements(consumers, outputValue, providerTemplate, selfName);
-    updateConsumerElements(oppositeOutcomeConsumers, '', null, selfName);
+    updateConsumerElements.call(this, consumers, outputValue, providerTemplate, selfName);
+    updateConsumerElements.call(this, oppositeOutcomeConsumers, '', null, selfName);
   }
 
   getAllInputElements() {
@@ -209,12 +222,6 @@ class CollectionAdderForm extends SocketConsumer {
 
   render() {
     let collectionType = this.getAttribute('collection-type');
-
-    let {
-      fieldValues: modelFieldValues
-    } = convertStringToFieldParams(this.getAttribute('model-values'));
-
-    this.modelFieldValues = modelFieldValues;
 
     if (this.collection) this.collection.destroy();
 
