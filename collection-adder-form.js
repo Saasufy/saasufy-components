@@ -33,6 +33,7 @@ class CollectionAdderForm extends SocketConsumer {
       'collection-type',
       'model-values',
       'success-message',
+      'disable-submit-on-enter-key',
       'trim-spaces'
     ];
   }
@@ -244,6 +245,14 @@ class CollectionAdderForm extends SocketConsumer {
         await this.submit();
       }
     });
+
+    if (!this.hasAttribute('disable-submit-on-enter-key')) {
+      inputSlot.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          await this.submit();
+        }
+      });
+    }
   }
 }
 
