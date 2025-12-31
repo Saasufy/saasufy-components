@@ -49,6 +49,8 @@ class OAuthLink extends HTMLElement {
     if (!itemTemplate) return;
 
     let clientId = this.getAttribute('client-id');
+    let redirectURI = this.getAttribute('redirect-uri');
+    let grantType = this.getAttribute('grant-type');
 
     let itemString = renderTemplate.call(
       this,
@@ -56,7 +58,9 @@ class OAuthLink extends HTMLElement {
       {
         oauth: {
           clientId,
-          state: this.state
+          state: this.state,
+          redirectURI,
+          grantType
         }
       }
     );
