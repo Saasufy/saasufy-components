@@ -46,7 +46,7 @@ class OAuthHandler extends SocketConsumer {
     let relevantStates = expectedOAuthState
       .split(',')
       .filter(expectedState => expectedState && expectedState.split('-')[0] === provider);
-    
+
     // Do not process. The state may have been set for a different provider
     // which is handled on the same page.
     if (!relevantStates.length) return;
@@ -58,10 +58,14 @@ class OAuthHandler extends SocketConsumer {
 
     let authTimeout = Number(this.getAttribute('auth-timeout') || DEFAULT_AUTH_TIMEOUT);
     let urlSearchParams = new URLSearchParams(location.search);
+    let state = urlSearchParams.get(stateParamName);
+
+    let stateProvider = (state || '').split('-')[0];
+    if (stateProvider !== provider) return;
+    
     let code = urlSearchParams.get(codeParamName);
 
     if (code) {
-      let state = urlSearchParams.get(stateParamName);
       let socket = this.getSocket();
 
       history.replaceState({}, document.title, location.pathname);
