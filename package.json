@@ -1,6 +1,6 @@
 {
   "name": "saasufy-components",
-  "version": "9.0.2",
+  "version": "9.0.3",
   "description": "Components for Saasufy.",
   "main": "index.js",
   "scripts": {
