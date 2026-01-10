@@ -404,7 +404,7 @@ In addition to the slots shown above, the `collection-viewer` also supports the 
 **Attributes**
 
 - `collection-type` (required): Specifies the type of collection to display. This should match a `Model` available in your Saasufy service.
-- `collection-fields` (required): A comma-separated list of fields from the `Model` that you want to display or use. This lets you pick specific pieces of data from your collection to work with.
+- `collection-fields` (required): A comma-separated list of fields from the `Model` that you want to display or use. This lets you pick specific pieces of data from your collection to work with. Note that updates made to these fields can cause the `collection-viewer` to re-render itself so you should consider whether or not a field needs to be specified at this level in the component hierarchy or should be delegated to a child component (otherwise it could cause nested `model-input` components to lose focus).
 - `collection-view` (required): Determines the view of the collection. This should match one of the `Views` defined in your Saasufy service under that specific `Model`.
 - `collection-view-params` (required): Parameters for the view, specified as comma-separated key-value pairs (e.g., key1=value1,key2=value2). These parameters can customize the behavior of the collection view. The keys must match `paramFields` specified in your Saasufy service under the relevant `View`.
 - `collection-page-size`: Sets how many items from the collection are displayed at once. This is useful for pagination, allowing users to navigate through large sets of data in chunks.
