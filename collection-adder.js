@@ -59,6 +59,14 @@ class CollectionAdder extends SocketConsumer {
     messageContainer.classList.remove('error');
     messageContainer.textContent = '';
 
+    // Clear any existing field errors
+    let existingFieldErrors = this.querySelectorAll('.collection-adder-field-error-container');
+    existingFieldErrors.forEach(el => el.textContent = '');
+
+    // Clear error classes from all inputs
+    let allInputs = this.querySelectorAll('.collection-adder-input, .collection-adder-radio');
+    allInputs.forEach(input => input.classList.remove('error'));
+
     let radioInputs = [ ...this.querySelectorAll('.collection-adder-radio') ];
     let radioData = {};
     for (let radio of radioInputs) {
@@ -150,7 +158,36 @@ class CollectionAdder extends SocketConsumer {
     } catch (error) {
       messageContainer.classList.add('error');
       messageContainer.classList.remove('success');
-      messageContainer.textContent = formatError(error);
+
+      if (this.hasAttribute('show-field-errors') && error.fieldErrors) {
+        for (let fieldName in error.fieldErrors) {
+          let fieldError = error.fieldErrors[fieldName];
+          let fieldContainer = this.querySelector(`.collection-adder-field-container[data-field="${fieldName}"]`);
+
+          if (fieldContainer) {
+            let fieldType = this.fieldTypes[fieldName];
+            let errorDiv = fieldContainer.querySelector('.collection-adder-field-error-container');
+
+            // For radio buttons and checkboxes, just add error class to input(s)
+            if (fieldType === 'radio') {
+              let radioInputs = fieldContainer.querySelectorAll('.collection-adder-radio');
+              radioInputs.forEach(radio => radio.classList.add('error'));
+            } else if (fieldType === 'checkbox') {
+              let input = fieldContainer.querySelector('.collection-adder-input');
+              input.classList.add('error');
+            } else {
+              // For other input types, populate the error message div
+              if (errorDiv) {
+                let simpleFieldError = fieldError.replace(/^Invalid [^:]+:/i, '');
+                errorDiv.textContent = simpleFieldError;
+              }
+            }
+          }
+        }
+      } else {
+        messageContainer.textContent = formatError(error);
+      }
+
       this.dispatchEvent(
         new CustomEvent('error', {
           detail: error
@@ -241,101 +278,126 @@ class CollectionAdder extends SocketConsumer {
       let optionLabel = optionLabels[field] == null ? 'Options' : optionLabels[field];
       if (inputType === 'checkbox') {
         items.push(
-          `<label>
-            ${
-              inputLabel
-            }
-            <input class="collection-adder-input" type="${
-              inputType
-            }" name="${
-              field
-            }" />
-          </label>`
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <label>
+              ${
+                inputLabel
+              }
+              <input class="collection-adder-input" type="${
+                inputType
+              }" name="${
+                field
+              }" />
+            </label>
+          </div>`
         );
       } else if (inputType === 'select') {
         items.push(
-          `<label>
-            ${
-              inputLabel
-            }
-            <select name="${field}" class="collection-adder-input collection-adder-select">
-              <option value="" selected disabled hidden>${optionLabel}</option>
-              ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
-            </select>
-          </label>`
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <label>
+              ${
+                inputLabel
+              }
+              <select name="${field}" class="collection-adder-input collection-adder-select">
+                <option value="" selected disabled hidden>${optionLabel}</option>
+                ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
+              </select>
+            </label>
+          </div>`
         );
       } else if (inputType === 'text-select') {
         items.push(
-          `<div class="collection-adder-select-text-row">
-            <input class="collection-adder-input" type="text" name="${
-              field
-            }" placeholder="${
-              inputLabel
-            }"${extraAttributesString} />
-            <select class="collection-adder-select">
-              <option value="" selected disabled hidden>${optionLabel}</option>
-              ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
-            </select>
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <div class="collection-adder-select-text-row">
+              <input class="collection-adder-input" type="text" name="${
+                field
+              }" placeholder="${
+                inputLabel
+              }"${extraAttributesString} />
+              <select class="collection-adder-select">
+                <option value="" selected disabled hidden>${optionLabel}</option>
+                ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
+              </select>
+            </div>
           </div>`
         );
       } else if (inputType === 'radio') {
         items.push(
-          `
-            ${
-              inputLabel
-            }
-            ${
-              inputTypeParams.map(
-                param => (
-                  `<label>
-                    <input class="collection-adder-radio" type="${
-                      inputType
-                    }" name="${
-                      field
-                    }" value=${
-                      param
-                    } />
-                    ${param}
-                  </label>`
-                )
-              ).join('')
-            }`
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <div>
+              ${
+                inputLabel
+              }
+              ${
+                inputTypeParams.map(
+                  param => (
+                    `<label>
+                      <input class="collection-adder-radio" type="${
+                        inputType
+                      }" name="${
+                        field
+                      }" value=${
+                        param
+                      } />
+                      ${param}
+                    </label>`
+                  )
+                ).join('')
+              }
+            </div>
+          </div>`
         );
       } else if (inputType === 'textarea') {
         items.push(
-          `<textarea class="collection-adder-input" name="${
-            field
-          }" placeholder="${
-            inputLabel
-          }"${extraAttributesString}></textarea>`
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <textarea class="collection-adder-input" name="${
+              field
+            }" placeholder="${
+              inputLabel
+            }"${extraAttributesString}></textarea>
+          </div>`
         );
       } else if (inputType === 'file') {
         items.push(
-          `<input class="collection-adder-input" type="${
-            inputType
-          }" name="${
-            field
-          }"${extraAttributesString} />`
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <input class="collection-adder-input" type="${
+              inputType
+            }" name="${
+              field
+            }"${extraAttributesString} />
+          </div>`
         );
       } else if (inputType === 'number') {
         items.push(
-          `<input class="collection-adder-input" type="${
-            inputType
-          }" name="${
-            field
-          }" placeholder="${
-            inputLabel
-          }" step="any"${extraAttributesString} />`
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <input class="collection-adder-input" type="${
+              inputType
+            }" name="${
+              field
+            }" placeholder="${
+              inputLabel
+            }" step="any"${extraAttributesString} />
+          </div>`
         );
       } else {
         items.push(
-          `<input class="collection-adder-input" type="${
-            inputType
-          }" name="${
-            field
-          }" placeholder="${
-            inputLabel
-          }"${extraAttributesString} />`
+          `<div class="collection-adder-field-container" data-field="${field}">
+            <div class="collection-adder-field-error-container error"></div>
+            <input class="collection-adder-input" type="${
+              inputType
+            }" name="${
+              field
+            }" placeholder="${
+              inputLabel
+            }"${extraAttributesString} />
+          </div>`
         );
       }
     }

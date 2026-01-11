@@ -437,6 +437,7 @@ This component is a simplified version of the `collection-adder-form` component 
   collection-fields="name,brand,qty"
   model-values="categoryName=electronics,isNew:boolean=true"
   submit-button-label="Create"
+  show-field-errors
   trim-spaces
 ></collection-adder>
 ```
@@ -453,6 +454,7 @@ This component is a simplified version of the `collection-adder-form` component 
 - `success-message`: A message to show the user if the resource has been successfully added to the collection after submitting the form.
 - `autocapitalize`: Can be set to `off` to disable auto-capitalization of the first input character on mobile devices.
 - `autocorrect`: Can be set to `off` to disable auto-correction of input on mobile devices.
+- `show-field-errors`: If this attribute exists on the element, then granular error messages will be shown above each corresponding input element instead of a single form-level error message.
 - `trim-spaces`: If this attribute exists on the element, then leading and trailing spaces will be trimmed from each input element's value before submitting the form.
 - `consumers`: This allows you to connect this `collection-adder` to other elements on your page. It should be used in conjunction with the `provider-template` attribute. The `consumers` attribute takes a list of selectors with optional attributes to target in the format `element-selector:attribute-name`. For example `.my-input:value` will find all elements with a `my-input` class and update their `value` attributes with the output of the `collection-adder` component on submit. You can specify multiple selectors separated by commas such as `.my-input,my-div`; in this case, because attribute names are not specified, values will be injected into the `value` attribute (for input elements) or into the `innerHTML` property (for other kinds of elements). The default attribute/property depends on the element type.
 - `success-consumers`: Same as the `consumers` attribute but the target elements are only updated if insertion was a success.

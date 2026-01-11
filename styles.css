@@ -159,6 +159,11 @@ collection-adder .collection-adder-form-content > label {
   align-self: flex-start;
 }
 
+collection-adder .collection-adder-field-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .label-container {
   display: flex;
   justify-content: flex-start;
