@@ -58,6 +58,20 @@ class CollectionAdderForm extends SocketConsumer {
       messageContainer.textContent = '';
     }
 
+    // Clear any existing field errors
+    let inputSlot = this.shadowRoot.querySelector('.input-slot');
+    if (inputSlot) {
+      let slottedElements = inputSlot.assignedElements();
+      slottedElements.forEach(element => {
+        let existingFieldErrors = element.querySelectorAll('.collection-adder-field-error-container');
+        existingFieldErrors.forEach(el => el.textContent = '');
+
+        // Clear error classes from all inputs
+        let allInputs = element.querySelectorAll('input, textarea, select');
+        allInputs.forEach(input => input.classList.remove('error'));
+      });
+    }
+
     let trimSpaces = this.hasAttribute('trim-spaces');
 
     let inputElements = this.getAllInputElements();
@@ -158,8 +172,45 @@ class CollectionAdderForm extends SocketConsumer {
       if (messageContainer) {
         messageContainer.classList.add('error');
         messageContainer.classList.remove('success');
+      }
+
+      if (this.hasAttribute('show-field-errors') && error.fieldErrors) {
+        let inputElements = this.getAllInputElements();
+
+        for (let fieldName in error.fieldErrors) {
+          let fieldError = error.fieldErrors[fieldName];
+
+          // Find the input element by name
+          let input = inputElements.find(el => el.name === fieldName);
+
+          if (input) {
+            // Look for a parent field container
+            let fieldContainer = input.closest('.collection-adder-field-container');
+
+            if (fieldContainer) {
+              let errorDiv = fieldContainer.querySelector('.collection-adder-field-error-container');
+              let inputType = input.type || (input.nodeName === 'TEXTAREA' ? 'textarea' : 'select');
+
+              // For radio buttons and checkboxes, just add error class to input(s)
+              if (inputType === 'radio') {
+                let radioInputs = fieldContainer.querySelectorAll(`input[name="${fieldName}"][type="radio"]`);
+                radioInputs.forEach(radio => radio.classList.add('error'));
+              } else if (inputType === 'checkbox') {
+                input.classList.add('error');
+              } else {
+                // For other input types, populate the error message div
+                if (errorDiv) {
+                  let simpleFieldError = fieldError.replace(/^Invalid [^:]+:/i, '');
+                  errorDiv.textContent = simpleFieldError;
+                }
+              }
+            }
+          }
+        }
+      } else if (messageContainer) {
         messageContainer.textContent = formatError(error);
       }
+
       this.dispatchEvent(
         new CustomEvent('error', {
           detail: error
