@@ -162,6 +162,7 @@ collection-adder .collection-adder-form-content > label {
 collection-adder .collection-adder-field-container {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
 .label-container {
