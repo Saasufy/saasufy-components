@@ -1,9 +1,11 @@
 import { create } from '/node_modules/socketcluster-client/socketcluster-client.min.js';
-import { convertStringToFieldParams } from './utils.js';
+import { convertStringToFieldParams, debouncer } from './utils.js';
 
 let globalSocket;
 
 let urlPartsRegExp = /(^[^:]+):\/\/([^:\/]*)(:[0-9]*)?(\/.*)/;
+
+const DEFAULT_DEBOUNCE_DELAY = 200;
 
 export function createGlobalSocket(options) {
   globalSocket = create({ ...options });
@@ -23,6 +25,7 @@ export class SocketProvider extends HTMLElement {
     this.saasufySocket = null;
     this.isReady = false;
     this.lastExtraSocketOptionsString = '';
+    this.debounce = debouncer();
   }
 
   connectedCallback() {
@@ -189,12 +192,61 @@ export class SocketProvider extends HTMLElement {
     return socket;
   }
 
+  async reauthenticateSocket() {
+    if (this.saasufySocket) {
+      await this.saasufySocket.invoke('reauthenticate');
+    }
+  }
+
+  handleAuthStateChange(event) {
+    if (this.saasufySocket) {
+      if (this.accessChangeChannelConsumer) {
+        this.accessChangeChannelConsumer.kill();
+        this.accessChangeChannelConsumer = null;
+      }
+      let accountId = event.authToken?.accountId;
+      if (accountId) {
+        this.accessChangeChannelConsumer = this.saasufySocket
+          .subscribe(`account-access-change/${accountId}`)
+          .createConsumer();
+        
+        let debounceDelay = Number(
+          this.getAttribute('debounce-delay') ?? DEFAULT_DEBOUNCE_DELAY
+        );
+
+        (async () => {
+          for await (let data of this.accessChangeChannelConsumer) {
+            this.debounce(this.reauthenticateSocket, debounceDelay);
+          }
+        })();
+      } else {
+        let accessChangesChannelRegExp = /^account-access-change\/([^\/]*)/;
+        let accessSubscriptions = this.saasufySocket.subscriptions(true).filter(
+          (channelName) => channelName.match(accessChangesChannelRegExp)
+        );
+        for (let channelName of accessSubscriptions) {
+          this.saasufySocket.unsubscribe(channelName);
+        }
+      }
+    }
+  }
+
   createSocket() {
     let socketOptions = this.getSocketOptions();
     this.saasufySocket = create(socketOptions);
     this.lastSaasufySocketURL = this.getSanitizedURL();
     this.lastExtraSocketOptionsString = this.getAttribute('socket-options') || '';
 
+    if (this.authStateChangeConsumer) {
+      this.authStateChangeConsumer.kill();
+    }
+    this.authStateChangeConsumer = this.saasufySocket.listener('authStateChange').createConsumer();
+    (async () => {
+      for await (let event of this.authStateChangeConsumer) {
+        this.handleAuthStateChange(event);
+      }
+    })();
+    
     return this.saasufySocket;
   }
 }
