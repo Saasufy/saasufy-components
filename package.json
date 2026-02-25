@@ -19,7 +19,7 @@
   "dependencies": {
     "ag-collection": "^5.4.0",
     "ag-model": "^3.2.0",
-    "capitalisk-auth-client": "^1.5.5",
+    "capitalisk-auth-client": "^2.0.0",
     "socketcluster-client": "^20.0.1",
     "uuid": "^8.3.2"
   },
