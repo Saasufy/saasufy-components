@@ -35,7 +35,8 @@ class ModelViewer extends SocketConsumer {
       'model-id',
       'model-fields',
       'fields-slice-to',
-      'type-alias'
+      'type-alias',
+      'realtime-fields'
     ];
   }
 
@@ -160,12 +161,16 @@ class ModelViewer extends SocketConsumer {
     }
     this.socket = socket;
 
+    let realtimeFields = this.hasAttribute('realtime-fields') ?
+      this.getAttribute('realtime-fields').split(',').map(field => field.trim()).filter(field => field) : null;
+
     this.model = new AGModel({
       socket: this.socket,
       type: modelType,
       id: modelId,
       fields: modelFields.split(',').map(field => field.trim()).filter(field => field),
-      fieldTransformations
+      fieldTransformations,
+      realtimeFields
     });
 
     this.shadowRoot.innerHTML = `

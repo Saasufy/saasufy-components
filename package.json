@@ -1,6 +1,6 @@
 {
   "name": "saasufy-components",
-  "version": "9.3.1",
+  "version": "9.4.0",
   "description": "Components for Saasufy.",
   "main": "index.js",
   "scripts": {
@@ -17,8 +17,8 @@
   "author": "Jonathan Gros-Dubois",
   "license": "MIT",
   "dependencies": {
-    "ag-collection": "^5.4.1",
-    "ag-model": "^3.2.1",
+    "ag-collection": "^6.0.0",
+    "ag-model": "^4.0.0",
     "capitalisk-auth-client": "^2.0.0",
     "socketcluster-client": "^20.0.1",
     "uuid": "^8.3.2"

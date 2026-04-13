@@ -163,6 +163,7 @@ class CollectionViewer extends SocketConsumer {
       'collection-page-offset',
       'collection-get-count',
       'collection-disable-realtime',
+      'realtime-fields',
       'auto-reset-page-offset',
       'max-show-loader',
       'type-alias'
@@ -379,6 +380,8 @@ class CollectionViewer extends SocketConsumer {
     let collectionPageOffset = this.getAttribute('collection-page-offset');
     let collectionGetCount = this.hasAttribute('collection-get-count');
     let collectionDisableRealtime = this.hasAttribute('collection-disable-realtime');
+    let realtimeFields = this.hasAttribute('realtime-fields') ?
+      this.getAttribute('realtime-fields').split(',').map(field => field.trim()).filter(field => field) : null;
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
@@ -402,7 +405,8 @@ class CollectionViewer extends SocketConsumer {
       pageOffset: Number(collectionPageOffset || 0),
       changeReloadDelay: collectionReloadDelay,
       getCount: collectionGetCount,
-      realtimeCollection: !collectionDisableRealtime
+      realtimeCollection: !collectionDisableRealtime,
+      realtimeFields
     });
 
     this.shadowRoot.innerHTML = `

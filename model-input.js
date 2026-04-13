@@ -50,7 +50,8 @@ class ModelInput extends SocketConsumer {
       'autocorrect',
       'input-id',
       'input-props',
-      'ignore-invalid-selection'
+      'ignore-invalid-selection',
+      'realtime-fields'
     ];
   }
 

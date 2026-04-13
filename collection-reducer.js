@@ -75,6 +75,7 @@ class CollectionReducer extends SocketConsumer {
       'collection-page-size',
       'collection-page-offset',
       'collection-get-count',
+      'realtime-fields',
       'max-show-loader',
       'type-alias'
     ];
@@ -217,6 +218,8 @@ class CollectionReducer extends SocketConsumer {
     let collectionPageOffset = this.getAttribute('collection-page-offset');
     let collectionGetCount = this.hasAttribute('collection-get-count');
 
+    let realtimeFields = this.hasAttribute('realtime-fields') ?
+      this.getAttribute('realtime-fields').split(',').map(field => field.trim()).filter(field => field) : null;
     let collectionReloadDelay = Number(
       this.getAttribute('collection-reload-delay') || DEFAULT_RELOAD_DELAY
     );
@@ -234,7 +237,8 @@ class CollectionReducer extends SocketConsumer {
       pageSize: Number(collectionPageSize || 10),
       pageOffset: Number(collectionPageOffset || 0),
       changeReloadDelay: collectionReloadDelay,
-      getCount: collectionGetCount
+      getCount: collectionGetCount,
+      realtimeFields
     });
 
     this.shadowRoot.innerHTML = `
