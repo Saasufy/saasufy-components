@@ -974,7 +974,7 @@ A link to initiate an OAuth flow to authenticate a user as part of log in. Can s
 - `client-id` (required): This is the client ID from the third-party OAuth provider.
 - `state-size`: This allows you to control the size (in bytes) of the random state string which is passed to the OAuth provider as part of the OAuth flow. Defaults to 20.
 - `state-storage-key`: The state string is stored in the browser's `sessionStorage` under this key. Defaults to `oauth.state`. It must match the value provided to the `oauth-handler` component at the end of the OAuth flow.
-- `use-session-storage`: By default, the state is stored inside sessionStorage. If this property is set, then the state will be stored inside localStorage instead. This is useful for sharing the state across different tabs. If set, this attribute should also be set on the related `oauth-handler` component.
+- `use-session-storage`: By default, the state is stored inside localStorage. If this property is set, then the state will be stored inside sessionStorage instead. If set, this attribute should also be set on the related `oauth-handler` component.
 
 ### oauth-handler
 
