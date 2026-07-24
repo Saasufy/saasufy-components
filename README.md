@@ -974,7 +974,7 @@ A link to initiate an OAuth flow to authenticate a user as part of log in. Can s
 - `client-id` (required): This is the client ID from the third-party OAuth provider.
 - `state-size`: This allows you to control the size (in bytes) of the random state string which is passed to the OAuth provider as part of the OAuth flow. Defaults to 20.
 - `state-storage-key`: The state string is stored in the browser's `sessionStorage` under this key. Defaults to `oauth.state`. It must match the value provided to the `oauth-handler` component at the end of the OAuth flow.
-- `use-local-storage`: By default, the state is stored inside sessionStorage. If this property is set, then the state will be stored inside localStorage instead. This is useful for sharing the state across different tabs. If set, this attribute should also be set on the related `oauth-handler` component.
+- `use-session-storage`: By default, the state is stored inside sessionStorage. If this property is set, then the state will be stored inside localStorage instead. This is useful for sharing the state across different tabs. If set, this attribute should also be set on the related `oauth-handler` component.
 
 ### oauth-handler
 
@@ -1004,7 +1004,7 @@ When using an OAuth provider, the callback URL which you register with the provi
 - `code-param-name`: The name of the query parameter which holds the `code` as provided by the OAuth provider within the OAuth callback URL. Defaults to `code`.
 - `state-param-name`: The name of the query parameter which holds the `state` as provided by the OAuth provider within the OAuth callback URL. Defaults to `state`.
 - `auth-timeout`: The number of milliseconds to wait for authentication to complete before timing out. Defaults to 10000 (10 seconds).
-- `use-local-storage`: By default, the state is retrieved from sessionStorage. If this property is set, then the state will be retrieved from localStorage instead. This is useful for sharing the state across different tabs. If set, this attribute should also be set on the related `oauth-link` component.
+- `use-session-storage`: By default, the state is retrieved from localStorage. If this property is set, then the state will be retrieved from sessionStorage instead. If set, this attribute should also be set on the related `oauth-link` component.
 
 ### render-group
 

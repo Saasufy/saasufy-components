@@ -17,7 +17,7 @@ class OAuthLink extends HTMLElement {
       'client-id',
       'state-size',
       'state-storage-key',
-      'use-local-storage'
+      'use-session-storage'
     ];
   }
 
@@ -77,7 +77,7 @@ class OAuthLink extends HTMLElement {
     if (!provider) {
       throw new Error('The provider attribute of oauth-link was not specified');
     }
-    let useLocalStorage = this.hasAttribute('use-local-storage');
+    let useLocalStorage = !this.hasAttribute('use-session-storage');
     let stateSize = Number(this.getAttribute('state-size') || 20);
     let storageKey = this.getAttribute('state-storage-key') || 'oauth.state';
     

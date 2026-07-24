@@ -33,7 +33,7 @@ class OAuthHandler extends SocketConsumer {
       throw new Error('The provider attribute of oauth-handler was not specified');
     }
 
-    let useLocalStorage = this.hasAttribute('use-local-storage');
+    let useLocalStorage = !this.hasAttribute('use-session-storage');
     let storageKey = this.getAttribute('state-storage-key') || 'oauth.state';
     let expectedOAuthState = (useLocalStorage ? localStorage : sessionStorage).getItem(storageKey);
     if (!expectedOAuthState) {
