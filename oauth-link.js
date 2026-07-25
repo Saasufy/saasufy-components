@@ -9,6 +9,10 @@ class OAuthLink extends HTMLElement {
     this.handleSlotChangeEvent = () => {
       this.renderItem();
     };
+
+    this.handleClickEvent = () => {
+      this.updateState();
+    };
   }
 
   static get observedAttributes() {
@@ -34,10 +38,12 @@ class OAuthLink extends HTMLElement {
 
     this.render();
     this.shadowRoot.addEventListener('slotchange', this.handleSlotChangeEvent);
+    this.addEventListener('click', this.handleClickEvent);
   }
 
   disconnectedCallback() {
     this.shadowRoot.removeEventListener('slotchange', this.handleSlotChangeEvent);
+    this.removeEventListener('click', this.handleClickEvent);
   }
 
   renderItem() {
@@ -67,12 +73,7 @@ class OAuthLink extends HTMLElement {
     viewportNode.innerHTML = itemString;
   }
 
-  render() {
-    if (this.code) {
-      this.shadowRoot.innerHTML = '';
-      return;
-    }
-
+  updateState() {
     let provider = this.getAttribute('provider');
     if (!provider) {
       throw new Error('The provider attribute of oauth-link was not specified');
@@ -93,10 +94,22 @@ class OAuthLink extends HTMLElement {
     } else {
       stateList = []
     }
-    this.state = `${provider}-${generateRandomHexString(stateSize)}`;
+    if (this.provider !== provider) {
+      this.state = `${provider}-${generateRandomHexString(stateSize)}`;
+      this.provider = provider;
+    }
     stateList.unshift(this.state);
 
     storage.setItem(storageKey, stateList.join(','));
+  }
+
+  render() {
+    if (this.code) {
+      this.shadowRoot.innerHTML = '';
+      return;
+    }
+
+    this.updateState();
 
     this.shadowRoot.innerHTML = `
       <slot name="item"></slot>
