@@ -25,6 +25,13 @@ class OAuthHandler extends SocketConsumer {
     }
   }
 
+  getProviderFromState(state) {
+    if (typeof state !== 'string') return '';
+    let lastDashIndex = state.lastIndexOf('-');
+    if (lastDashIndex === -1) return state;
+    return state.slice(0, lastDashIndex);
+  }
+
   async connectedCallback() {
     this.innerHTML = '';
 
@@ -45,7 +52,7 @@ class OAuthHandler extends SocketConsumer {
 
     let relevantStates = expectedOAuthState
       .split(',')
-      .filter(expectedState => expectedState && expectedState.split('-')[0] === provider);
+      .filter(expectedState => this.getProviderFromState(expectedState) === provider);
 
     // Do not process. The state may have been set for a different provider
     // which is handled on the same page.
@@ -60,7 +67,7 @@ class OAuthHandler extends SocketConsumer {
     let urlSearchParams = new URLSearchParams(location.search);
     let state = urlSearchParams.get(stateParamName);
 
-    let stateProvider = (state || '').split('-')[0];
+    let stateProvider = this.getProviderFromState(state);
     if (stateProvider !== provider) return;
     
     let code = urlSearchParams.get(codeParamName);
