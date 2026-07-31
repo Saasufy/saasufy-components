@@ -62,6 +62,11 @@ class OAuthHandler extends SocketConsumer {
     let stateParamName = this.getAttribute('state-param-name') || 'state';
     let extraDataString = this.getAttribute('extra-data') || '';
     let { fieldValues: extraData } = convertStringToFieldParams(extraDataString);
+    let redirectURI = this.getAttribute('redirect-uri');
+
+    if (redirectURI) {
+      extraData.redirectURI = redirectURI;
+    }
 
     let authTimeout = Number(this.getAttribute('auth-timeout') || DEFAULT_AUTH_TIMEOUT);
     let urlSearchParams = new URLSearchParams(location.search);
