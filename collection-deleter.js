@@ -27,14 +27,14 @@ class CollectionDeleter extends HTMLElement {
 
   showConfirmModal(deleteField) {
     let message = this.getAttribute('confirm-message');
-    let title = this.getAttribute('confirm-title');
+    let heading = this.getAttribute('confirm-heading');
     let confirmButtonLabel = this.getAttribute('confirm-button-label');
     let cancelButtonLabel = this.getAttribute('cancel-button-label');
     this.dispatchEvent(
       new CustomEvent('showModal', {
         detail: {
           message,
-          title,
+          heading,
           confirmButtonLabel,
           cancelButtonLabel,
           callback: () => {

@@ -541,6 +541,7 @@ OR (with confirmation step)
 - `model-id` (required): Specifies the ID of the resource to delete from the parent collection when this component is activated. This can be achieved by invoking either the `deleteItem()` or `confirmDeleteItem()` function from inside an event handler. The example above shows how to achieve deletion via the `onclick` event. You can either invoke `deleteItem()` to delete the resource immediately or you can invoke `confirmDeleteItem()` to require additional confirmation prior to deletion.
 - `onclick` (required): The logic to execute to delete the item. Should be either `deleteItem()` or `confirmDeleteItem()`.
 - `confirm-message`: The confirmation message to show the user when this component's `confirmDeleteItem()` function is invoked.
+- `confirm-heading`: The heading to show in the confirmation modal's title bar when this component's `confirmDeleteItem()` function is invoked.
 - `model-field`: If specified, this attribute can be used to delete a single field of a model instance, instead of the whole instance.
 
 If `confirmDeleteItem()` is used, then the parent `collection-viewer` must have a `confirm-modal` element slotted into it as shown here:
@@ -563,7 +564,7 @@ If `confirmDeleteItem()` is used, then the parent `collection-viewer` must have 
   <div slot="viewport" class="chat-viewport"></div>
 
   <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
-  <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
+  <confirm-modal slot="modal" heading="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
 </collection-viewer>
 ```
 
@@ -1173,16 +1174,17 @@ A modal component to prompt the user for confirmation before performing sensitiv
   <div slot="viewport"></div>
 
   <!-- The confirm-modal element must be specified here with slot="modal" to prompt the user for confirmation -->
-  <confirm-modal slot="modal" title="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
+  <confirm-modal slot="modal" heading="Delete confirmation" message="" confirm-button-label="Delete"></confirm-modal>
 </collection-viewer>
 ```
 
 **Attributes**
 
-- `title`: The text to show in the modal's title bar.
+- `heading`: The text to show in the modal's title bar.
 - `message`: The text to show as the modal's main content.
 - `confirm-button-label`: The text to use as the confirm button label.
 - `cancel-button-label`: The text to use as the cancel button label.
+- `auto-focus`: Which button to focus when the modal is shown; either `confirm` (or its alias `delete`) or `cancel`. If not specified, no button will be focused.
 
 ### overlay-modal
 
