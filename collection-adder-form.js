@@ -50,21 +50,14 @@ class CollectionAdderForm extends SocketConsumer {
       throw new Error('Collection adder form is not ready to be submitted');
     }
     let successMessage = this.getAttribute('success-message');
-    let messageContainer = this.shadowRoot.querySelector('slot[name="message"]').assignedElements()[0];
+    let messageContainer;
 
-    if (messageContainer) {
-      messageContainer.classList.remove('success');
-      messageContainer.classList.remove('error');
-      messageContainer.textContent = '';
+    // By default, the previous status is only cleared once the outcome of the
+    // submit is known so that the status is replaced within a single frame; this
+    // avoids the form flickering when the same error occurs twice in a row.
+    if (this.hasAttribute('reset-status-on-submit')) {
+      this.clearStatus();
     }
-
-    // Clear any existing field errors
-    let existingFieldErrors = this.querySelectorAll('.collection-adder-field-error-container');
-    existingFieldErrors.forEach(el => el.remove());
-
-    // Clear error classes from all inputs
-    let allInputs = this.querySelectorAll('input, textarea, select');
-    allInputs.forEach(input => input.classList.remove('error'));
 
     let trimSpaces = this.hasAttribute('trim-spaces');
 
@@ -133,6 +126,9 @@ class CollectionAdderForm extends SocketConsumer {
       };
 
       let resourceId = await this.collection.create(newModelData);
+
+      this.clearStatus();
+
       let insertedModelData = {
         ...newModelData,
         id: resourceId
@@ -162,6 +158,8 @@ class CollectionAdderForm extends SocketConsumer {
         }
       }
     } catch (error) {
+      this.clearStatus();
+
       messageContainer = this.shadowRoot.querySelector('slot[name="message"]').assignedElements()[0];
       if (messageContainer) {
         messageContainer.classList.add('error');
@@ -227,6 +225,24 @@ class CollectionAdderForm extends SocketConsumer {
     let selfName = this.getAttribute('name');
     updateConsumerElements.call(this, consumers, outputValue, providerTemplate, selfName);
     updateConsumerElements.call(this, oppositeOutcomeConsumers, '', null, selfName);
+  }
+
+  clearStatus() {
+    let messageContainer = this.shadowRoot.querySelector('slot[name="message"]').assignedElements()[0];
+
+    if (messageContainer) {
+      messageContainer.classList.remove('success');
+      messageContainer.classList.remove('error');
+      messageContainer.textContent = '';
+    }
+
+    // Clear any existing field errors
+    let existingFieldErrors = this.querySelectorAll('.collection-adder-field-error-container');
+    existingFieldErrors.forEach(el => el.remove());
+
+    // Clear error classes from all inputs
+    let allInputs = this.querySelectorAll('input, textarea, select');
+    allInputs.forEach(input => input.classList.remove('error'));
   }
 
   getAllInputElements() {

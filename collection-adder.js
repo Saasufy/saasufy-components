@@ -55,17 +55,12 @@ class CollectionAdder extends SocketConsumer {
     let successMessage = this.getAttribute('success-message');
     let messageContainer = this.querySelector('.collection-adder-message-container');
 
-    messageContainer.classList.remove('success');
-    messageContainer.classList.remove('error');
-    messageContainer.textContent = '';
-
-    // Clear any existing field errors
-    let existingFieldErrors = this.querySelectorAll('.collection-adder-field-error-container');
-    existingFieldErrors.forEach(el => el.textContent = '');
-
-    // Clear error classes from all inputs
-    let allInputs = this.querySelectorAll('.collection-adder-input, .collection-adder-radio');
-    allInputs.forEach(input => input.classList.remove('error'));
+    // By default, the previous status is only cleared once the outcome of the
+    // submit is known so that the status is replaced within a single frame; this
+    // avoids the form flickering when the same error occurs twice in a row.
+    if (this.hasAttribute('reset-status-on-submit')) {
+      this.clearStatus();
+    }
 
     let radioInputs = [ ...this.querySelectorAll('.collection-adder-radio') ];
     let radioData = {};
@@ -131,6 +126,9 @@ class CollectionAdder extends SocketConsumer {
         )
       };
       let resourceId = await this.collection.create(newModelData);
+
+      this.clearStatus();
+
       let insertedModelData = {
         ...newModelData,
         id: resourceId
@@ -156,6 +154,8 @@ class CollectionAdder extends SocketConsumer {
         messageContainer.textContent = '';
       }
     } catch (error) {
+      this.clearStatus();
+
       messageContainer.classList.add('error');
       messageContainer.classList.remove('success');
 
@@ -211,6 +211,24 @@ class CollectionAdder extends SocketConsumer {
     let selfName = this.getAttribute('name');
     updateConsumerElements.call(this, consumers, outputValue, providerTemplate, selfName);
     updateConsumerElements.call(this, oppositeOutcomeConsumers, '', null, selfName);
+  }
+
+  clearStatus() {
+    let messageContainer = this.querySelector('.collection-adder-message-container');
+
+    if (messageContainer) {
+      messageContainer.classList.remove('success');
+      messageContainer.classList.remove('error');
+      messageContainer.textContent = '';
+    }
+
+    // Clear any existing field errors
+    let existingFieldErrors = this.querySelectorAll('.collection-adder-field-error-container');
+    existingFieldErrors.forEach(el => el.textContent = '');
+
+    // Clear error classes from all inputs
+    let allInputs = this.querySelectorAll('.collection-adder-input, .collection-adder-radio');
+    allInputs.forEach(input => input.classList.remove('error'));
   }
 
   reset() {
