@@ -92,10 +92,8 @@ class CollectionAdderForm extends SocketConsumer {
                 } else {
                   inputType = input.type;
                 }
-                let Type = getTypeCastFunction(
-                  inputType === 'hidden' ?
-                    input.getAttribute('output-type') : inputType
-                );
+                let outputType = input.getAttribute('output-type');
+                let Type = getTypeCastFunction(outputType || inputType);
                 let value;
                 if (inputType === 'file' && input.files && input.files.length) {
                   let reader = new FileReader();
