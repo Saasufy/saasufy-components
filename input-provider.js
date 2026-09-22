@@ -3,7 +3,8 @@ import {
   renderTemplate,
   updateConsumerElements,
   convertStringToFieldParams,
-  convertStringToFieldTypeValues
+  convertStringToFieldTypeValues,
+  getTypeCastFunction
 } from './utils.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 800;
@@ -135,15 +136,21 @@ class InputProvider extends HTMLElement {
       elementType = 'input';
     }
     this.inputElement = document.createElement(elementType);
+    let optionValues = null;
     if (type === 'select') {
       if (options != null) {
         let fieldTypeValues = convertStringToFieldTypeValues(options, true, true);
+        optionValues = new Map();
         let optionElements = fieldTypeValues
           .map((option) => {
             if (option.field === placeholder) {
               return `<option value="" selected class="select-default-option">${option.field}</option>`;
             }
-            return `<option value="${option.value ?? option.field}">${option.field}</option>`;
+            let Type = getTypeCastFunction(option.type);
+            let optionValue = Type(option.value ?? option.field);
+            let elementValue = String(optionValue);
+            optionValues.set(elementValue, optionValue);
+            return `<option value="${elementValue}">${option.field}</option>`;
           })
           .join('');
         this.inputElement.innerHTML = optionElements;
@@ -189,7 +196,7 @@ class InputProvider extends HTMLElement {
     this.updateInputClassList(value);
     this.appendChild(this.inputElement);
 
-    let destroyHandlers = this.updateConsumerElementsOnEdit();
+    let destroyHandlers = this.updateConsumerElementsOnEdit(optionValues);
 
     if (this.hasAttribute('force-init-change')) {
       this.forceTriggerChange = true;
@@ -208,7 +215,14 @@ class InputProvider extends HTMLElement {
     };
   }
 
-  updateConsumerElementsOnEdit() {
+  getTargetValue(inputValue, inputElement, optionValues) {
+    if (optionValues && optionValues.has(inputValue)) {
+      return optionValues.get(inputValue);
+    }
+    return inputElement.type === 'number' ? Number(inputValue) : inputValue;
+  }
+
+  updateConsumerElementsOnEdit(optionValues) {
     let consumers = this.getAttribute('consumers');
     if (!consumers) return () => {};
 
@@ -235,8 +249,7 @@ class InputProvider extends HTMLElement {
         if (event.target.value === '') {
           updateConsumerElements.call(this, consumers, '', providerTemplate, elementName);
         } else {
-          let targetValue = inputElement.type === 'number' ?
-            Number(event.target.value) : event.target.value;
+          let targetValue = this.getTargetValue(event.target.value, inputElement, optionValues);
           updateConsumerElements.call(this, consumers, targetValue, providerTemplate, elementName);
         }
       }, debounceDelay);
@@ -256,8 +269,7 @@ class InputProvider extends HTMLElement {
           if (event.target.value === '') {
             updateConsumerElements.call(this, consumers, '', providerTemplate, elementName);
           } else {
-            let targetValue = inputElement.type === 'number' ?
-              Number(event.target.value) : event.target.value;
+            let targetValue = this.getTargetValue(event.target.value, inputElement, optionValues);
             updateConsumerElements.call(this, consumers, targetValue, providerTemplate, elementName);
           }
         }, debounceDelay);

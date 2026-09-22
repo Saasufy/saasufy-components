@@ -4,6 +4,7 @@ import {
   updateConsumerElements,
   convertStringToFieldParams,
   convertStringToFieldTypeValues,
+  getTypeCastFunction,
   formatError,
   renderTemplate
 } from './utils.js';
@@ -207,15 +208,21 @@ class ModelInput extends SocketConsumer {
     }
     this.inputElement = document.createElement(elementType);
     let optionList = null;
+    let optionValues = null;
     if (type === 'select') {
       if (options != null) {
         let fieldTypeValues = convertStringToFieldTypeValues(options, true, true);
+        optionValues = new Map();
         let optionElements = fieldTypeValues
           .map((option) => {
             if (option.field === placeholder) {
               return `<option value="" selected class="select-default-option">${option.field}</option>`;
             }
-            return `<option value="${option.value ?? option.field}">${option.field}</option>`;
+            let Type = getTypeCastFunction(option.type);
+            let optionValue = Type(option.value ?? option.field);
+            let elementValue = String(optionValue);
+            optionValues.set(elementValue, optionValue);
+            return `<option value="${elementValue}">${option.field}</option>`;
           })
           .join('');
         this.inputElement.innerHTML = optionElements;
@@ -260,7 +267,7 @@ class ModelInput extends SocketConsumer {
       this.appendChild(errorMessageContainer);
     }
     this.appendChild(this.inputElement);
-    let destroyInputSync = this.syncInputElementWithModel(this.inputElement, model, modelField, errorMessageContainer, optionList);
+    let destroyInputSync = this.syncInputElementWithModel(this.inputElement, model, modelField, errorMessageContainer, optionList, optionValues);
     this.destroy = () => {
       destroyInputSync();
       this.isLoadedConsumer && this.isLoadedConsumer.kill();
@@ -302,13 +309,13 @@ class ModelInput extends SocketConsumer {
     }
   }
 
-  syncInputElementWithModel(inputElement, model, fieldName, messageContainerElement, optionList) {
+  syncInputElementWithModel(inputElement, model, fieldName, messageContainerElement, optionList, optionValues) {
     if (model.isLoaded) {
       let fieldValue = model.value[fieldName];
       this.verifyValue(fieldValue, optionList, inputElement, messageContainerElement);
       this.updateInputElement(inputElement, fieldValue);
     }
-    let stopSaving = this.saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement);
+    let stopSaving = this.saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement, optionValues);
     let changeConsumer = model.listener('change').createConsumer();
     (async () => {
       for await (let event of changeConsumer) {
@@ -325,7 +332,7 @@ class ModelInput extends SocketConsumer {
     };
   }
 
-  saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement) {
+  saveInputElementOnEdit(inputElement, model, fieldName, messageContainerElement, optionValues) {
     let errorStyleClass = 'error';
     let successStyleClass = 'success';
     let showErrorMessage = (fieldName, errorMessage) => {
@@ -387,8 +394,13 @@ class ModelInput extends SocketConsumer {
             updateConsumerElements.call(this, consumers, '', providerTemplate, this.getAttribute('name'));
             await model.delete(fieldName);
           } else {
-            let targetValue = inputElement.type === 'number' ?
-              Number(inputValue) : inputValue;
+            let targetValue;
+            if (optionValues && optionValues.has(inputValue)) {
+              targetValue = optionValues.get(inputValue);
+            } else {
+              targetValue = inputElement.type === 'number' ?
+                Number(inputValue) : inputValue;
+            }
             updateConsumerElements.call(this, consumers, targetValue, providerTemplate, this.getAttribute('name'));
             await model.update(fieldName, targetValue);
           }
