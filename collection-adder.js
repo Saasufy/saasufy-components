@@ -70,7 +70,16 @@ class CollectionAdder extends SocketConsumer {
       }
     }
 
+    // The trim-spaces attribute can either be empty (in which case spaces are
+    // trimmed from all input values) or it can hold a comma-separated list of
+    // field names to restrict trimming to those specific inputs.
     let trimSpaces = this.hasAttribute('trim-spaces');
+    let trimSpacesFieldNames = trimSpaces ?
+      (this.getAttribute('trim-spaces') || '')
+        .split(',')
+        .map(fieldName => fieldName.trim())
+        .filter(fieldName => fieldName) : [];
+
     let outputValue;
 
     let modelValues = this.getAttribute('model-values');
@@ -116,7 +125,11 @@ class CollectionAdder extends SocketConsumer {
                   value = input.value;
                 }
                 let sanitizedValue = Type(value);
-                if (trimSpaces && typeof sanitizedValue === 'string') {
+                let shouldTrimSpaces = trimSpaces && (
+                  !trimSpacesFieldNames.length ||
+                  trimSpacesFieldNames.includes(input.name)
+                );
+                if (shouldTrimSpaces && typeof sanitizedValue === 'string') {
                   sanitizedValue = sanitizedValue.trim();
                 }
                 return [ input.name, sanitizedValue ];
