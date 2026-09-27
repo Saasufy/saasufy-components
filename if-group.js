@@ -1,15 +1,12 @@
-import { debouncer } from './utils.js';
-
-const DEBOUNCE_DELAY = 0;
-
 class IfGroup extends HTMLElement {
   constructor() {
     super();
     this.isReady = false;
+    this.renderPending = false;
+    this.lastViewportNode = null;
+    this.lastRenderedContent = null;
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.innerHTML = '<slot name="content"></slot><slot name="viewport"></slot>';
-
-    let debounce = debouncer();
 
     this.processTemplates = () => {
       let viewportSlot = this.shadowRoot.querySelector('slot[name="viewport"]');
@@ -32,10 +29,33 @@ class IfGroup extends HTMLElement {
       for (let node of contentNodes) {
         contentList.push(node.innerHTML);
       }
-      viewportNode.innerHTML = contentList.join('');
+      let content = contentList.join('');
+
+      // Rewriting innerHTML with identical markup recreates the nodes, which loses
+      // decoded images, focus and scroll position; greedy-refresh forces that reset.
+      if (
+        !this.hasAttribute('greedy-refresh') &&
+        viewportNode === this.lastViewportNode &&
+        content === this.lastRenderedContent
+      ) return;
+
+      this.lastViewportNode = viewportNode;
+      this.lastRenderedContent = content;
+
+      viewportNode.innerHTML = content;
     };
 
-    this.debouncedProcessTemplates = debounce(this.processTemplates, DEBOUNCE_DELAY);
+    // Coalescing on a microtask keeps the write ahead of the next paint; deferring
+    // with a timeout lets the browser paint the empty viewport first, which flickers.
+    this.debouncedProcessTemplates = () => {
+      if (this.renderPending) return;
+      this.renderPending = true;
+      queueMicrotask(() => {
+        this.renderPending = false;
+        this.processTemplates();
+      });
+    };
+
     this.shadowRoot.addEventListener('slotchange', this.debouncedProcessTemplates);
   }
 
