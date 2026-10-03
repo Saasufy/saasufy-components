@@ -6,7 +6,8 @@ import {
   convertStringToFieldTypeValues,
   getTypeCastFunction,
   formatError,
-  renderTemplate
+  renderTemplate,
+  toSafeHTML
 } from './utils.js';
 import AGModel from '/node_modules/ag-model/ag-model.js';
 
@@ -35,6 +36,7 @@ class ModelInput extends SocketConsumer {
       'placeholder',
       'accept',
       'consumers',
+      'error-consumers',
       'show-error-message',
       'model-type',
       'model-id',
@@ -292,6 +294,40 @@ class ModelInput extends SocketConsumer {
     }
   }
 
+  reportError(messageContainerElement, errorMessage) {
+    if (messageContainerElement) {
+      messageContainerElement.textContent = errorMessage;
+      messageContainerElement.classList.add('error');
+      messageContainerElement.classList.remove('hidden');
+    }
+    this.updateErrorConsumerElements(errorMessage);
+  }
+
+  clearError(messageContainerElement) {
+    if (messageContainerElement) {
+      messageContainerElement.textContent = '';
+      messageContainerElement.classList.remove('error');
+      messageContainerElement.classList.add('hidden');
+    }
+    this.updateErrorConsumerElements('');
+  }
+
+  // A consumer which is not given an attribute to write to has the message injected as HTML,
+  // and an error message can carry whatever the server quoted back, so the message is escaped
+  // first. Markup can still be introduced on purpose through the error-provider-template,
+  // which is applied after the escaping.
+  updateErrorConsumerElements(errorMessage) {
+    let errorConsumers = this.getAttribute('error-consumers');
+    if (!errorConsumers) return;
+    updateConsumerElements.call(
+      this,
+      errorConsumers,
+      toSafeHTML(errorMessage || ''),
+      this.getAttribute('error-provider-template'),
+      this.getAttribute('name')
+    );
+  }
+
   verifyValue(fieldValue, optionList, inputElement, messageContainerElement) {
     if (
       optionList &&
@@ -301,11 +337,7 @@ class ModelInput extends SocketConsumer {
     ) {
       inputElement.classList.add('error');
       inputElement.classList.remove('success');
-      if (messageContainerElement) {
-        messageContainerElement.textContent = 'Invalid selection';
-        messageContainerElement.classList.add('error');
-        messageContainerElement.classList.remove('hidden');
-      }
+      this.reportError(messageContainerElement, 'Invalid selection');
     }
   }
 
@@ -336,17 +368,11 @@ class ModelInput extends SocketConsumer {
     let errorStyleClass = 'error';
     let successStyleClass = 'success';
     let showErrorMessage = (fieldName, errorMessage) => {
-      if (!messageContainerElement) return;
-      messageContainerElement.textContent = errorMessage;
-      messageContainerElement.classList.add(errorStyleClass);
-      messageContainerElement.classList.remove('hidden');
+      this.reportError(messageContainerElement, errorMessage);
     };
 
     let hideErrorMessage = (fieldName) => {
-      if (!messageContainerElement) return;
-      messageContainerElement.textContent = '';
-      messageContainerElement.classList.remove(errorStyleClass);
-      messageContainerElement.classList.add('hidden');
+      this.clearError(messageContainerElement);
     };
 
     let consumers = this.getAttribute('consumers');
