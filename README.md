@@ -232,7 +232,24 @@ Saasufy enforces access controls for HTTP in the same way as it does for its Web
 It's possible to block or restrict access to specific files stored on specific fields via the `Access` page under the relevant model.
 
 If your model field's access is set to `restrict`, only authenticated users with matching permissions will be able to view/download the image/file.
-In this case, you will need to add your user's JWT token to a cookie with the name `socketcluster.saasufyService.authToken` and it will be passed along with the request.
+In this case the request has to carry the user's signed JWT in an `Authorization: Bearer <signedAuthToken>` header; the token is the `signedAuthToken` of your `socket-provider`'s socket.
+
+Headers cannot be attached to an `<img src="...">`, so fetch the file yourself and hand the element an object URL:
+
+```js
+let socket = document.querySelector('socket-provider').saasufySocket;
+
+let response = await fetch('https://sid7999.saasufy.com/files/Image/58f2051c-14bc-4518-8816-ff387cfdd57e/data', {
+  headers: { Authorization: `Bearer ${socket.signedAuthToken}` }
+});
+
+let img = document.querySelector('img');
+img.src = URL.createObjectURL(await response.blob());
+```
+
+Remember to `URL.revokeObjectURL(img.src)` once you are done with it.
+
+Because files are served on a subdomain of their own, that fetch is a cross-origin request and the browser preflights it. Your app's origin therefore has to appear in the **Files allow origin** setting on the Saasufy settings page, which defaults to `*`. Files which are not restricted need none of this - an `<img>` tag is not subject to CORS.
 
 ## Components
 
