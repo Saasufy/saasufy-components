@@ -211,19 +211,21 @@ After adding a record to Saasufy which holds a file in one of its fields, that f
 The format of the URL to link directly to a specific file/image is:
 
 ```
-https://saasufy.com/:serviceId/files/:modelName/:modelId/:fieldName
+https://:serviceId.saasufy.com/files/:modelName/:modelId/:fieldName
 ```
-For example, if the URL for your Saasufy service (which you get after deploying your service) is `wss://saasufy.com/sid7999/socketcluster/`
-and your file is stored inside an `Image` model with ID `58f2051c-14bc-4518-8816-ff387cfdd57e` inside a `data` field, you will be able to link to your image directly using this URL:
+Each service serves its files on a subdomain of its own, named after the service.
+The `:serviceId` is the `sid` part of the URL for your Saasufy service (which you get after deploying your service); if that URL is `wss://saasufy.com/sid7999/socketcluster/`, then your service ID is `sid7999`.
+
+So if your file is stored inside an `Image` model with ID `58f2051c-14bc-4518-8816-ff387cfdd57e` inside a `data` field, you will be able to link to your image directly using this URL:
 
 ```
-https://saasufy.com/sid7999/files/Image/58f2051c-14bc-4518-8816-ff387cfdd57e/data
+https://sid7999.saasufy.com/files/Image/58f2051c-14bc-4518-8816-ff387cfdd57e/data
 ```
 
 You can use it to embed images into your application using the `<img>` tag like this:
 
 ```html
-<img src="https://saasufy.com/sid7999/files/Image/58f2051c-14bc-4518-8816-ff387cfdd57e/data" alt="My image" />
+<img src="https://sid7999.saasufy.com/files/Image/58f2051c-14bc-4518-8816-ff387cfdd57e/data" alt="My image" />
 ```
 
 Saasufy enforces access controls for HTTP in the same way as it does for its WebSocket protocol.
