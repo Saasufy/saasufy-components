@@ -58,7 +58,14 @@ export function toSafeHTML(value) {
     .replace(/'/g, '&#039;')
     .replace(/\{/g, '&#123;')
     .replace(/\}/g, '&#125;')
-    .replace(/\n/g, '<br>');
+    .replace(/\n/g, '<br>')
+    // The escaping above re-creates the brackets which toSafeString flattened,
+    // so the encoded form is flattened again here, once nothing further will
+    // produce it. A value such as &#123;{expression}&#125; would otherwise
+    // leave as two adjacent encoded brackets which the browser decodes back
+    // into a live expression for whichever component next evaluates it.
+    .replace(templateEncodedStartBracesRegExp, '[[')
+    .replace(templateEncodedEndBracesRegExp, ']]');
 }
 
 export function toExpression(value) {
@@ -333,7 +340,13 @@ function replaceExpressions(string, replaceFn) {
     let match = matches[i];
     charList.splice(match.startIndex, match.length, ...charSubs[i]);
   }
-  return charList.join('');
+  // Adjacent brackets can also form where two separately escaped values meet,
+  // which no single-value pass can see, so the joined result is flattened too.
+  // Only the encoded form is touched; expressions written by the page author
+  // stay literal and remain available to nested components to evaluate later.
+  return charList.join('')
+    .replace(templateEncodedStartBracesRegExp, '[[')
+    .replace(templateEncodedEndBracesRegExp, ']]');
 }
 
 export function renderTemplate(templateString, data, socket, autoExecFunction) {
