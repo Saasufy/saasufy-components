@@ -4,7 +4,8 @@ import {
   updateConsumerElements,
   convertStringToFieldParams,
   convertStringToFieldTypeValues,
-  getTypeCastFunction
+  getTypeCastFunction,
+  toSafeHTML
 } from './utils.js';
 
 const DEFAULT_DEBOUNCE_DELAY = 800;
@@ -141,16 +142,20 @@ class InputProvider extends HTMLElement {
       if (options != null) {
         let fieldTypeValues = convertStringToFieldTypeValues(options, true, true);
         optionValues = new Map();
+        // The options attribute can be written by a consumer rather than by hand,
+        // in which case it carries whatever a record held. Escaping is a no-op on
+        // the entities the template layer already produced, so a label keeps
+        // rendering as it did while markup in it stays text.
         let optionElements = fieldTypeValues
           .map((option) => {
             if (option.field === placeholder) {
-              return `<option value="" selected class="select-default-option">${option.field}</option>`;
+              return `<option value="" selected class="select-default-option">${toSafeHTML(option.field)}</option>`;
             }
             let Type = getTypeCastFunction(option.type);
             let optionValue = Type(option.value ?? option.field);
             let elementValue = String(optionValue);
             optionValues.set(elementValue, optionValue);
-            return `<option value="${elementValue}">${option.field}</option>`;
+            return `<option value="${toSafeHTML(elementValue)}">${toSafeHTML(option.field)}</option>`;
           })
           .join('');
         this.inputElement.innerHTML = optionElements;

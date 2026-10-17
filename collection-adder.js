@@ -4,7 +4,8 @@ import {
   convertStringToFieldParams,
   getTypeCastFunction,
   formatError,
-  renderTemplate
+  renderTemplate,
+  toSafeHTML
 } from './utils.js';
 import AGCollection from '/node_modules/ag-collection/ag-collection.js';
 
@@ -281,10 +282,14 @@ class CollectionAdder extends SocketConsumer {
     let autocapitalize = this.getAttribute('autocapitalize');
     let autocorrect = this.getAttribute('autocorrect');
 
+    // Every value interpolated into the form markup below comes from an
+    // attribute, which the browser has already decoded, so each one is escaped
+    // on the way back into markup. Escaping is a no-op on entities the template
+    // layer produced, so labels keep rendering exactly as they did.
     let extraAttributesString = `${
-      autocapitalize ? ` autocapitalize="${autocapitalize}"` : ''
+      autocapitalize ? ` autocapitalize="${toSafeHTML(autocapitalize)}"` : ''
     }${
-      autocorrect ? ` autocorrect="${autocorrect}"` : ''
+      autocorrect ? ` autocorrect="${toSafeHTML(autocorrect)}"` : ''
     }`;
 
     if (this.collection) this.collection.destroy();
@@ -309,59 +314,59 @@ class CollectionAdder extends SocketConsumer {
       let optionLabel = optionLabels[field] == null ? 'Options' : optionLabels[field];
       if (inputType === 'checkbox') {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <label>
               ${
-                inputLabel
+                toSafeHTML(inputLabel)
               }
               <input class="collection-adder-input" type="${
                 inputType
               }" name="${
-                field
+                toSafeHTML(field)
               }" />
             </label>
           </div>`
         );
       } else if (inputType === 'select') {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <label>
               ${
-                inputLabel
+                toSafeHTML(inputLabel)
               }
-              <select name="${field}" class="collection-adder-input collection-adder-select">
-                <option value="" selected disabled hidden>${optionLabel}</option>
-                ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
+              <select name="${toSafeHTML(field)}" class="collection-adder-input collection-adder-select">
+                <option value="" selected disabled hidden>${toSafeHTML(optionLabel)}</option>
+                ${inputTypeParams.map(param => `<option value="${toSafeHTML(param)}">${toSafeHTML(param)}</option>`).join('')}
               </select>
             </label>
           </div>`
         );
       } else if (inputType === 'text-select') {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <div class="collection-adder-select-text-row">
               <input class="collection-adder-input" type="text" name="${
-                field
+                toSafeHTML(field)
               }" placeholder="${
-                inputLabel
+                toSafeHTML(inputLabel)
               }"${extraAttributesString} />
               <select class="collection-adder-select">
-                <option value="" selected disabled hidden>${optionLabel}</option>
-                ${inputTypeParams.map(param => `<option value="${param}">${param}</option>`).join('')}
+                <option value="" selected disabled hidden>${toSafeHTML(optionLabel)}</option>
+                ${inputTypeParams.map(param => `<option value="${toSafeHTML(param)}">${toSafeHTML(param)}</option>`).join('')}
               </select>
             </div>
           </div>`
         );
       } else if (inputType === 'radio') {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <div>
               ${
-                inputLabel
+                toSafeHTML(inputLabel)
               }
               ${
                 inputTypeParams.map(
@@ -370,11 +375,11 @@ class CollectionAdder extends SocketConsumer {
                       <input class="collection-adder-radio" type="${
                         inputType
                       }" name="${
-                        field
-                      }" value=${
-                        param
-                      } />
-                      ${param}
+                        toSafeHTML(field)
+                      }" value="${
+                        toSafeHTML(param)
+                      }" />
+                      ${toSafeHTML(param)}
                     </label>`
                   )
                 ).join('')
@@ -384,49 +389,49 @@ class CollectionAdder extends SocketConsumer {
         );
       } else if (inputType === 'textarea') {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <textarea class="collection-adder-input" name="${
-              field
+              toSafeHTML(field)
             }" placeholder="${
-              inputLabel
+              toSafeHTML(inputLabel)
             }"${extraAttributesString}></textarea>
           </div>`
         );
       } else if (inputType === 'file') {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <input class="collection-adder-input" type="${
               inputType
             }" name="${
-              field
+              toSafeHTML(field)
             }"${extraAttributesString} />
           </div>`
         );
       } else if (inputType === 'number') {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <input class="collection-adder-input" type="${
               inputType
             }" name="${
-              field
+              toSafeHTML(field)
             }" placeholder="${
-              inputLabel
+              toSafeHTML(inputLabel)
             }" step="any"${extraAttributesString} />
           </div>`
         );
       } else {
         items.push(
-          `<div class="collection-adder-field-container" data-field="${field}">
+          `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <input class="collection-adder-input" type="${
               inputType
             }" name="${
-              field
+              toSafeHTML(field)
             }" placeholder="${
-              inputLabel
+              toSafeHTML(inputLabel)
             }"${extraAttributesString} />
           </div>`
         );
@@ -438,7 +443,7 @@ class CollectionAdder extends SocketConsumer {
         <div class="collection-adder-message-container"></div>
         <div class="collection-adder-form-content">
           ${items.join('')}
-          ${hideSubmitButton ? '' : `<input type="submit" value="${submitButtonLabel}" />`}
+          ${hideSubmitButton ? '' : `<input type="submit" value="${toSafeHTML(submitButtonLabel)}" />`}
         </div>
       </form>
     `;

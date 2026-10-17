@@ -1,5 +1,6 @@
 import '/node_modules/capitalisk-auth-client/dist/capitalisk-log-in.js';
 import { SocketConsumer } from './socket.js';
+import { toSafeHTML } from './utils.js';
 
 const DEFAULT_AUTH_TIMEOUT = 10000;
 
@@ -45,11 +46,11 @@ class LogInForm extends SocketConsumer {
 
     this.innerHTML = `
       <capitalisk-log-in
-        hostname="${hostname}"
-        port="${port}"
-        network-symbol="${networkSymbol}"
-        chain-module-name="${chainModuleName}"
-        secure="${secure}"
+        hostname="${toSafeHTML(hostname)}"
+        port="${toSafeHTML(port)}"
+        network-symbol="${toSafeHTML(networkSymbol)}"
+        chain-module-name="${toSafeHTML(chainModuleName)}"
+        secure="${toSafeHTML(secure)}"
         disabled="true"
       ></capitalisk-log-in>
     `;

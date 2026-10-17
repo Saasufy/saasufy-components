@@ -1,4 +1,5 @@
 import './overlay-modal.js';
+import { toSafeHTML } from './utils.js';
 
 class ConfirmModal extends HTMLElement {
   constructor() {
@@ -65,14 +66,19 @@ class ConfirmModal extends HTMLElement {
     let confirmButtonLabel = this.getAttribute('confirm-button-label') || 'Confirm';
     let cancelButtonLabel = this.getAttribute('cancel-button-label') || 'Cancel';
 
+    // These are documented as text and typically come from an attribute which a
+    // template wrote, such as confirm-message="Delete {{Product.name}}?". The
+    // browser decodes entities when the attribute is parsed, so getAttribute
+    // hands back the original characters and they have to be escaped again
+    // before going into markup here.
     this.innerHTML = `
       <overlay-modal${this.isHidden ? ' style="display: none;"' : ''}>
-        <div slot="title">${heading}</div>
+        <div slot="title">${toSafeHTML(heading)}</div>
         <div class="confirm-modal-content" slot="content">
-          <div>${message}</div>
+          <div>${toSafeHTML(message)}</div>
           <div class="confirm-modal-buttons-container">
-            <input class="modal-confirm-button" type="button" value="${confirmButtonLabel}" />
-            <input class="modal-cancel-button" type="button" value="${cancelButtonLabel}" />
+            <input class="modal-confirm-button" type="button" value="${toSafeHTML(confirmButtonLabel)}" />
+            <input class="modal-cancel-button" type="button" value="${toSafeHTML(cancelButtonLabel)}" />
           </div>
         </div>
       </overlay-modal>

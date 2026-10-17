@@ -11,28 +11,54 @@ let backtickRegExp = /`/g;
 let templateMultiStartBracesRegExp = /{{{*/g
 let templateMultiEndBracesRegExp = /}}}*/g
 
+// Expression brackets in their encoded form. Escaping leaves these alone so
+// that it stays idempotent, but the browser turns them back into brackets when
+// it parses them out of an attribute, which would hand a value to any component
+// that re-evaluates that attribute (computable-value, computable-model-values).
+// They are flattened here for the same reason the literal brackets above are.
+let templateEncodedStartBracesRegExp = /(?:&#123;){2,}/g
+let templateEncodedEndBracesRegExp = /(?:&#125;){2,}/g
+
+// Line breaks are the one piece of markup a value is allowed to carry; they are
+// escaped along with everything else and then put back, so that only a genuine
+// break tag survives and a stray angle bracket elsewhere in the value cannot.
+let safeBreakRegExp = /&lt;(br ?\/?)&gt;/g;
+
 export function toSafeString(value) {
   return value.replace(expressionCharsRegExp, '$!{$1}')
     .replace(backtickRegExp, `'`)
     .replace(templateMultiStartBracesRegExp, '[[')
-    .replace(templateMultiEndBracesRegExp, ']]');
+    .replace(templateMultiEndBracesRegExp, ']]')
+    .replace(templateEncodedStartBracesRegExp, '[[')
+    .replace(templateEncodedEndBracesRegExp, ']]');
 }
 
 export function toSafeHTML(value) {
-  if (typeof value === 'string') {
-    return toSafeString(value)
-      .replace(/&(?!(amp|lt|gt|quot|#039|#123|#125);)/g, '&amp;')
-      .replace(/<(?!br ?\/?>)/g, '&lt;')
-      .replace(/(?<!br ?\/?)>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-      .replace(/\{/g, '&#123;')
-      .replace(/\}/g, '&#125;')
-      .replace(/\n/g, '<br>');
-  } else if (value != null && typeof value.toString !== 'function') {
-    return '[invalid]';
+  // null and undefined are passed through so that callers can tell a missing
+  // value apart from an empty one and fall back to their own default.
+  if (value == null) return value;
+  if (typeof value !== 'string') {
+    if (typeof value.toString !== 'function') {
+      return '[invalid]';
+    }
+    // Anything which is not a string still has to be escaped; a field holding a
+    // list or an object would otherwise reach the page as markup once it was
+    // stringified further down the line.
+    value = String(value);
   }
-  return value;
+  return toSafeString(value)
+    // Entities which this function itself produces are left alone so that
+    // escaping an already-escaped value is a no-op. Consumer chains pass values
+    // through several templates and would otherwise encode them once per hop.
+    .replace(/&(?!(amp|lt|gt|quot|#039|#123|#125);)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(safeBreakRegExp, '<$1>')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/\{/g, '&#123;')
+    .replace(/\}/g, '&#125;')
+    .replace(/\n/g, '<br>');
 }
 
 export function toExpression(value) {
@@ -363,6 +389,12 @@ export function updateConsumerElements(consumers, value, template, sourceElement
       })
       .filter(([ selector, attributeName ]) => selector);
 
+    // A template is the supported way to send markup to a consumer: the template
+    // itself is written by the page author and is left intact, while the value
+    // substituted into it is escaped by the {{ }} expression. Without a template
+    // there is no author-written markup to preserve, so the value is escaped
+    // before it can reach the innerHTML of a consumer further down.
+    let isTemplateApplied = !!template;
     if (template) {
       value = renderTemplate.call(this, template, { value }, null, true);
     }
@@ -412,7 +444,7 @@ export function updateConsumerElements(consumers, value, template, sourceElement
               sourceElementName ? `${sourceElementName}:${value}` : value
             );
           } else {
-            element.innerHTML = value;
+            element.innerHTML = isTemplateApplied ? value : toSafeHTML(value);
           }
         }
       }

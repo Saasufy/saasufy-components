@@ -1,5 +1,5 @@
 import { SocketConsumer } from './socket.js';
-import { generateRandomHexString, convertStringToFieldParams } from './utils.js';
+import { generateRandomHexString, convertStringToFieldParams, toSafeHTML } from './utils.js';
 
 const DEFAULT_AUTH_TIMEOUT = 20000;
 
@@ -86,8 +86,10 @@ class OAuthHandler extends SocketConsumer {
         try {
           await socket.invoke('log-in-oauth', { provider, data: { code, ...extraData } });
         } catch (error) {
+          // The message is quoted back by the service and can carry parts of the
+          // query string which brought the browser here.
           this.innerHTML = `
-            <div class="error">OAuth authentication failed. ${error.message}</div>
+            <div class="error">OAuth authentication failed. ${toSafeHTML(error.message)}</div>
           `;
           return;
         }
