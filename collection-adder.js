@@ -321,7 +321,7 @@ class CollectionAdder extends SocketConsumer {
                 toSafeHTML(inputLabel)
               }
               <input class="collection-adder-input" type="${
-                inputType
+                toSafeHTML(inputType)
               }" name="${
                 toSafeHTML(field)
               }" />
@@ -373,7 +373,7 @@ class CollectionAdder extends SocketConsumer {
                   param => (
                     `<label>
                       <input class="collection-adder-radio" type="${
-                        inputType
+                        toSafeHTML(inputType)
                       }" name="${
                         toSafeHTML(field)
                       }" value="${
@@ -403,7 +403,7 @@ class CollectionAdder extends SocketConsumer {
           `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <input class="collection-adder-input" type="${
-              inputType
+              toSafeHTML(inputType)
             }" name="${
               toSafeHTML(field)
             }"${extraAttributesString} />
@@ -414,7 +414,7 @@ class CollectionAdder extends SocketConsumer {
           `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <input class="collection-adder-input" type="${
-              inputType
+              toSafeHTML(inputType)
             }" name="${
               toSafeHTML(field)
             }" placeholder="${
@@ -427,7 +427,7 @@ class CollectionAdder extends SocketConsumer {
           `<div class="collection-adder-field-container" data-field="${toSafeHTML(field)}">
             <div class="collection-adder-field-error-container error"></div>
             <input class="collection-adder-input" type="${
-              inputType
+              toSafeHTML(inputType)
             }" name="${
               toSafeHTML(field)
             }" placeholder="${
