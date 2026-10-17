@@ -11,7 +11,9 @@ class OAuthLink extends HTMLElement {
     };
 
     this.handleClickEvent = () => {
-      this.updateState();
+      // Re-asserts the stored state in case it was evicted; not regenerated,
+      // since the href was built from it at render time.
+      this.storeState();
     };
   }
 
@@ -73,33 +75,34 @@ class OAuthLink extends HTMLElement {
     viewportNode.innerHTML = itemString;
   }
 
+  // A fresh nonce per render; the handler consumes a state on use. Render only,
+  // since the href is rebuilt from the new state.
   updateState() {
     let provider = this.getAttribute('provider');
     if (!provider) {
       throw new Error('The provider attribute of oauth-link was not specified');
     }
-    let useLocalStorage = !this.hasAttribute('use-session-storage');
     let stateSize = Number(this.getAttribute('state-size') || 20);
+    this.provider = provider;
+    this.state = `${provider}-${generateRandomHexString(stateSize)}`;
+    this.storeState();
+  }
+
+  // Re-read immediately before writing so another provider's state, from
+  // another link or tab, is not dropped.
+  storeState() {
+    if (!this.state) return;
+    let useLocalStorage = !this.hasAttribute('use-session-storage');
     let storageKey = this.getAttribute('state-storage-key') || 'oauth.state';
-    
     let storage = useLocalStorage ? localStorage : sessionStorage;
     let existingState = storage.getItem(storageKey);
-    let stateList;
-    if (existingState) {
-      stateList = existingState.split(',').filter(Boolean);
-      let maxStateCount = Number(this.getAttribute('max-state-count') ?? 20);
-      if (stateList.length >= maxStateCount) {
-        stateList.pop();
-      }
-    } else {
-      stateList = []
-    }
-    if (this.provider !== provider) {
-      this.state = `${provider}-${generateRandomHexString(stateSize)}`;
-      this.provider = provider;
+    let stateList = existingState ? existingState.split(',').filter(Boolean) : [];
+    if (stateList.includes(this.state)) return;
+    let maxStateCount = Number(this.getAttribute('max-state-count') ?? 20);
+    if (stateList.length >= maxStateCount) {
+      stateList.pop();
     }
     stateList.unshift(this.state);
-
     storage.setItem(storageKey, stateList.join(','));
   }
 

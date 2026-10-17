@@ -20,6 +20,16 @@ class LogOut extends SocketConsumer {
       );
     }
 
+    // A javascript: or data: URL would execute when assigned to location.href.
+    if (
+      providerLogOutURL.protocol !== 'https:' &&
+      providerLogOutURL.protocol !== 'http:'
+    ) {
+      throw new Error(
+        'The logout-url attribute of log-out must be an http or https URL'
+      );
+    }
+
     let clientId = this.getAttribute('client-id');
     let postLogoutRedirectURI = this.getAttribute('post-logout-redirect-uri');
     let searchParams = providerLogOutURL.searchParams;

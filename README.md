@@ -990,7 +990,7 @@ Logging out of Keycloak as well as of the app:
 
 **Attributes**
 
-- `logout-url`: The log out endpoint of the OAuth provider; for OpenID Connect providers this is the `end_session_endpoint`. If it is not specified, the component only deauthenticates the socket. The redirect is skipped if the user did not log in via an OAuth provider.
+- `logout-url`: The log out endpoint of the OAuth provider; for OpenID Connect providers this is the `end_session_endpoint`. If it is not specified, the component only deauthenticates the socket. The redirect is skipped if the user did not log in via an OAuth provider. It must be an `http` or `https` URL; relative paths are supported and are resolved against your app's origin.
 - `provider`: The name of the OAuth provider, as specified on the `Authentication` page of your Saasufy control panel. If it is set, the redirect only happens when the user logged in via that specific provider; this is useful when your app offers several different ways to log in.
 - `client-id`: The client ID to pass to the provider as the `client_id` query parameter. OpenID Connect providers require either this or an ID token in order to log the user out without asking them to confirm.
 - `post-logout-redirect-uri`: The URL to send the user back to once the provider has logged them out, passed as the `post_logout_redirect_uri` query parameter. It usually needs to be registered with the provider in advance. If it is not specified, the user is left on the provider's own logged out page.
@@ -1051,7 +1051,7 @@ When using an OAuth provider, the callback URL which you register with the provi
 
 - `provider` (required): The name of the provider. It must match the provider name specified on the `Authentication` page of your Saasufy control panel and also the value provided to the `oauth-link` component at the start of the OAuth flow.
 - `success-location-hash`: If authentication is successful, the browser's `location.hash` will be set to this value. It can be used to redirect the user to their dashboard, for example.
-- `success-url`: If authentication is successful, the browser's `location.href` will be set to this value. It can be used to redirect the user to their dashboard, for example.
+- `success-url`: If authentication is successful, the browser's `location.href` will be set to this value. It can be used to redirect the user to their dashboard, for example. It must be an `http` or `https` URL; relative paths are supported and are resolved against the current page.
 - `redirect-uri`: A URI to redirect the user to once OAuth is successful. This attribute may be required depending on the OAuth provider/client.
 - `extra-data`: This attribute can be used to pass additional data to the OAuth `getAccessTokenURL` endpoint. For Google OAuth, for example, an additional `redirect_uri` field is required, so it should be set using `extra-data="redirect_uri=http://localhost.com:8000/"` (substitute the URI with your own).
 - `navigate-event-path`: If authentication is successful and a path is set via this attribute, the component will emit a `navigate` event which will bubble up the component hierarchy and can be used by a parent component to perform the success redirection. This approach can be used as an alternative to `success-location-hash` or `success-url` for doing the final redirect.

@@ -12,7 +12,25 @@ class OAuthHandler extends SocketConsumer {
     if (successLocationHash) {
       location.hash = successLocationHash;
     } else if (successURL) {
-      location.href = successURL;
+      let resolvedURL;
+      // Resolved against the document URL so relative paths behave as they did
+      // with the plain assignment; only an absolute URL brings its own scheme.
+      try {
+        resolvedURL = new URL(successURL, location.href);
+      } catch (error) {
+        throw new Error(
+          'The success-url attribute of oauth-handler was not a valid URL'
+        );
+      }
+      if (
+        resolvedURL.protocol !== 'https:' &&
+        resolvedURL.protocol !== 'http:'
+      ) {
+        throw new Error(
+          'The success-url attribute of oauth-handler must be an http or https URL'
+        );
+      }
+      location.href = resolvedURL.href;
     } else {
       this.dispatchEvent(
         new CustomEvent('navigate', {
@@ -42,7 +60,8 @@ class OAuthHandler extends SocketConsumer {
 
     let useLocalStorage = !this.hasAttribute('use-session-storage');
     let storageKey = this.getAttribute('state-storage-key') || 'oauth.state';
-    let expectedOAuthState = (useLocalStorage ? localStorage : sessionStorage).getItem(storageKey);
+    let storage = useLocalStorage ? localStorage : sessionStorage;
+    let expectedOAuthState = storage.getItem(storageKey);
     if (!expectedOAuthState) {
       this.innerHTML = `
         <div class="error">OAuth authentication failed because the state was missing.</div>
@@ -83,6 +102,18 @@ class OAuthHandler extends SocketConsumer {
       history.replaceState({}, document.title, location.pathname);
       
       if (relevantStates.some(expectedState => expectedState === state)) {
+        // Single-use, so consumed before the exchange. Re-read rather than
+        // written back from the list captured above, which would drop a state
+        // another handler or tab added since.
+        let remainingStates = (storage.getItem(storageKey) || '')
+          .split(',')
+          .filter(existingState => existingState && existingState !== state);
+        if (remainingStates.length) {
+          storage.setItem(storageKey, remainingStates.join(','));
+        } else {
+          storage.removeItem(storageKey);
+        }
+
         try {
           await socket.invoke('log-in-oauth', { provider, data: { code, ...extraData } });
         } catch (error) {
